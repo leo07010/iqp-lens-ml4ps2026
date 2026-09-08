@@ -1,0 +1,73 @@
+{
+ "holdout_random_vs_trained": {
+  "trained Phi + trained theta0": {
+   "corr_mean": 0.9113121952680444,
+   "corr_min": 0.8129439621610846,
+   "kl": 0.08477765432582926
+  },
+  "random Phi(seed 99) + trained theta0": {
+   "corr_mean": 0.6716821419938315,
+   "corr_min": 0.30228343650612294,
+   "kl": 0.3464634609551074
+  },
+  "random Phi(seed 123) + trained theta0": {
+   "corr_mean": 0.6721301741684698,
+   "corr_min": 0.314697798687634,
+   "kl": 0.3448805822374358
+  },
+  "random Phi(seed 99) + M=0 theta0": {
+   "corr_mean": 0.7460137598991124,
+   "corr_min": 0.38148019434463104,
+   "kl": 0.2258714508812683
+  },
+  "no latent (theta0 only)": {
+   "corr_mean": 0.6705335843406272,
+   "corr_min": 0.3063060872778703,
+   "kl": 0.3508379928581666
+  }
+ },
+ "train_random_vs_trained": {
+  "trained Phi + trained theta0": {
+   "corr_mean": 0.9463775026656794,
+   "corr_min": 0.8281309641740064
+  },
+  "random Phi(seed 99) + trained theta0": {
+   "corr_mean": 0.708825441201091,
+   "corr_min": 0.3566371325427166
+  },
+  "random Phi(seed 123) + trained theta0": {
+   "corr_mean": 0.7095709962174848,
+   "corr_min": 0.3501334986440374
+  },
+  "random Phi(seed 99) + M=0 theta0": {
+   "corr_mean": 0.7879335777049199,
+   "corr_min": 0.5039314189120472
+  },
+  "no latent (theta0 only)": {
+   "corr_mean": 0.7081399868067768,
+   "corr_min": 0.35065811048616
+  }
+ },
+ "M4_samples": {
+  "train_ring_min": 0.5290724160818786,
+  "train_ring_mean": 0.7855468872503876,
+  "frac_ring_ge_train_min": 0.58,
+  "frac_ring_ge_0.7": 0.34,
+  "radius_ringlike": [
+   10.12118368580714,
+   0.39546462310608804
+  ],
+  "radius_all": [
+   10.826233839257483,
+   0.9610629229777031
+  ],
+  "e1_ringlike": [
+   -0.03538444271738045,
+   0.029674890838144334
+  ],
+  "e2_ringlike": [
+   0.10508311649845167,
+   0.0757122867079669
+  ]
+ }
+}

@@ -1,0 +1,7 @@
+# Tested with Python 3.9.21 (also runs under 3.11+). Versions below are what the
+# experiments in this repository were actually run against; nearby minor versions
+# should work but are untested.
+numpy==1.26.4
+torch==2.8.0
+matplotlib==3.9.4
+scipy==1.13.1

@@ -1,0 +1,4 @@
+fig3 v2 complete 2026-09-08 07:07:27
+jsonl=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/outputs_controlled/results_fig3_v2.jsonl
+targets=140 exact_QCLI=0.0000..0.4079 sample_QCLI=0.0000..0.0644 null=0.0696
+wall_seconds=897.1

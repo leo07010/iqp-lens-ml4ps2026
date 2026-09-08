@@ -1,0 +1,61 @@
+{
+  "S": 112.33581521972023,
+  "arm": "CTRL-copy",
+  "conditional": false,
+  "control": "copy",
+  "gen_offsets": [
+    [
+      16,
+      16
+    ],
+    [
+      14,
+      20
+    ],
+    [
+      17,
+      19
+    ],
+    [
+      19,
+      16
+    ],
+    [
+      19,
+      19
+    ],
+    [
+      13,
+      21
+    ],
+    [
+      18,
+      18
+    ],
+    [
+      13,
+      13
+    ],
+    [
+      12,
+      12
+    ],
+    [
+      20,
+      11
+    ],
+    [
+      16,
+      19
+    ]
+  ],
+  "n_gen": 11,
+  "n_holdout": 200,
+  "n_train": 11,
+  "note": "raw training images, NOT re-pasted -- the only arm that keeps the light outside the 32x32 window",
+  "param_count": 0,
+  "round": 3,
+  "script": "controls_r3.py",
+  "seed": 0,
+  "wallclock_seconds": 0.3109135627746582
+}
