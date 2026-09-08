@@ -16,26 +16,34 @@ sys.path.insert(0, HERE)
 
 import fig_pipeline                # noqa: E402
 import fig_pipeline_v2             # noqa: E402
+import fig_pipeline_v2_c           # noqa: E402
 import fig1_map_samples            # noqa: E402
 import fig1_compact                # noqa: E402
 import fig2_mechanism_scaling      # noqa: E402
 import fig2_compact                # noqa: E402
 import figA_scaling                # noqa: E402
 import figA_fig4                   # noqa: E402
+import figA_fig4_c               # noqa: E402
 import figA_fig3                   # noqa: E402
+import figA_fig3_c               # noqa: E402
 import figB_classes                # noqa: E402
+import figB_classes_c            # noqa: E402
 
 BUILDERS = [
     ("fig_pipeline",            fig_pipeline.make),
     ("fig_pipeline_v2",         fig_pipeline_v2.make),
+    ("fig_pipeline_v2_c",       fig_pipeline_v2_c.make),
     ("fig1_map_samples",        fig1_map_samples.make),
     ("fig1_compact",            fig1_compact.make),
     ("fig2_mechanism_scaling",  fig2_mechanism_scaling.make),
     ("fig2_compact",            fig2_compact.make),
     ("figA_scaling",            figA_scaling.make),
     ("figA_fig3",               figA_fig3.make),
+    ("figA_fig3_c",           figA_fig3_c.make),
     ("figA_fig4",               figA_fig4.make),
+    ("figA_fig4_c",           figA_fig4_c.make),
     ("figB_classes",            figB_classes.make),
+    ("figB_classes_c",        figB_classes_c.make),
 ]
 
 

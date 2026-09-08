@@ -35,7 +35,9 @@ Final PDF media boxes: `fig_pipeline` 5.50 × 1.82 in, `fig_pipeline_v2` 5.46 ×
 (`data_lens_r3.load_r3(100).S`), so a shared 0–1 scale is the honest one, but a handful of
 IQP peak pixels exceed 1 and are clipped by `vmax = 1`:
 Fig. 1(b) IQP paper-protocol 3 / 12 288 px (max 1.146), IQP learned-Φ 13 / 12 288 px (max 1.491);
-Fig. 2(b) M=2 (paper kernel) 28 / 12 288 px (max 1.826), M=4 13 px (max 1.491), M=8 1 px (max 1.013).
+Fig. 2(b) as shipped in `fig2_compact` M=4 (flat MMD) 13 / 12 288 px (max 1.491), M=4 (paper kernel)
+15 px (max 1.602), M=8 (collapsed) 1 px (max 1.013). (The M=2 paper-kernel row, 28 px, max 1.826, is
+no longer shipped.)
 Held-out, RBM and DCGAN rows have no clipped pixels.
 
 ---
@@ -123,7 +125,12 @@ scaled down to fit the four-page main text.
 |---|---|---|---|
 | Fig. 1 | `fig1_compact.pdf` | 5.44 x 2.28 in | `width=1.0\textwidth` (5.50 in), i.e. a 1.1 % upscale |
 | Fig. 2 | `fig2_compact.pdf` | 5.34 x 1.97 in | `width=1.0\textwidth` (5.50 in), i.e. a 3.0 % upscale |
-| Fig. 5 (App. E) | `figA_scaling.pdf` | 2.70 x 2.10 in | `width=0.48\textwidth` (2.64 in), inside a `wrapfigure` |
+| Fig. 5 (App. E) | `figA_scaling.pdf` | 2.58 x 2.06 in | `width=0.48\textwidth` (2.64 in), inside a `wrapfigure` |
+
+**Appendix figures 2026-09-08.** The appendix now ships the native-size variants
+`fig_pipeline_v2_c` (width 0.92), `figA_fig3_c` and `figA_fig4_c` (0.38 minipages) and
+`figB_classes_c` (width 0.70), so that appendix text also stays at 7 pt. The non-`_c` files remain
+for reference and are no longer included by `main.tex`.
 
 `fig2_compact` carries only panels (a) and (b); the old panel (c) became the standalone
 `figA_scaling` in App. E. Its panel (b) rows are held-out, M = 4 (flat MMD), M = 4 (paper kernel) and
@@ -353,7 +360,10 @@ account <YOUR_ACCOUNT>, `/usr/bin/python3`.  Scripts: `data_lens_class.py`,
 
 Written because the full-height Fig. 1 / Fig. 2 had to be scaled to 0.58 / 0.66 of
 `\linewidth` in the body, which drops their 7 pt text to 4.5–5 pt.  These three are laid out
-to be included at `width=\linewidth` with **no scaling**, so 7 pt stays 7 pt.  They add no
+to be included at `width=\linewidth` at close to their natural size, so 7 pt stays essentially 7 pt.
+The residual upscale is **+1.1 % for `fig1_compact`** (5.44 in drawn into 5.50 in) and **+3.0 % for
+`fig2_compact`** (5.34 in into 5.50 in), measured on the delivered `main.pdf` as 108.0-504.0 pt on
+both pages.  They add no
 new numbers: each imports its loaders from the full-size script, so the pair cannot drift.
 
 | file | size | replaces | what changed |
@@ -390,3 +400,41 @@ new numbers: each imports its loaders from the full-size script, so the pair can
   `SCALING_ARMS`, i.e. the same three arms and the same `HOLDOUT split-half` floor from
   `results_scaling.jsonl` (values tabulated in the Fig. 2(c) section above).  x ticks are the
   six actual training-set sizes read off the jsonl.
+
+---
+
+## Native-size appendix variants — `*_c`
+
+Written because the appendix figures were being scaled to 0.92 / 0.38 / 0.70 of
+`\textwidth`, which drops their 7 pt text to 4–5.5 pt.  These four are laid out for exactly
+that target width, so they are included at `width=<target>` with **at most a few percent of
+upscaling** — 7 pt never shrinks.  They introduce **no new data**: each imports its loader
+from the full-size script, so the pair cannot drift.  Originals are untouched.
+
+| file | target width | actual PDF | source of every number |
+|---|---|---|---|
+| `fig_pipeline_v2_c.pdf` | 5.06 in (0.92 `\textwidth`) | 4.91 × 3.29 in | `fig_pipeline_v2.load()` — identical panels (a)–(g), see the `fig_pipeline_v2` section above |
+| `figA_fig3_c.pdf` | 2.09 in (0.38 `\textwidth`) | 2.06 × 1.85 in | `figA_fig3.load()` + `figA_fig3.envelope()` — same `results_fig3_v2.jsonl`, same 8-bin envelopes |
+| `figA_fig4_c.pdf` | 2.09 in (0.38 `\textwidth`) | 1.99 × 1.80 in | `figA_fig4.load()` + `figA_fig4.binned()` — same `results_fig4.jsonl`, same 18-bin medians and 10–90 bands |
+| `figB_classes_c.pdf` | 3.85 in (0.70 `\textwidth`) | 3.40 × 1.57 in | `figB_classes.load_rows()` — same three classes, same "first two held-out, first three generated" selection rule |
+
+What had to change to fit 7 pt at these widths (content, never font size):
+
+* **`fig_pipeline_v2_c`** — thumbnails 0.66 → 0.58 in, circuit 4.92 → 3.74 in, the (a) caption
+  shortened to "held-out", the phase-block subtitle to "1024 generators, all subsets $s$",
+  and the three metric minis lose their axis decoration: the Conv2D-MMD² panel now carries
+  rotated in-panel bar labels (IQP / RBM / GAN) instead of a y axis, and the projection title
+  is "projection 0.968" rather than "held-out proj. mean 0.968".  Same values throughout
+  (PDF–JS 0.0024; MMD² 0.0861 / 0.0752 / 0.0371; projection mean 0.968).
+* **`figA_fig3_c`** — the three-line note becomes two lines,
+  "$n = 16$, ≤4-local targets; ≤2-local learners".  It does not fit on one line at 7 pt in
+  2.09 in (that string is ~2.3 in wide), so it is wrapped rather than shrunk.
+  x ticks thinned to 0, 0.2, 0.4.
+* **`figA_fig4_c`** — "paper's plotted range" → "paper's range"; the calibration note →
+  "uniform calib. (★)"; ticks thinned to 0, 0.5, 1.0; the per-*n* labels moved inward.
+* **`figB_classes_c`** — cells 0.40 in, the right-hand group header shortened from
+  "generated, trained on this class only" to "generated (this class)", and the colour-bar
+  label from "pixel intensity (a.u.)" to "intensity (a.u.)".
+
+Smallest font in all four scripts is exactly 7.0 pt (verified by grepping every `fontsize=`
+and `labelsize=`); the modest upscaling at include time only makes text larger.

@@ -63,6 +63,25 @@ traceable, and `outputs_lens_r3b/*/meta.json` records `device = cuda` with 9.3�
 The paragraph adds no measurement of our own. It restates the reference paper's setup from the
 summary document and contrasts it with choices already documented elsewhere in this file.
 
+## Restructure 2026-09-08 (numbers moved from prose into main-text tables)
+
+The results sections were rewritten to carry their numbers in tables rather than in sentences. Three
+tables now sit in the main text and nothing below changed value, only location.
+
+| Main-text table | contents | source rows in this file |
+|---|---|---|
+| Table 1 (`tab:map`, Sec. 3.1) | six map rows, lens 18-bit and its permutation null, turbulence D2 at K = 4,096 and its permutation null, lens 10-bit crop pmf and its permutation null | the Section 3.1 block below; MNIST-784 (0.0135 / 0.5684) and BinaryBlobs (0.0316 / 0.5420) were **dropped from the paper on 2026-09-08** for space, and Sec. 3.1 now compares lens only against the reference paper's own turbulence data |
+| Table 2 (`tab:main`, Sec. 3.4) | unchanged | the Table 1 block below |
+| Table 3 (`tab:classes`, Sec. 3.4) | per-class run at **N = 100 only**, four rows | the Appendix F block below. The N = 11 block was moved out of the table into one sentence of App. F, which quotes the three projection correlations 0.9232 / 0.9238 / 0.8998 against the pooled 0.9092 |
+
+Values **removed from the running text** in the same pass, all still sourced below and unchanged in
+value. Sec. 3.1 no longer prints 0.4715 / 0.8677 / 0.4154 / 0.8782 / 0.473 / 0.178 / 0.431 / 0.963
+inline (they are the table). Sec. 3.3 no longer prints the N = 20 sweep points 0.911 / 0.672 / 0.095
+or the coherence radius 0.03-0.05 (they are Fig. 2(a) and its caption). Sec. 3.4 no longer prints
+0.00095 / 0.00092 / 0.0279 / 0.0275 / 0.0741 / 0.1134 / 0.0371 / 0.0861 inline (they are Table 2);
+the parameter ratios 2x and 36-39x stay in the text. Sec. 3.2 no longer prints the KL single-crop fit
+0.9999 or the paper-kernel 0.9962.
+
 ## Section 3.1 (correlation–complexity map) — all from facts.md §2 / MAP
 
 | Value | Source |
