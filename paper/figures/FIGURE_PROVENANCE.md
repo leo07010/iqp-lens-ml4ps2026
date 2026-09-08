@@ -1,7 +1,7 @@
 # Figure provenance — ML4PS 2026 submission
 
 Every number and every pixel in `fig_pipeline`, `fig_pipeline_v2`, `fig1_map_samples`,
-`fig2_mechanism_scaling`, `figA_fig3` and `figA_fig4` is traced to a file below.  Rebuild everything with
+`fig2_mechanism_scaling`, `figA_fig3`, `figA_fig4` and `figB_classes` is traced to a file below.  Rebuild everything with
 
 ```
 cd paper/ml4ps2026/figures && python3 make_figures.py          # ~15 s, CPU only
@@ -10,7 +10,7 @@ python3 make_figures.py fig1_map_samples                       # or one stem at 
 
 Scripts: `fig_style.py` (shared style), `fig_pipeline.py`, `fig_pipeline_v2.py`,
 `fig1_map_samples.py`, `fig2_mechanism_scaling.py`, `figA_fig3.py`, `figA_fig4.py`,
-driver `make_figures.py`.
+`figB_classes.py`, driver `make_figures.py`.
 Each writes `<stem>.pdf` (vector, TrueType fonts) and `<stem>.png` (300 dpi).
 
 Experiment root (`EXP` below):
@@ -29,13 +29,13 @@ Experiment root (`EXP` below):
 
 Final PDF media boxes: `fig_pipeline` 5.50 × 1.82 in, `fig_pipeline_v2` 5.46 × 3.58 in,
 `fig1_map_samples` 5.51 × 3.23 in, `fig2_mechanism_scaling` 5.45 × 3.15 in,
-`figA_fig3` 2.63 × 2.19 in, `figA_fig4` 2.68 × 2.16 in.
+`figA_fig3` 2.63 × 2.19 in, `figA_fig4` 2.68 × 2.16 in, `figB_classes` 5.21 × 2.10 in.
 
 **Intensity clipping.** All samples are rescaled to the same total flux `S = 124.92`
 (`data_lens_r3.load_r3(100).S`), so a shared 0–1 scale is the honest one, but a handful of
 IQP peak pixels exceed 1 and are clipped by `vmax = 1`:
 Fig. 1(b) IQP paper-protocol 3 / 12 288 px (max 1.146), IQP learned-Φ 13 / 12 288 px (max 1.491);
-Fig. 2(b) M=2 2 px (max 1.337), M=4 13 px (max 1.491), M=8 1 px (max 1.013).
+Fig. 2(b) M=2 (paper kernel) 28 / 12 288 px (max 1.826), M=4 13 px (max 1.491), M=8 1 px (max 1.013).
 Held-out, RBM and DCGAN rows have no clipped pixels.
 
 ---
@@ -113,7 +113,33 @@ Arm ↔ directory mapping verified against `EXP/results_r3.jsonl` and `EXP/resul
 
 ---
 
-## `fig2_mechanism_scaling.pdf` (5.44 × 3.18 in)
+## Layout change 2026-09-08 (compact figures shipped in the paper)
+
+`main.tex` no longer includes `fig1_map_samples` or `fig2_mechanism_scaling`. It ships three compact
+figures instead, so that every figure is placed at its natural size with 7 pt fonts rather than being
+scaled down to fit the four-page main text.
+
+| in the paper | file | media box | included at |
+|---|---|---|---|
+| Fig. 1 | `fig1_compact.pdf` | 5.44 x 2.28 in | `width=1.0\textwidth` (5.50 in), i.e. a 1.1 % upscale |
+| Fig. 2 | `fig2_compact.pdf` | 5.34 x 1.97 in | `width=1.0\textwidth` (5.50 in), i.e. a 3.0 % upscale |
+| Fig. 5 (App. E) | `figA_scaling.pdf` | 2.70 x 2.10 in | `width=0.48\textwidth` (2.64 in), inside a `wrapfigure` |
+
+`fig2_compact` carries only panels (a) and (b); the old panel (c) became the standalone
+`figA_scaling` in App. E. Its panel (b) rows are held-out, M = 4 (flat MMD), M = 4 (paper kernel) and
+the collapsed M = 8 arm, so the M = 2 row discussed in the section below is no longer shipped.
+
+**`figA_scaling` label fix (2026-09-08).** Its dashed series was labelled `centroid-aligned`, which
+contradicts the paper, where `conv_mmd2_aligned` is the **flux-aligned** variant (Sec. 2 defines the
+shared flux scalar S; `centroid-aligned` in the paper refers to the integer-shift image alignment,
+a different operation). The label in `figA_scaling.py` was corrected to `flux-aligned` and the figure
+regenerated (backup `figA_scaling.py.backup-20260908`). Any regeneration of that figure must keep
+`flux-aligned`.
+
+The two sections below describe the superseded full-size figures and are kept because the compact
+scripts reuse their data loaders.
+
+## `fig2_mechanism_scaling.pdf` (5.45 × 3.15 in)
 
 ### Panel (a) — held-out projection correlation vs M
 Controlled mechanism test, **N = 20 training images**, joint training of
@@ -146,14 +172,17 @@ within 1e-4 — with no latent, the model *is* one shared distribution.  `diag2.
 "no latent (θ⁰ only)" control, which reuses the trained-Φ run's θ⁰, gives 0.6705.
 
 ### Panel (b) — samples (round 3b, N = 100 — a *different* run from panel (a))
-`generated_000/001/002.npy` from `EXP/outputs_lens_r3b/<tag>/`:
+Rows match Table 1.  `generated_000/001/002.npy` from `EXP/outputs_lens_r3b/<tag>/`:
 
-| row | tag | arm | projection corr (`results_r3b.jsonl`) |
-|---|---|---|---|
-| held-out (real) | — | — | — |
-| IQP, M = 2 (KL) | `iqp_m2_kl_resample_n100` | `IQP-affine-M2-KL-resample` | 0.914 |
-| IQP, M = 4 (MMD-flat) | `iqp_m4_mmdflat_resample_n100` | `IQP-affine-M4-MMDflat-resample` | 0.968 |
-| IQP, M = 8 (KL + z-pen.) | `iqp_m8_kl_zpen_resample_n100` | `IQP-affine-M8-KL-zpen-resample` | 0.636 |
+| row | tag | arm | objective | projection corr (`results_r3b.jsonl`) |
+|---|---|---|---|---|
+| held-out (real) | — | — | — | — |
+| IQP, M = 4 (flat MMD) | `iqp_m4_mmdflat_resample_n100` | `IQP-affine-M4-MMDflat-resample` | `mmdflat` | 0.968 |
+| IQP, M = 4 (paper kernel) | `iqp_m4_auto3_resample_n100` | `IQP-affine-M4-auto3-resample` | `auto3` | 0.794 |
+| IQP, M = 8 (collapsed) | `iqp_m8_kl_zpen_resample_n100` | `IQP-affine-M8-KL-zpen-resample` | `kl` | 0.636 |
+
+The two M = 4 rows are the same model size and the same resample prior, differing only in the
+training kernel, so the row pair isolates the objective; M = 8 is the collapsed regime.
 
 Round-3b reference values for that column: mean crop 0.779, nearest training image 0.970
 (`docs/IQP_LENS_ROUND3_RESULTS.md:93`).  Panels (a) and (b) come from two different
@@ -257,3 +286,107 @@ Fixed choices, all deterministic:
 **No pixel in this figure is clipped**: the maxima of the five thumbnails are 1.000 (held-out
 frame), 1.000 (crop), 0.614 (`q×S`), 0.614 (generated) and 0.875 (reference-protocol sample),
 all ≤ `vmax = 1`.
+
+---
+
+## `figB_classes.pdf` — appendix: per-class generation (5.21 × 2.10 in)
+
+**What it shows.** The paper's best arm trained *separately* on each of the three dark-matter
+substructure classes.  Three rows (`axion`, `cdm`, `no sub`); each row is two held-out images
+of that class followed by three images generated by a run trained on 100 images of that class
+alone.  Every panel uses the same `magma`, linear, `vmin = 0`, `vmax = 1` scale as the other
+image panels, with one shared colorbar.
+
+**Why it exists.** Every result in the main paper pools the three classes.  This figure and
+the table in `facts.md` § "Addendum: per-class generation" answer the narrower question — does
+the same arm train and generate for each class on its own?
+
+**Arm.** Unchanged from the main result: IQP-affine, `M = 4`, MMD-flat objective, resample
+prior, seed 0, `lr 0.02`, 4 000 joint steps, 1 000 θ₀ seed steps, 8 × 1 000-step projection
+restarts at `infer-lr 0.005`, `N = 100`, 200 generated frames, 200 held-out.  Byte-for-byte the
+`IQP-affine-M4-MMDflat-resample` command line of `submit_lens_r3b.sbatch:160-162`; the *only*
+change is which images it sees.
+
+| row | held-out source (2 images) | generated source (3 images) |
+|---|---|---|
+| axion  | `data_lens_class.install("axion")` → `data_lens_r3.load_r3(100, n_holdout=200).holdout_images[0:2]` | `EXP/outputs_lens_class/axion_m4_mmdflat_resample_n100/generated_000/001/002.npy` |
+| cdm    | `data_lens_class.install("cdm")` → same call | `EXP/outputs_lens_class/cdm_m4_mmdflat_resample_n100/generated_000/001/002.npy` |
+| no sub | `data_lens_class.install("no_sub")` → same call | `EXP/outputs_lens_class/no_sub_m4_mmdflat_resample_n100/generated_000/001/002.npy` |
+
+Arm ↔ directory mapping verified against `EXP/results_class.jsonl` (`run_dir` / `arm` fields);
+the arm names are class-tagged (`IQP-affine-M4-MMDflat-resample-<class>`) so the three runs
+cannot collide in the results table.
+
+**Selection rule (fixed in advance, no cherry-picking).** The *first two* held-out images and
+the *first three* generated frames of each run, in index order — held-out `i = 0, 1` and
+`generated_000/001/002.npy`.  Nothing is reordered, screened for ring completeness, or swapped
+between rows.  The rule is stated in `figB_classes.py`'s docstring and is the same rule
+`fig1_map_samples.py` uses for its sample rows.
+
+**Per-class split (this is the one thing that differs from the pooled runs).**
+`data_lens_class.py` builds a cache per class and `install(<class>)` swaps three functions
+(`_arrays`, `build_cache`, `get_cache_meta`) inside the imported `data_lens_r3` module, so
+`load_r3` transparently returns that class's images.  No existing script is edited on disk.
+
+| | pooled (main paper) | per class (this figure) |
+|---|---|---|
+| training set | `default_rng([0,3,0]).permutation(80194)[:100]` | `default_rng([0,3,0,c]).permutation(indices with label c)[:100]` |
+| latent pool | same permutation, `[100:2100]` | same per-class permutation, `[100:2100]` |
+| held-out | `default_rng([0,3,1]).permutation(8910)[:200]` | `default_rng([0,3,1,c]).permutation(val indices with label c)[:200]` |
+| flux scale `S` | 124.92 | axion 127.19 (per class; each arm uses its own class's `S`) |
+
+The per-class training sets are **not** subsets of the pooled one: the pooled `N = 100`
+contains only ≈ 33 images of each class, so a per-class `N = 100` cannot be carved out of it.
+The class index is appended to the seed so the three classes get independent permutations.
+Purity and disjointness are asserted at run time (`test_class.py`) and re-asserted on the real
+dataset in the job log (`logs_lens/sbatch-class-358382.out`): all three classes report
+`pure(train,val)=(True,True) disjoint=True`.
+
+**Provenance of the pixels.** SLURM job **358382**, partition `dev`, node `25a-hgpn024`,
+account <YOUR_ACCOUNT>, `/usr/bin/python3`.  Scripts: `data_lens_class.py`,
+`train_iqp_affine_class.py`, `evaluate_class.py`, `test_class.py`, `submit_lens_class.sbatch`
+(all in `EXP/`).  Metrics in `EXP/results_class.jsonl`.
+
+---
+
+## Body-column variants — `fig1_compact`, `fig2_compact`, `figA_scaling`
+
+Written because the full-height Fig. 1 / Fig. 2 had to be scaled to 0.58 / 0.66 of
+`\linewidth` in the body, which drops their 7 pt text to 4.5–5 pt.  These three are laid out
+to be included at `width=\linewidth` with **no scaling**, so 7 pt stays 7 pt.  They add no
+new numbers: each imports its loaders from the full-size script, so the pair cannot drift.
+
+| file | size | replaces | what changed |
+|---|---|---|---|
+| `fig1_compact.pdf` | 5.44 × 2.28 in | `fig1_map_samples.pdf` | same panel (a) map at a full 2.26 in wide; the dataset legend moves to a thin 0.95 in column between the panels with shortened labels; panel (b) grid uses 0.33 in cells with one-line row labels and a horizontal colour bar beneath |
+| `fig2_compact.pdf` | 5.34 × 1.97 in | `fig2_mechanism_scaling.pdf` panels (a)+(b) | panel (c) removed (it becomes `figA_scaling`); 0.40 in cells |
+| `figA_scaling.pdf` | 2.58 × 2.06 in | `fig2_mechanism_scaling.pdf` panel (c) | stands alone at half-column width, legend inside the axes |
+
+### `fig1_compact.pdf`
+* Panel (a): identical data to **Fig. 1(a)** above — `fig1_compact.py` calls
+  `fig1_map_samples.load_map()`, so the 8 datasets, their i.i.d. nulls and their permutation
+  nulls are the same rows of `paper_suite/map/results_map.json`.  The same two documented
+  deviations apply (the 10-bit null is annotated rather than drawn; the "IQP-compatible"
+  wash has no hard edge).  Legend labels are shortened to fit the thin column:
+  `lens 18b`, `lens 18b pool`, `lens 10b`, `turb. D2`, `D2 pooled`, `MNIST-16`,
+  `MNIST-784`, `Blobs`.
+* Panel (b): identical rows to **Fig. 1(b)** — `fig1_map_samples.load_images()`, i.e.
+  held-out / `iqp_paper_n100` / `iqp_m4_mmdflat_resample_n100` / `rbm_n100` / `dcgan_n100`,
+  samples 000–002, N = 100.  Row labels shortened to one line: `held-out`, `IQP ref.`,
+  `IQP M=4`, `RBM`, `DCGAN`.
+
+### `fig2_compact.pdf`
+* Panel (a): identical to **Fig. 2(a)** — `fig2_mechanism_scaling.load_mech()`, so the six
+  M values and the three reference levels come from the same
+  `mech_tests/mech_test2/{results,diag,diag2,diag3}.json` paths listed above.
+* Panel (b): identical to **Fig. 2(b)** — `fig2_mechanism_scaling.load_images()` with that
+  module's `ARMS_B`, i.e. held-out, `iqp_m4_mmdflat_resample_n100` (projection corr 0.968),
+  `iqp_m4_auto3_resample_n100` (0.794, the paper's reference kernel) and
+  `iqp_m8_kl_zpen_resample_n100` (0.636), all from `results_r3b.jsonl` at n_train = 100 —
+  the same four rows as Table 1.
+
+### `figA_scaling.pdf`
+* Identical to **Fig. 2(c)** — `fig2_mechanism_scaling.load_scaling()` and its
+  `SCALING_ARMS`, i.e. the same three arms and the same `HOLDOUT split-half` floor from
+  `results_scaling.jsonl` (values tabulated in the Fig. 2(c) section above).  x ticks are the
+  six actual training-set sizes read off the jsonl.

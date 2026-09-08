@@ -6,7 +6,8 @@
     (controlled mechanism test, mech_tests/mech_test2, N = 20 training images), against
     three reference levels: random directions, the mean training image, and the nearest
     training image (the memorisation ceiling).
-(b) held-out lens images and samples from the M = 2 / 4 / 8 affine-latent arms of round 3b
+(b) held-out lens images and samples from the M = 2 (paper kernel) / 4 (MMD-flat) / 8
+    (collapsed) affine-latent arms of round 3b
     (N = 100), one linear magma scale, vmin = 0, vmax = 1.
 (c) sample quality vs training-set size: Conv2D-MMD^2 (solid) and its flux-aligned
     variant (dashed) for the IQP arm and the two paper baselines, against the held-out
@@ -49,9 +50,9 @@ M_SWEEP = [
 
 ARMS_B = [
     ("held-out\n(real)",              None),
-    ("IQP, $M{=}2$\n(KL)",            "iqp_m2_kl_resample_n100"),
-    ("IQP, $M{=}4$\n(MMD-flat)",      "iqp_m4_mmdflat_resample_n100"),
-    ("IQP, $M{=}8$\n(KL + $z$-pen.)", "iqp_m8_kl_zpen_resample_n100"),
+    ("IQP, $M{=}4$\n(flat MMD)",      "iqp_m4_mmdflat_resample_n100"),
+    ("IQP, $M{=}4$\n(paper kernel)",  "iqp_m4_auto3_resample_n100"),
+    ("IQP, $M{=}8$\n(collapsed)",     "iqp_m8_kl_zpen_resample_n100"),
 ]
 NCOL = 3
 

@@ -310,3 +310,77 @@ magnitudes across the two datasets.
 - Learners: IQP students with G_n ∈ {50,100,150} random generators (all three learners cover 140/140 targets — 420 `record="fit"` rows, 140 per learner; the earlier "G_n=150 has 136/140 targets" was a misreading of `learner_gates_effective` = 136, i.e. the number of distinct generators left after dedup for the 150-gate learner; corrected 2026-09-08 from outputs_controlled/results_fig3_v2.jsonl), trained by MMD; achieved MMD² recorded per (target, learner).
 - Qualitative finding: achieved MMD² increases with target exact I_QCLI for all three learner sizes (upper envelopes rise from ≈2e-3 to ≈1.5e-2 for G_n=50, ≈2e-3→5e-3 for G_n=100, ≈1.5e-3→3e-3 for G_n=150); larger learners fit better at every QCLI. This reproduces the paper's Fig. 3 trend within I_QCLI ≤ 0.41 only.
 - Figure: docs/figures/iqp_fig3_support_mismatch.png (v2, overwrote v1); paper copy figures/iqp_fig3_support_mismatch.png; vector version pending as figures/figA_fig3.pdf.
+
+---
+
+## Addendum: per-class generation (2026-09-08) — appendix material, COMPLETE
+
+**Question.** Every result above pools the three dark-matter substructure classes. Does the
+paper's best arm train and generate for **each class on its own**?
+
+**Setup.** The arm is unchanged — `IQP-affine`, M = 4, MMD-flat objective, resample prior,
+seed 0, lr 0.02, 4 000 joint steps, 1 000 θ₀ seed steps, 8 × 1 000-step projection restarts at
+`infer-lr 0.005`, 200 generated frames, 200 held-out. The **only** change is which images it
+sees: for class *c* it trains on 100 images of *c* and is scored against 200 held-out images of
+*c*. Same codec (`codec10`), same metric functions (`evaluate_r3` / `evaluate_r3b`), same
+`CONV_SEED`.
+
+**Provenance.** SLURM job **358382**, partition `dev`, node `25a-hgpn024`, account <YOUR_ACCOUNT>,
+`/usr/bin/python3`, elapsed **00:07:24**, `COMPLETED`, exit 0:0, `fail=0`, 6/6 run dirs.
+- submit script: `experiments/13_iqp_turbulence_replication/submit_lens_class.sbatch`
+- log: `experiments/13_iqp_turbulence_replication/logs_lens/sbatch-class-358382.out`
+- outputs: `experiments/13_iqp_turbulence_replication/outputs_lens_class/<class>_m4_mmdflat_resample_n{100,11}/`
+- metrics: `experiments/13_iqp_turbulence_replication/results_class.jsonl` (18 rows)
+- new scripts: `data_lens_class.py`, `train_iqp_affine_class.py`, `evaluate_class.py`, `test_class.py`
+- figure: `paper/ml4ps2026/figures/figB_classes.pdf` (5.21 × 2.10 in) + `.png`
+
+**Per-class split (the one deliberate difference from the pooled runs).** The pooled N = 100
+holds only ≈ 33 images of each class, so a per-class N = 100 cannot be a subset of it. The same
+"one permutation, take the prefix" rule is applied *within* a class, with the class index
+appended to the split seed: train = `default_rng([0,3,0,c]).permutation(train indices of c)[:100]`,
+latent pool = the next 2 000, held-out = `default_rng([0,3,1,c]).permutation(val indices of c)[:200]`.
+Class pools are large enough (train 26 942 / 26 782 / 26 470; val 2 954 / 2 977 / 2 979 for
+axion / cdm / no_sub). Purity and train-vs-latent disjointness are asserted at run time and
+logged: all three report `pure(train,val)=(True,True) disjoint=True`
+(`logs_lens/sbatch-class-358382.out`). Each arm uses its own class's flux scale
+S (axion 127.19, cdm 123.30, no_sub 121.54; pooled 124.92).
+
+### N = 100 (the working point of the paper's main table)
+
+| training set | PDF–JS ↓ | MMD² ↓ | MMD²(flux-aligned) ↓ | held-out projection corr ↑ | NN-holdout |
+|---|---|---|---|---|---|
+| axion only | 0.00205 | 0.09012 | 0.02346 | 0.9720 | 3.851 |
+| cdm only | 0.002275 | 0.09783 | 0.01848 | 0.9686 | 4.111 |
+| no_sub only | 0.002001 | 0.10340 | 0.02773 | 0.9703 | 3.780 |
+| **pooled (main paper)** | 0.002387 | 0.08607 | 0.02745 | 0.9684 | 3.963 |
+| _axion held-out split-half (floor)_ | 7.633e-05 | 0.005915 | 0.006399 | — | 0.8186 |
+| _cdm held-out split-half (floor)_ | 9.869e-05 | 0.01794 | 0.01871 | — | 1.019 |
+| _no_sub held-out split-half (floor)_ | 0.0001097 | 0.01603 | 0.01823 | — | 0.7795 |
+
+### N = 11
+
+| training set | PDF–JS ↓ | MMD² ↓ | MMD²(flux-aligned) ↓ | held-out projection corr ↑ | NN-holdout |
+|---|---|---|---|---|---|
+| axion only | 0.002197 | 0.1015 | 0.02636 | 0.9232 | 3.874 |
+| cdm only | 0.002174 | 0.1108 | 0.02031 | 0.9238 | 3.462 |
+| no_sub only | 0.001102 | 0.08096 | 0.02379 | 0.8998 | 3.994 |
+| **pooled (main paper)** | 0.001963 | 0.11340 | 0.02786 | 0.9092 | 3.915 |
+
+Pooled reference rows are the `IQP-affine-M4-MMDflat-resample` rows of `results_r3b.jsonl` at
+the matching N — the same arm, scored the same way, against the *pooled* 200 held-out images.
+
+**What this supports (and what it does not).**
+- *Supported:* each class trains and generates on its own at the pooled arm's working point.
+  At N = 100 the three per-class projection correlations (0.9686–0.9720) bracket the pooled
+  0.9684, and the three PDF–JS values (0.0020–0.0023) bracket the pooled 0.002387. Nothing
+  degrades when the training set is restricted to one class.
+- *Not supported:* any claim that one class is easier or harder. The per-class spread is
+  ≤ 0.004 in projection corr and ≤ 0.0003 in PDF–JS — inside the noise band this project
+  treats as uninformative — and each class is scored against a *different* held-out set with
+  its own split-half floor (MMD² floors differ by 3× across classes: 0.0059 / 0.0179 / 0.0160),
+  so the raw per-class MMD² values are not comparable to each other.
+- *Expected, and observed:* the generated samples look alike across classes. The class signal
+  lives from PC6 onward and accounts for only **3.0 %** of the pixel variance
+  (`docs/LENS_IMAGE_CHARACTERISTICS.md:195`); nearest-centroid classification on raw pixels is
+  38.3 % against a 33.3 % chance baseline (`docs/LENS_IMAGE_CHARACTERISTICS.md:205`). A
+  pixel-reconstruction objective is not expected to reproduce it, and this run does not claim to.
