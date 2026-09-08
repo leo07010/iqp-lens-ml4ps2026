@@ -1,0 +1,413 @@
+% refs.bib for ML4PS 2026 submission (IQP generative models on DeepLense lens images)
+% Built 2026-09-08. Sources:
+%   - docs/IQP_LITERATURE_SURVEY.md (26-paper IQP survey, all arXiv IDs WebFetch-verified 2026-09-05)
+%   - docs/PAPER_2603.06440_SUMMARY.md (target paper + its own bibliography, HTML-verified)
+%   - papers/README.md (DeepLense dataset provenance)
+% Key convention: author_year_short. Every entry that has an arXiv ID carries an eprint field.
+% TODO markers denote items that could not be fully verified from local docs and need a live check
+% (e.g. exact page numbers) before submission.
+
+%% ===================== Target paper =====================
+
+@misc{liu_2026_correlation,
+  title        = {Toward Generative Quantum Utility via Correlation--Complexity Map},
+  author       = {Liu, Chen-Yu and Placidi, Leonardo and Brunner, Eric and Rinaldi, Enrico},
+  year         = {2026},
+  eprint       = {2603.06440},
+  archiveprefix = {arXiv},
+  primaryclass = {quant-ph},
+  note         = {arXiv:2603.06440},
+}
+
+@misc{liu_2026_physics,
+  title        = {Generative {IQP} Circuit Learning with Physics-Informed Latent Initialization},
+  author       = {Liu, Chen-Yu and Placidi, Leonardo and Ballarin, Marco and Rinaldi, Enrico},
+  year         = {2026},
+  eprint       = {2607.28866},
+  archiveprefix = {arXiv},
+  primaryclass = {quant-ph}
+}
+
+%% ===================== Complexity-theoretic foundations =====================
+
+@article{bremner_2011_classical,
+  title   = {Classical simulation of commuting quantum computations implies collapse of the polynomial hierarchy},
+  author  = {Bremner, Michael J. and Jozsa, Richard and Shepherd, Dan J.},
+  journal = {Proceedings of the Royal Society A},
+  volume  = {467},
+  number  = {2126},
+  pages   = {459--472},
+  year    = {2011},
+  doi     = {10.1098/rspa.2010.0301},
+  eprint  = {1005.1407},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph}
+}
+
+@article{bremner_2016_average,
+  title   = {Average-case complexity versus approximate simulation of commuting quantum computations},
+  author  = {Bremner, Michael J. and Montanaro, Ashley and Shepherd, Dan J.},
+  journal = {Physical Review Letters},
+  volume  = {117},
+  pages   = {080501},
+  year    = {2016},
+  eprint  = {1504.07999},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph}
+}
+
+@article{bremner_2017_achieving,
+  title   = {Achieving quantum supremacy with sparse and noisy commuting quantum computations},
+  author  = {Bremner, Michael J. and Montanaro, Ashley and Shepherd, Dan J.},
+  journal = {Quantum},
+  volume  = {1},
+  pages   = {8},
+  year    = {2017},
+  eprint  = {1610.01808},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph}
+}
+
+@article{codsi_2025_classically,
+  title   = {Classically Simulating Quantum Supremacy {IQP} Circuits through a Random Graph Approach},
+  author  = {Codsi, Julien and van de Wetering, John},
+  journal = {Physical Review A},
+  volume  = {111},
+  pages   = {012422},
+  year    = {2025},
+  eprint  = {2212.08609},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+}
+
+@misc{maslov_2024_fast,
+  title  = {Fast classical simulation of {Harvard}/{QuEra} {IQP} circuits},
+  author = {Maslov, Dmitri and Bravyi, Sergey and Tripier, Felix and Maksymov, Andrii and Latone, Joe},
+  year   = {2024},
+  eprint = {2402.03211},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph}
+}
+
+@misc{rajakumar_2024_polynomial,
+  title  = {Polynomial-Time Classical Simulation of Noisy {IQP} Circuits with Constant Depth},
+  author = {Rajakumar, Joel and Watson, James D. and Liu, Yi-Kai},
+  year   = {2024},
+  eprint = {2403.14607},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+  note   = {arXiv:2403.14607. Also published in Proceedings of the 2025 Annual ACM-SIAM Symposium on Discrete Algorithms (SODA), pp.~1037--1056, doi:10.1137/1.9781611978322.30},
+}
+
+@misc{takahashi_2026_classical,
+  title  = {Classical simulability of quantum circuits followed by sparse classical post-processing},
+  author = {Takahashi, Yasuhiro and Miyamoto, Aiko and Kunihiro, Noboru},
+  year   = {2026},
+  eprint = {2603.05920},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph}
+}
+
+%% ===================== Verification / peaked circuits =====================
+
+@article{bremner_2025_instantaneous,
+  title   = {Instantaneous Quantum Polynomial-Time Sampling and Verifiable Quantum Advantage: Stabilizer Scheme and Classical Security},
+  author  = {Bremner, Michael J. and Cheng, Sixia and Ji, Zhengfeng},
+  journal = {PRX Quantum},
+  year    = {2025},
+  eprint  = {2308.07152},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+}
+
+@misc{aaronson_2024_verifiable,
+  title  = {On verifiable quantum advantage with peaked circuit sampling},
+  author = {Aaronson, Scott and Zhang, Yuxuan},
+  year   = {2024},
+  eprint = {2404.14493},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph}
+}
+
+@misc{zhang_2025_complexity,
+  title  = {Complexity and hardness of random peaked circuits},
+  author = {Zhang, Yuxuan},
+  year   = {2025},
+  eprint = {2510.00132},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph}
+}
+
+@misc{gharibyan_2025_heuristic,
+  title  = {Heuristic Quantum Advantage with Peaked Circuits},
+  author = {Gharibyan, Hrant and others},
+  year   = {2025},
+  eprint = {2510.25838},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+}
+
+@misc{kremer_2026_efficient,
+  title  = {Efficient Classical Simulation of Heuristic Peaked Quantum Circuits},
+  author = {Kremer, Marius and Dupuis, Fr{\'e}d{\'e}ric},
+  year   = {2026},
+  eprint = {2604.21908},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+}
+
+%% ===================== IQP as a feature map / kernel =====================
+
+@article{havlicek_2019_supervised,
+  title   = {Supervised learning with quantum-enhanced feature spaces},
+  author  = {Havl{\'i}{\v{c}}ek, Vojt{\v{e}}ch and C{\'o}rcoles, Antonio D. and Temme, Kristan and Harrow, Aram W. and Kandala, Abhinav and Chow, Jerry M. and Gambetta, Jay M.},
+  journal = {Nature},
+  volume  = {567},
+  pages   = {209--212},
+  year    = {2019},
+  eprint  = {1804.11326},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph}
+}
+
+@article{huang_2021_power,
+  title   = {Power of data in quantum machine learning},
+  author  = {Huang, Hsin-Yuan and Broughton, Michael and Mohseni, Masoud and Babbush, Ryan and Boixo, Sergio and Neven, Hartmut and McClean, Jarrod R.},
+  journal = {Nature Communications},
+  volume  = {12},
+  pages   = {2631},
+  year    = {2021},
+  eprint  = {2011.01938},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph}
+}
+
+%% ===================== IQP generative models (Born machines) =====================
+
+@misc{recio_2025_iqpopt,
+  title  = {{IQPopt}: Fast optimization of instantaneous quantum polynomial circuits in {JAX}},
+  author = {Recio-Armengol, Erik and Bowles, Joseph},
+  year   = {2025},
+  eprint = {2501.04776},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+  note   = {arXiv:2501.04776},
+}
+
+@misc{recio_2025_train,
+  title  = {Train on classical, deploy on quantum: scaling generative quantum machine learning to a thousand qubits},
+  author = {Recio-Armengol, Erik and Ahmed, Shahnawaz and Bowles, Joseph},
+  year   = {2025},
+  eprint = {2503.02934},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+  note   = {arXiv:2503.02934},
+}
+
+@misc{kurkin_2025_universality,
+  title  = {Universality and kernel-adaptive training for classically trained, quantum-deployed generative models},
+  author = {Kurkin, Andrey and Shen, Yudai and Pielawa, Suzanne and Wang and Dunjko, Vedran},
+  year   = {2025},
+  eprint = {2510.08476},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+}
+
+@misc{shen_2026_characterizing,
+  title  = {Characterizing Trainability of Instantaneous Quantum Polynomial Circuit Born Machines},
+  author = {Shen, Yudai and Pielawa, Suzanne and Dunjko, Vedran and Wang},
+  year   = {2026},
+  eprint = {2602.11042},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+}
+
+@misc{lerch_2026_iqp,
+  title  = {{IQP} Born Machines under Data-dependent and Agnostic Initialization Strategies},
+  author = {Lerch, Sabine and Bowles, Joseph and Puig and Armengol, Erik Recio and Holmes, Zo{\"e} and Thanasilp, Supanut},
+  year   = {2026},
+  eprint = {2603.14576},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+}
+
+@misc{deluca_2026_trainability,
+  title  = {Trainability of {IQP} Quantum Circuit Born Machines Under Gaussian Initialization},
+  author = {De Luca},
+  year   = {2026},
+  eprint = {2606.10179},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+}
+
+@misc{nguyen_2026_discovery,
+  title  = {Discovery of connectivity-trainability trade-off of {IQP} Circuits for Hamiltonian Optimization},
+  author = {Nguyen, Quoc Chuong},
+  year   = {2026},
+  eprint = {2606.24264},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+}
+
+@misc{banks_2026_qudit,
+  title  = {Qudit extension of parameterized {IQP} circuits: A generative quantum machine learning approach to integer data},
+  author = {Banks, Harry and Crippa, Leonardo and Traube and Unger and Ertler and Lechner, Wolfgang},
+  year   = {2026},
+  eprint = {2606.28236},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+}
+
+@misc{huang_2026_spectral,
+  title  = {Spectral {Born} machines: classically trainable quantum generative models for discrete data},
+  author = {Huang and Maxwell and Belis, Vasilis and Peters and Pye and Jahangiri, Hossein and Bowles, Joseph},
+  year   = {2026},
+  eprint = {2607.06675},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+}
+
+%% ===================== Hardware demonstrations =====================
+
+@article{ballo_2026_shallow,
+  title   = {Shallow instantaneous quantum polynomial-time circuits for generative modeling on noisy intermediate-scale quantum hardware},
+  author  = {Ball{\'o}-Gimbernat, Oriol and Arroyo-S{\'a}nchez and Garc{\'i}a-Molina, Pablo and Garriga, Albert and Vilari{\~n}o, Ferran},
+  journal = {Physical Review A},
+  volume  = {113},
+  pages   = {042617},
+  year    = {2026},
+  eprint  = {2511.05267},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+}
+
+@misc{huang_2025_generative,
+  title  = {Generative quantum advantage for classical and quantum problems},
+  author = {Huang, Hsin-Yuan and Broughton, Michael and Eassa, Noah and Neven, Hartmut and Babbush, Ryan and McClean, Jarrod R.},
+  year   = {2025},
+  eprint = {2509.09033},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph},
+}
+
+@misc{buhrman_2025_formal,
+  title  = {Formal framework for quantum advantage},
+  author = {Buhrman, Harry and Galke, Niklas and Meichanetzidis, Konstantinos},
+  year   = {2025},
+  eprint = {2510.01953},
+  archiveprefix = {arXiv},
+  primaryclass  = {quant-ph}
+}
+
+%% ===================== Total correlation / Chow-Liu (CCI background) =====================
+
+@article{watanabe_1960_information,
+  title   = {Information theoretical analysis of multivariate correlation},
+  author  = {Watanabe, Satosi},
+  journal = {IBM Journal of Research and Development},
+  volume  = {4},
+  number  = {1},
+  pages   = {66--82},
+  year    = {1960},
+  doi     = {10.1147/rd.41.0066}
+}
+
+@article{schneidman_2003_network,
+  title   = {Network information and connected correlations},
+  author  = {Schneidman, Elad and Still, Susanne and Bialek, William and Berry, Michael J.},
+  journal = {Physical Review Letters},
+  volume  = {91},
+  number  = {23},
+  pages   = {238701},
+  year    = {2003},
+  doi     = {10.1103/PhysRevLett.91.238701}
+}
+
+%% ===================== MMD / RBM / Walsh-Hadamard / DCGAN (method background) =====================
+
+@article{gretton_2012_kernel,
+  title   = {A Kernel Two-Sample Test},
+  author  = {Gretton, Arthur and Borgwardt, Karsten M. and Rasch, Malte J. and Sch{\"o}lkopf, Bernhard and Smola, Alexander},
+  journal = {Journal of Machine Learning Research},
+  volume  = {13},
+  number  = {25},
+  pages   = {723--773},
+  year    = {2012}
+}
+
+@article{hinton_2002_training,
+  title   = {Training Products of Experts by Minimizing Contrastive Divergence},
+  author  = {Hinton, Geoffrey E.},
+  journal = {Neural Computation},
+  volume  = {14},
+  number  = {8},
+  pages   = {1771--1800},
+  year    = {2002},
+  doi     = {10.1162/089976602760128018}
+}
+
+@inproceedings{tieleman_2008_training,
+  title     = {Training Restricted {Boltzmann} Machines using Approximations to the Likelihood Gradient},
+  author    = {Tieleman, Tijmen},
+  booktitle = {Proceedings of the 25th International Conference on Machine Learning (ICML)},
+  pages     = {1064--1071},
+  year      = {2008},
+  doi       = {10.1145/1390156.1390290}
+}
+
+@article{walsh_1923_closed,
+  title   = {A Closed Set of Normal Orthogonal Functions},
+  author  = {Walsh, Joseph L.},
+  journal = {American Journal of Mathematics},
+  volume  = {45},
+  number  = {1},
+  pages   = {5--24},
+  year    = {1923}
+}
+
+@misc{radford_2015_unsupervised,
+  title  = {Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks},
+  author = {Radford, Alec and Metz, Luke and Chintala, Soumith},
+  year   = {2015},
+  eprint = {1511.06434},
+  archiveprefix = {arXiv},
+  primaryclass  = {cs.LG},
+  note   = {arXiv:1511.06434},
+}
+
+%% ===================== Turbulence dataset (paper's D1/D2) =====================
+
+@article{khojasteh_2022_lagrangian,
+  title   = {Lagrangian and {Eulerian} dataset of the wake downstream of a smooth cylinder at a {Reynolds} number equal to 3900},
+  author  = {Khojasteh, Ali R. and Laizet, Sylvain and Heitz, Dominique and Yang, Yin},
+  journal = {Data in Brief},
+  volume  = {40},
+  pages   = {107725},
+  year    = {2022},
+  doi     = {10.1016/j.dib.2021.107725},
+}
+
+%% ===================== DeepLense / Model II dataset provenance =====================
+
+@article{alexander_2020_deep,
+  title   = {Deep Learning the Morphology of Dark Matter Substructure},
+  author  = {Alexander, Stephon and Gleyzer, Sergei and McDonough, Evan and Toomey, Michael W. and Usai, Emanuele},
+  journal = {The Astrophysical Journal},
+  volume  = {893},
+  number  = {1},
+  pages   = {15},
+  year    = {2020},
+  eprint  = {1909.07346},
+  archiveprefix = {arXiv},
+  primaryclass  = {astro-ph.CO},
+}
+
+@misc{alexander_2021_decoding,
+  title  = {Decoding Dark Matter Substructure without Supervision},
+  author = {Alexander, Stephon and Gleyzer, Sergei and Parul, Hanna and Reddy, Pranath and Toomey, Michael W. and Usai, Emanuele and Von Klar, Ryker},
+  year   = {2020},
+  eprint = {2008.12731},
+  archiveprefix = {arXiv},
+  primaryclass  = {astro-ph.CO},
+  note   = {arXiv:2008.12731. NeurIPS 2020 Workshop on Machine Learning and the Physical Sciences},
+}

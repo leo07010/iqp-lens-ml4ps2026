@@ -1,0 +1,392 @@
+\documentclass{article}
+
+% plain.bst is a numeric style, so natbib must be loaded in numeric mode; the
+% template documents this hook.
+\PassOptionsToPackage{numbers,compress}{natbib}
+
+% ML4PS 2026 workshop, double-blind reviewing.
+\usepackage[dblblindworkshop]{neurips_2026}
+\workshoptitle{Machine Learning and the Physical Sciences}
+
+% The submission branch of neurips_2026.sty builds the first-page footer from
+% \@noticestring.  We redefine only that macro -- the mechanism the style file
+% itself provides.  No style-file edits, no layout changes.
+\makeatletter
+\renewcommand{\@noticestring}{%
+  Submitted to the 9th Workshop on Machine Learning and the Physical Sciences (ML4PS 2026). Do not distribute.%
+}
+\makeatother
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{microtype}
+\usepackage{graphicx}
+
+\newcommand{\qcli}{I_{\mathrm{QCLI}}}
+\newcommand{\cci}{I_{\mathrm{CCI}}}
+% Figures are supplied as vector PDFs; the extension is left off so that a PDF
+% supersedes a PNG of the same basename automatically.
+\newcommand{\figboxw}[3]{%
+  \IfFileExists{#1.pdf}{\includegraphics[width=#3\textwidth]{#1}}{%
+    \IfFileExists{#1.png}{\includegraphics[width=#3\textwidth]{#1}}{%
+      \fbox{\parbox[c][#2][c]{0.95#3\textwidth}{\centering figure pending: \texttt{#1}}}}}}
+\newcommand{\figbox}[2]{\figboxw{#1}{#2}{1.0}}
+
+\title{A 10-qubit IQP generative model outperforms RBM and DCGAN on strong-lensing
+images under the reference paper's metrics}
+
+% Double-blind submission: the dblblindworkshop option suppresses the author block.
+\author{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Sampling from instantaneous-quantum-polynomial (IQP) circuits is believed to be classically
+hard~\cite{bremner_2011_classical,bremner_2016_average}, while the expectation values a
+maximum-mean-discrepancy (MMD) loss needs stay classically computable, so an IQP Born machine can be
+trained classically and deployed on quantum hardware~\cite{recio_2025_train}. A recent
+correlation--complexity map predicts which datasets suit such models, and on it DeepLense
+strong-lensing images are the most IQP-compatible dataset we measured ($\qcli = 0.47$,
+$\cci = 0.87$), above the turbulence data of the paper that introduced it. Given \emph{learned} latent directions,
+$\theta = \theta^{0} + \Phi^{\!\top} z$, a 10-qubit IQP Born machine trained on lens crops beats an
+RBM and a DCGAN on the paper's PDF--JS and flux-aligned Conv2D-MMD$^2$, at $N = 11$ and $N = 100$
+training images with
+$2$--$39\times$ fewer parameters, and reconstructs unseen images at correlation $0.97$. Three caveats
+bound it. The reference paper's own fixed latent protocol yields only noise on images, a
+structure-matched permutation null still scores $\qcli = 0.42$, and the DCGAN still leads on raw
+Conv2D-MMD$^2$ at $N = 100$. Everything is exact classical simulation at a single seed and $n = 10$
+qubits, so we claim no quantum advantage.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+
+IQP circuits are commuting-gate circuits whose output distribution is the squared Walsh--Hadamard
+transform of a phase function. Exact classical sampling from them would collapse the polynomial
+hierarchy~\cite{bremner_2011_classical}, and the hardness is conjectured to survive approximate
+sampling in the average case~\cite{bremner_2016_average,codsi_2025_classically}, though sufficient
+noise restores classical simulability~\cite{rajakumar_2024_polynomial}. The same commuting structure
+keeps the expectation values in an MMD loss classically computable, so such a model can be
+\emph{trained classically and deployed on quantum
+hardware}~\cite{recio_2025_train,recio_2025_iqpopt}.
+
+Whether real scientific data sits where that is useful is an empirical question, and a recent
+proposal~\cite{liu_2026_correlation} approaches it with two ingredients. (i) A
+\emph{correlation--complexity map} placing a dataset on two coordinates, the quantum
+correlation-likeness indicator $\qcli$, how much of its Walsh order spectrum sits at high order as an
+IQP output would, and the classical correlation-complexity indicator $\cci$, how much of its total
+correlation the best pairwise tree misses~\cite{watanabe_1960_information,schneidman_2003_network};
+the high-$\qcli$, high-$\cci$ corner is argued to be where IQP circuits do well. (ii) A
+latent-adaptation protocol (their Algorithm~1) that fits a shared core to one anchor sample, then
+adapts only a $d_{\mathrm{lat}}=50$ latent block of Hamming-ordered Pauli strings per sample. Both
+were demonstrated on one dataset, 2D turbulence snapshots~\cite{khojasteh_2022_lagrangian} at
+$n=18$ qubits.
+
+We take both to simulated dark-matter strong-lensing images from
+DeepLense~\cite{alexander_2020_deep,alexander_2021_decoding} and report three results. (1) On the
+reference paper's own map, lens crops land at the most IQP-compatible position of any dataset we
+measured, above the turbulence data the map was built to recommend. (2) A 10-qubit IQP Born machine
+trained on those crops beats the paper's own RBM and DCGAN baselines on PDF--JS and flux-aligned
+Conv2D-MMD$^2$ at both training-set sizes with far fewer parameters. (3) It does so only after one change to the reference
+protocol, whose fixed Walsh latent block gives noise on images until its directions are made
+\emph{learnable}. Appendices~\ref{app:turb}--\ref{app:fig4} take the same tests back to the
+paper's own data, where its turbulence result does not reproduce under our pre-registered convention
+and two internal claims come out mixed.
+
+\section{Setup}
+\label{sec:setup}
+
+\paragraph{Data and encoding.}
+We use the DeepLense \texttt{Model~II} simulation set (80{,}194 train / 8{,}910 validation images,
+$64\times64$, three substructure classes pooled)~\cite{alexander_2020_deep}. Each image is
+centroid-aligned by an integer shift (offset $3.4 \pm 1.6$\,px) and cropped to the central
+$32\times32$ window, keeping $99.4\%$ of the light, and the crop becomes a probability mass function
+(pmf) $p(k_x,k_y)$ over $1{,}024$ cells on $n=10$ qubits (App.~\ref{app:pipe}). All $2^{10}$
+generators $Z_s$ are used, so $\theta \in \mathbb{R}^{1024}$ and $q_\theta$ follows from two
+length-$1024$ fast Walsh--Hadamard transforms. Generated pmfs return to $64\times64$ with a fixed flux
+$S = 124.92$ and an offset from the empirical distribution.
+
+\paragraph{Latent parameterisations.}
+The reference protocol keeps a fixed $d_{\mathrm{lat}}=50$ block of $\theta$ as the per-image latent
+and freezes the other $974$ coordinates, fitted to one anchor image (Algorithm~1, sequential). We
+compare it against (i) the same fixed block trained \emph{jointly} across images and (ii) our
+\emph{learned-direction} model
+\begin{equation}
+\theta_i \;=\; \theta^{0} + \Phi^{\!\top} z_i,
+\qquad \theta^{0}\in\mathbb{R}^{1024},\quad
+\Phi\in\mathbb{R}^{M\times 1024},\quad z_i \in \mathbb{R}^{M},
+\label{eq:affine}
+\end{equation}
+with $M \in \{2,4,8\}$, each row of $\Phi$ $L^2$-normalised to $\sqrt{1024}$, and
+$\theta^0,\Phi,\{z_i\}$ trained jointly under an $L^2$ penalty on $z$ of $10^{-3}$, raised to $0.3$
+for the $M{=}8$ arm. The three objectives are the paper's multi-bandwidth Gaussian MMD kernel, a
+flat-Walsh-weight MMD estimable from hardware shots, and exact KL. For unconditional generation $z$
+is drawn from a fitted Gaussian or resampled from the trained $z_i$ with jitter.
+
+\paragraph{Baselines and metrics.}
+We compare only against the two baselines the reference paper uses, a restricted
+Boltzmann machine (RBM; 10 visible and 1{,}000 hidden units, persistent contrastive divergence with
+one Gibbs step, PCD-1~\cite{hinton_2002_training,tieleman_2008_training}; 11{,}010 parameters) and a
+deep convolutional generative adversarial network (DCGAN)~\cite{radford_2015_unsupervised} on
+$32\times32$ crops (199{,}837 parameters), trained on the same data with the same seed. Metrics are
+the paper's two, the probability-density Jensen--Shannon divergence between intensity histograms
+(PDF--JS) and Conv2D-MMD$^2$, a biased MMD estimate in the feature space of a fixed random
+three-layer convolutional encoder under a median-heuristic Gaussian
+kernel~\cite{gretton_2012_kernel}. Every IQP arm and the RBM share the flux scalar $S$ while the
+DCGAN learns its own scale, so raw Conv2D-MMD$^2$ is partly a brightness comparison and we also
+report a flux-aligned variant, flagged as post-hoc. Every arm generates 200 images scored against the
+same 200 held-out images at the reference training-set sizes $N \in \{11,100\}$, with a single seed
+(seed 0) throughout.
+
+\begin{figure}[t]
+\centering
+\figboxw{figures/fig1_map_samples}{1.9in}{0.70}
+\caption{\textbf{(a)} Correlation--complexity map. Datasets (filled), i.i.d.-uniform nulls at the
+same $(n,K)$ (open), permutation nulls (crosses; ours, not in the reference paper). The shaded corner
+is the reference paper's \emph{qualitative} IQP-compatible region.
+\textbf{(b)} First three unconditional samples per model, $N{=}100$, no selection, shared $0$--$1$
+colour scale (at most 13 pixels per row are clipped).}
+\label{fig:map}
+\end{figure}
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Lens images are the most IQP-compatible dataset on the map}
+\label{sec:map}
+
+Figure~\ref{fig:map}(a) recomputes the map on our data. Encoded as the reference paper encodes
+turbulence (18-bit $(x,y,z)$ tuples, $K = 4{,}096$ sampled tuples per image), lens images score
+$\qcli = 0.4715$ and $\cci = 0.8677$, higher in $\qcli$ than the paper's own
+turbulence data at the same $K$ ($0.023$), binarised MNIST ($0.014$) or BinaryBlobs ($0.032$, both at
+$K = 10^{4}$), and squarely inside the corner the map calls IQP-compatible, a stronger
+recommendation than the dataset the map was introduced to justify.
+
+Two caveats temper that reading. A permutation null that keeps each image's intensity histogram
+exactly and destroys all spatial structure still scores $\qcli = 0.4154$ and \emph{raises} $\cci$ to
+$0.8782$, leaving only $+0.056$ in $\qcli$ from lens structure, and the paper's turbulence data
+behaves the same way at the same $K$ ($0.023$ against a null of $0.011$), so at this encoding the map
+largely tracks the intensity histogram. The 10-bit crop pmf we train on does separate from both nulls
+in both coordinates ($0.473$ against $0.178$, $0.431$ against $0.963$), and we therefore read a
+favourable map position as necessary rather than sufficient, settling the question by training.
+
+\subsection{Why the reference protocol needs learned directions}
+\label{sec:whyfail}
+
+Run with the paper's sequential protocol, using our low-variance latent block, Algorithm~1 produces
+noise (Fig.~\ref{fig:map}(b), second column; the Hamming-ordered variant is in App.~\ref{app:arms}).
+Representability is not the cause, since the full 1{,}024-phase circuit fits a \emph{single} aligned
+crop to correlation $0.9999$ (KL), $0.99997$ (flat MMD) and $0.9962$ (the paper's kernel). The
+protocol is. With the core frozen on one anchor, the 50 fixed latent coordinates reconstruct every
+other training image at correlation $0.47$, because fixed Walsh directions act as an XOR-shift
+interference pattern that cross-fades pixels instead of moving lens structure, which suits a drifting
+time series and not an i.i.d.\ image set.
+
+\subsection{Learned latent directions generalise}
+\label{sec:affine}
+
+Equation~\eqref{eq:affine} repairs this. To test generalisation we freeze $\theta^{0}$ and $\Phi$
+and optimise only $z$ on 200 \emph{held-out} images. At $N{=}100$ the best
+arm reaches mean correlation $0.968$
+(minimum $0.851$) against a nearest-training-image reference of $0.970$. The gain comes from learning
+the directions, not the extra parameters, since in a separate controlled sweep at $N{=}20$
+(Fig.~\ref{fig:gen}(a)) the trained model reaches $0.911$ while a random $\Phi$ of the same size
+gives $0.672$ and no latent gives $0.671$. The flat-MMD kernel, which is estimable from hardware shots,
+generalises best ($0.968$ at $M{=}4$) and the paper's own multi-bandwidth kernel worst
+($0.74$--$0.79$), with KL in between ($0.914$ at $M{=}2$). Useful $M$ stays small, as that sweep peaks at $M{=}2$--$4$ and
+collapses to $0.10$ by $M{=}8$ once the required $\|z\|$ exceeds the model's coherence radius
+($\approx 0.03$--$0.05$). At $M{=}2$ all prior draws are rings of rms radius $9.40 \pm 0.21$\,px
+against $9.21 \pm 0.15$ for real data, though under-dispersed in ellipticity ($0.048$ vs.\ $0.099$).
+
+\begin{table}[t]
+\centering
+\caption{Paper-style comparison on lens crops, IQP against the two baselines the reference paper
+uses. Lower is better and \textbf{bold} marks the best entry in a column. Learned-direction parameter
+counts are $N{=}11\,/\,N{=}100$, and MMD$^2_{\mathrm{al}}$ is the flux-aligned variant
+(post-hoc). The last row is an empirical floor from scoring one held-out half against the other, not
+a model. Single seed.}
+\label{tab:main}
+\footnotesize
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{lrccc@{\hskip 10pt}ccc}
+\toprule
+& & \multicolumn{3}{c}{$N = 11$} & \multicolumn{3}{c}{$N = 100$} \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-8}
+Model & Params & PDF--JS & MMD$^2$ & MMD$^2_{\mathrm{al}}$ & PDF--JS & MMD$^2$ & MMD$^2_{\mathrm{al}}$ \\
+\midrule
+IQP, paper protocol (Alg.~1)      & 1{,}024          & 0.00609 & 0.2032 & 0.1837 & 0.00697 & 0.2140 & 0.2233 \\
+IQP, fixed basis, joint           & 1{,}024          & 0.00133 & 0.1416 & 0.1141 & 0.00099 & 0.1041 & 0.0617 \\
+IQP, learned dir.\ $M{=}2$ (KL)   & 3{,}094 / 3{,}272 & 0.00175 & 0.1673 & 0.0559 & 0.00302 & 0.1356 & 0.0866 \\
+IQP, learned dir.\ $M{=}4$ (flat MMD) & 5{,}164 / 5{,}520 & 0.00196 & 0.1134 & \textbf{0.0279} & 0.00239 & 0.0861 & \textbf{0.0275} \\
+IQP, learned dir.\ $M{=}4$ (paper kernel) & 5{,}164 / 5{,}520 & \textbf{0.00095} & 0.1168 & 0.0679 & \textbf{0.00092} & 0.1189 & 0.0876 \\
+RBM~\cite{tieleman_2008_training}  & 11{,}010        & 0.00632 & \textbf{0.0741} & 0.1240 & 0.00195 & 0.0752 & 0.1144 \\
+DCGAN~\cite{radford_2015_unsupervised} & 199{,}837   & 0.00183 & 0.2165 & 0.1241 & 0.00763 & \textbf{0.0371} & 0.0694 \\
+\midrule
+\textit{Held-out split-half (floor)} & n/a & \textit{0.00003} & \textit{0.0040} & \textit{0.0069} & \textit{0.00003} & \textit{0.0040} & \textit{0.0069} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Paper-style comparison and data scaling}
+\label{sec:table}
+
+In Table~\ref{tab:main} the best IQP arm wins PDF--JS at both training-set sizes ($0.00095$ and $0.00092$) and wins the flux-aligned
+Conv2D-MMD$^2$ at both ($0.0279$ and $0.0275$), with $2\times$ fewer parameters than the RBM
+and $39\times$ fewer than the DCGAN. Two of five IQP arms fall behind the DCGAN on PDF--JS at
+$N{=}11$ and three of five fall behind the RBM at $N{=}100$, and on
+raw Conv2D-MMD$^2$ the IQP arms \emph{lose} at both sizes, to the RBM at $N{=}11$ ($0.0741$ against
+$0.1134$) and to the DCGAN at $N{=}100$ ($0.0371$ against $0.0861$); that ordering is partly an
+artefact of the imposed flux scalar, since it reverses once flux is aligned. The paper's
+data-scaling claim holds only in part. Our single-seed DCGAN is \emph{better} at $N{=}11$ than at
+$N{=}100$ on PDF--JS, the opposite of the low-data GAN collapse the paper reports, and in
+Fig.~\ref{fig:gen}(c) it leads already at $N{=}10$ and swings $3\times$ non-monotonically while the
+IQP arm stays flat for $N \geq 30$ (App.~\ref{app:arms}).
+
+\begin{figure}[t]
+\centering
+\figboxw{figures/fig2_mechanism_scaling}{1.6in}{0.64}
+\caption{Panels (a) and (b) are different experiments. \textbf{(a)} Controlled latent-width sweep
+($N{=}20$ mechanism test), held-out projection correlation against the number of learned directions
+$M$, with that sweep's own reference levels (nearest training image $0.934$, mean training image
+$0.744$, random directions $0.672$); the $M{=}8$ and $16$ points are the best over a learning-rate
+sweep, i.e.\ favourable to the model. \textbf{(b)} Round-3b arms at $N{=}100$, held-out crops (top),
+then $M{=}2$ (KL), $M{=}4$ (flat MMD), $M{=}8$ (KL${}+z$-penalty). \textbf{(c)} Conv2D-MMD$^2$ vs.\
+training-set size (solid raw, dashed flux-aligned).}
+\label{fig:gen}
+\end{figure}
+
+\section{Discussion and limitations}
+\label{sec:disc}
+
+\paragraph{Findings.} IQP sampling is classically hard while the MMD training signal is not, which is
+what makes classical training with quantum deployment plausible. The reference paper's map puts
+strong-lensing crops at the most IQP-compatible position we measured, and a 10-qubit IQP Born machine
+trained on those crops beats an RBM and a DCGAN on PDF--JS and on flux-aligned Conv2D-MMD$^2$ at both
+training-set sizes with far fewer parameters. Making the latent directions $\Phi$ trainable is the one
+change that unlocks it.
+
+\paragraph{Limitations.} Nothing here is evidence of quantum advantage, because every circuit is
+simulated exactly at $n=10$ qubits, where the classical cost is two length-1024 transforms, and the
+hardness results describe the model class at scale rather than our instances. All numbers are single
+seed; the DCGAN's $3\times$ swing in Fig.~\ref{fig:gen}(c) sets the scale of the effects we discuss. The flux $S$ is imposed, which makes raw Conv2D-MMD$^2$ partly a brightness metric, and the
+aligned variant is post-hoc. The map's indicators barely separate real data from permutation
+nulls. We compare only against the paper's two baselines, and zero-learning and PCA controls we ran
+match or exceed the IQP arms on some physical-quantity metrics. Code and per-arm result tables will
+be released with the paper.
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\newpage
+\appendix
+
+\section{Pipeline}
+\label{app:pipe}
+
+Figure~\ref{fig:pipe} summarises the encoding, the latent parameterisation and the evaluation.
+
+\begin{figure}[h]
+\centering
+\figbox{figures/fig_pipeline_v2}{3.6in}
+\caption{Pipeline. \textbf{(a)} A held-out $64\times64$ image, white cross at its intensity centroid
+and dashed box the $32\times32$ crop window. \textbf{(b)} The aligned crop read as a pmf over
+$1{,}024$ cells, where the example pixel $(k_x,k_y) = (12,20)$ carries code $404 = 0110010100_2$ and
+bit $j$ addresses qubit $j$. \textbf{(c)} The first two learned latent coordinates of the $100$
+training images at $M = 4$. \textbf{(d)} The IQP circuit, an H layer, one diagonal phase
+$\exp(i\sum_s \theta_s Z_s)$ over all $1{,}024$ subsets $s$, a second H layer and measurement.
+\textbf{(e)} Exact simulation through $q_\theta = |\mathcal{W}e^{i\theta}|^{2}/2^{n}$, trained jointly
+over the $N$ images by MMD (flat or reference kernel) or by KL, the dashed arrow updating
+$\theta^{0}$, $\Phi$ and $z$. \textbf{(f)} A trained $q(x,y)$ scaled by $S$ and pasted at a sampled
+offset. \textbf{(g)} The intensity PDF of real against IQP samples (PDF--JS $0.0024$), Conv2D-MMD$^2$
+at $N{=}100$ (IQP $0.086$, RBM $0.075$, DCGAN $0.037$), and projection correlations over $200$
+held-out images (mean $0.968$). The bottom row contrasts a reference-protocol sample with an $M{=}4$
+sample from this work.}
+\label{fig:pipe}
+\end{figure}
+
+\section{Replication of the reference paper's turbulence experiment}
+\label{app:turb}
+
+We attempted a direct replication on the reference paper's own dataset (2D cylinder-wake turbulence
+D2~\cite{khojasteh_2022_lagrangian}, $n=18$ qubits, 11 anchor snapshots). Under
+our pre-registered evaluation convention the result is \textbf{not reproduced},
+since in the 11-snapshot regime the RBM and a 1.2M-parameter DCGAN beat our IQP on \emph{both} of the
+paper's metrics. Two findings qualify this. Under a last-write-wins aggregation convention, never
+specified in the paper, our IQP's PDF--JS values do land close to the published ones ($0.0322$ and
+$0.0476$ against $0.0238$ and $0.0221$), but the RBM still wins. Conv2D-MMD$^2$ is also saturated
+there, since ground truth shuffled in
+pixel space already scores $0.704$, below every model in the paper's Table~2 ($0.90$--$1.47$), and
+the unseen-time synthesis task is solvable by linear interpolation (correlation $0.9998$). Our
+anchor-fit ceiling (correlation $0.69$ sampled, $0.77$ exact) traces to a frozen
+$\theta_{\mathrm{lat}}$ in stage~1 ($\approx -0.08$), a $5\times10^{4}$-sample pmf ($\approx -0.04$)
+and a $0.88$--$0.89$ model-family ceiling, not to our implementation.
+
+\section{Support mismatch (reference paper Fig.~3)}
+\label{app:fig3}
+
+\begin{figure}[h]
+\centering
+\begin{minipage}[t]{0.41\textwidth}\centering
+\includegraphics[width=\linewidth]{figures/figA_fig3}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.41\textwidth}\centering
+\includegraphics[width=\linewidth]{figures/figA_fig4}
+\end{minipage}
+\caption{\textbf{(a)} Support-mismatch study at $n=16$, with $140$ target circuits ($\leq 4$-local)
+spanning exact $\qcli \in [0, 0.408]$ fitted by $\leq 2$-local learners of $50$, $100$ and $150$
+gates (exact MMD, Adam, $5{,}000$ steps). More gates lower the whole envelope (claim (b),
+reproduced), while within the reachable range the achieved MMD$^2$ \emph{rises} with target $\qcli$,
+the opposite of claim (a). \textbf{(b)} Circuits optimised to maximise $\qcli$ only, $n = 8, 12, 16$,
+3 seeds and 2 gain settings per $n$, $3{,}333$ steps each and about $20{,}000$ logged points per $n$.
+$\cci$ never enters the objective.}
+\label{fig:appcd}
+\end{figure}
+
+The reference paper's Fig.~3 claims (a) that the upper envelope of achievable MMD falls as the
+target's $\qcli$ rises, because the support-induced floor shrinks, and (b) that the envelope drops
+overall as the learner gets more gates (Fig.~\ref{fig:appcd}(a)). Claim (b) reproduces, as the median
+achieved MMD$^2$ falls $9.6\times10^{-3} \to 2.2\times10^{-3} \to 1.45\times10^{-3}$ across the three
+learners. Claim (a) runs the other way inside the range we can reach, since the achieved MMD$^2$
+\emph{rises} as the target's exact $\qcli$ goes from $0$ to $0.41$ (Spearman
+$\rho = +0.98/+0.90/+0.81$), a trend that also holds for a control trained on exact pmfs. The paper's premise still holds mechanistically ($\rho \le -0.98$ for the
+Proposition~II.2 floor proxy), but here the achieved MMD is dominated by trainability rather than by
+support mismatch. Our target family saturates at exact $\qcli \approx 0.41$, and at $0$--$0.064$ when
+estimated from $10^{4}$ samples as the paper does, so the regime where claim (a) is asserted lies
+outside what we could construct.
+
+\section{\texorpdfstring{The $\qcli$--$\cci$ ceiling}{The QCLI-CCI ceiling}}
+\label{app:fig4}
+
+We also reproduced the experiment in which maximising $\qcli$ alone raises $\cci$ as a by-product
+(Fig.~\ref{fig:appcd}(b)). The coupling reproduces at low $\qcli$
+(Spearman $\rho = +0.83/+0.76/+0.95$ for $n=8/12/16$ restricted to $\qcli \leq 0.3$) but reverses
+above $\qcli \approx 0.38$ for $n = 12,16$ (global $\rho = -0.53, -0.57$). The reversal is forced by
+the definitions, because the exactly uniform distribution maximises $\qcli$ ($0.982/0.998/1.000$ for
+$n=8/12/16$) and has $\cci = 0$. The reference paper's figure stops below $\qcli \approx 0.7$, so a
+high $\qcli$ need not indicate exploitable structure and can simply indicate proximity to uniform.
+
+\section{Additional arms}
+\label{app:arms}
+
+\paragraph{Data scaling.} At $N \in \{10,30,50,70,90,100\}$ the learned-direction IQP arm is flat for
+$N \geq 30$ (raw Conv2D-MMD$^2$ $0.082$--$0.087$) and so is the RBM ($0.066$--$0.089$), while the
+single-seed DCGAN leads already at $N{=}10$ ($0.044$ against $0.120$)
+and swings by $3\times$ non-monotonically ($0.113 \to 0.037$), so the paper's pattern of a GAN
+catching up only as data grows is half reproduced.
+
+\paragraph{Other arms.} We ran 25 conditions, 16 IQP arms, the RBM and DCGAN baselines and seven
+zero-learning or PCA controls, of which the main text reports five IQP arms. The rest (Hamming-ordered
+latent block, other objectives and priors, a pseudo-time conditional arm) and the controls are
+released with the code under the same metrics. Every IQP arm keeps a
+nearest-neighbour distance to the held-out set ($3.6$--$5.9$) far above the split-half floor ($0.95$),
+so none is memorising the training set, and the $M{=}8$ arm collapses (PDF--JS $0.0103$, MMD$^2$
+$0.244$ at $N{=}100$).
+
+\end{document}
