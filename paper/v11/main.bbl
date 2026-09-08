@@ -1,0 +1,99 @@
+\begin{thebibliography}{10}
+
+\bibitem{alexander_2020_deep}
+Stephon Alexander, Sergei Gleyzer, Evan McDonough, Michael~W. Toomey, and Emanuele Usai.
+\newblock Deep learning the morphology of dark matter substructure.
+\newblock {\em The Astrophysical Journal}, 893(1):15, 2020.
+
+\bibitem{alexander_2023_domain}
+Stephon Alexander, Sergei Gleyzer, Hanna Parul, Pranath Reddy, Marcos Tidball, and Michael~W. Toomey.
+\newblock Domain adaptation for simulation-based dark matter searches with strong gravitational lensing.
+\newblock {\em The Astrophysical Journal}, 954(1):28, 2023.
+\newblock arXiv:2112.12121.
+
+\bibitem{alexander_2021_decoding}
+Stephon Alexander, Sergei Gleyzer, Hanna Parul, Pranath Reddy, Michael~W. Toomey, Emanuele Usai, and Ryker Von~Klar.
+\newblock Decoding dark matter substructure without supervision, 2020.
+\newblock arXiv:2008.12731.
+
+\bibitem{bremner_2011_classical}
+Michael~J. Bremner, Richard Jozsa, and Dan~J. Shepherd.
+\newblock Classical simulation of commuting quantum computations implies collapse of the polynomial hierarchy.
+\newblock {\em Proceedings of the Royal Society A}, 467(2126):459--472, 2011.
+
+\bibitem{bremner_2016_average}
+Michael~J. Bremner, Ashley Montanaro, and Dan~J. Shepherd.
+\newblock Average-case complexity versus approximate simulation of commuting quantum computations.
+\newblock {\em Physical Review Letters}, 117:080501, 2016.
+
+\bibitem{chow_1968_approximating}
+C.~K. Chow and C.~N. Liu.
+\newblock Approximating discrete probability distributions with dependence trees.
+\newblock {\em IEEE Transactions on Information Theory}, 14(3):462--467, 1968.
+
+\bibitem{codsi_2025_classically}
+Julien Codsi and John van~de Wetering.
+\newblock Classically simulating quantum supremacy {IQP} circuits through a random graph approach.
+\newblock {\em Physical Review A}, 111:012422, 2025.
+
+\bibitem{gretton_2012_kernel}
+Arthur Gretton, Karsten~M. Borgwardt, Malte~J. Rasch, Bernhard Sch{\"o}lkopf, and Alexander Smola.
+\newblock A kernel two-sample test.
+\newblock {\em Journal of Machine Learning Research}, 13(25):723--773, 2012.
+
+\bibitem{hinton_2002_training}
+Geoffrey~E. Hinton.
+\newblock Training products of experts by minimizing contrastive divergence.
+\newblock {\em Neural Computation}, 14(8):1771--1800, 2002.
+
+\bibitem{khojasteh_2022_lagrangian}
+Ali~R. Khojasteh, Sylvain Laizet, Dominique Heitz, and Yin Yang.
+\newblock Lagrangian and {Eulerian} dataset of the wake downstream of a smooth cylinder at a {Reynolds} number equal to 3900.
+\newblock {\em Data in Brief}, 40:107725, 2022.
+
+\bibitem{liu_2026_correlation}
+Chen-Yu Liu, Leonardo Placidi, Eric Brunner, and Enrico Rinaldi.
+\newblock Toward generative quantum utility via correlation--complexity map, 2026.
+\newblock arXiv:2603.06440.
+
+\bibitem{ml4sci_deeplense}
+{ML4SCI Collaboration}.
+\newblock {DeepLense}: Deep learning for strong gravitational lensing.
+\newblock \url{https://github.com/ML4SCI/DeepLense}, 2025.
+
+\bibitem{radford_2015_unsupervised}
+Alec Radford, Luke Metz, and Soumith Chintala.
+\newblock Unsupervised representation learning with deep convolutional generative adversarial networks, 2015.
+\newblock arXiv:1511.06434.
+
+\bibitem{rajakumar_2024_polynomial}
+Joel Rajakumar, James~D. Watson, and Yi-Kai Liu.
+\newblock Polynomial-time classical simulation of noisy {IQP} circuits with constant depth, 2024.
+\newblock arXiv:2403.14607.
+
+\bibitem{recio_2025_train}
+Erik Recio-Armengol, Shahnawaz Ahmed, and Joseph Bowles.
+\newblock Train on classical, deploy on quantum: scaling generative quantum machine learning to a thousand qubits, 2025.
+\newblock arXiv:2503.02934.
+
+\bibitem{recio_2025_iqpopt}
+Erik Recio-Armengol and Joseph Bowles.
+\newblock {IQPopt}: Fast optimization of instantaneous quantum polynomial circuits in {JAX}, 2025.
+\newblock arXiv:2501.04776.
+
+\bibitem{schneidman_2003_network}
+Elad Schneidman, Susanne Still, Michael~J. Berry, and William Bialek.
+\newblock Network information and connected correlations.
+\newblock {\em Physical Review Letters}, 91(23):238701, 2003.
+
+\bibitem{tieleman_2008_training}
+Tijmen Tieleman.
+\newblock Training restricted {Boltzmann} machines using approximations to the likelihood gradient.
+\newblock In {\em Proc.\ ICML}, pages 1064--1071, 2008.
+
+\bibitem{watanabe_1960_information}
+Satosi Watanabe.
+\newblock Information theoretical analysis of multivariate correlation.
+\newblock {\em IBM Journal of Research and Development}, 4(1):66--82, 1960.
+
+\end{thebibliography}
