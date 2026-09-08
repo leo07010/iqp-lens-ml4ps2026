@@ -1,0 +1,340 @@
+{
+  "meta": {
+    "n_seeds": 5,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "files": [
+      "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/paper_suite/map/results_map_seed0.json",
+      "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/paper_suite/map/results_map_seed1.json",
+      "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/paper_suite/map/results_map_seed2.json",
+      "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/paper_suite/map/results_map_seed3.json",
+      "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/paper_suite/map/results_map_seed4.json"
+    ],
+    "script": "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/paper_suite/map/agg_map_seeds.py",
+    "note": "sd is the sample sd (ddof=1) over seeds; a row whose sd is exactly 0 is an exact statistic of a fixed split, not a Monte-Carlo estimate",
+    "reproduction_check": {
+      "max_abs_diff_vs_results_map_json": 0.0,
+      "per_field": {
+        "Lens, 18-bit (x,y,z) tuples/I_QCLI": 0.0,
+        "Lens, 18-bit (x,y,z) tuples/I_CCI": 0.0,
+        "Lens, 18-bit (x,y,z) tuples/perm_QCLI": 0.0,
+        "Lens, 18-bit (x,y,z) tuples/perm_CCI": 0.0,
+        "Turbulence D2, 18-bit tuples/I_QCLI": 0.0,
+        "Turbulence D2, 18-bit tuples/I_CCI": 0.0,
+        "Turbulence D2, 18-bit tuples/perm_QCLI": 0.0,
+        "Turbulence D2, 18-bit tuples/perm_CCI": 0.0,
+        "Turbulence D2, 18-bit tuples (native K)/I_QCLI": 0.0,
+        "Turbulence D2, 18-bit tuples (native K)/I_CCI": 0.0,
+        "Turbulence D2, 18-bit tuples (native K)/perm_QCLI": 0.0,
+        "Turbulence D2, 18-bit tuples (native K)/perm_CCI": 0.0,
+        "Lens, 10-bit crop pmf/I_QCLI": 0.0,
+        "Lens, 10-bit crop pmf/I_CCI": 0.0,
+        "Lens, 10-bit crop pmf/perm_QCLI": 0.0,
+        "Lens, 10-bit crop pmf/perm_CCI": 0.0
+      }
+    }
+  },
+  "rows": [
+    {
+      "label": "Lens, 18-bit (x,y,z) tuples",
+      "dataset": "lens",
+      "representation": "18-bit (x,y,z) tuples, per-image",
+      "K": 4096,
+      "K_note": "exhaustive: one k_z per (k_x,k_y) cell of the 64x64 image",
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "per_seed": {
+        "I_QCLI": [
+          0.4715263151895326,
+          0.4715263151895326,
+          0.4715263151895326,
+          0.4715263151895326,
+          0.4715263151895326
+        ],
+        "I_CCI": [
+          0.8676898897301594,
+          0.8676898897301594,
+          0.8676898897301594,
+          0.8676898897301594,
+          0.8676898897301594
+        ],
+        "perm_QCLI": [
+          0.4153995942527295,
+          0.4153735966943279,
+          0.41534366808545786,
+          0.41534919229135214,
+          0.4153635490908934
+        ],
+        "perm_CCI": [
+          0.8782449069943576,
+          0.8783015704189999,
+          0.878415628814976,
+          0.878378604380839,
+          0.8783922643850718
+        ]
+      },
+      "I_QCLI_mean": 0.4715263151895326,
+      "I_QCLI_sd": 0.0,
+      "I_QCLI_range": [
+        0.4715263151895326,
+        0.4715263151895326
+      ],
+      "I_CCI_mean": 0.8676898897301595,
+      "I_CCI_sd": 1.2412670766236366e-16,
+      "I_CCI_range": [
+        0.8676898897301594,
+        0.8676898897301594
+      ],
+      "perm_QCLI_mean": 0.41536592008295214,
+      "perm_QCLI_sd": 2.2211889159010585e-05,
+      "perm_QCLI_range": [
+        0.41534366808545786,
+        0.4153995942527295
+      ],
+      "perm_CCI_mean": 0.8783465949988489,
+      "perm_CCI_sd": 7.114004531631838e-05,
+      "perm_CCI_range": [
+        0.8782449069943576,
+        0.878415628814976
+      ],
+      "varies_with_seed": {
+        "I_QCLI": false,
+        "I_CCI": true,
+        "perm_QCLI": true,
+        "perm_CCI": true
+      }
+    },
+    {
+      "label": "Turbulence D2, 18-bit tuples",
+      "dataset": "turbulence D2",
+      "representation": "18-bit tuples, per-snapshot (M=4096)",
+      "K": 4096,
+      "K_note": "subsampled from the native grid to match the lens K",
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "per_seed": {
+        "I_QCLI": [
+          0.023234108222059773,
+          0.023305757747097058,
+          0.02347243233751638,
+          0.02292739803212837,
+          0.023109824697444187
+        ],
+        "I_CCI": [
+          0.9294153682103118,
+          0.9276233601657845,
+          0.9278818057249424,
+          0.9284565173571745,
+          0.9292365733236508
+        ],
+        "perm_QCLI": [
+          0.011347085342522203,
+          0.011366166447218088,
+          0.01128521133957068,
+          0.011365945945954135,
+          0.011398398283250254
+        ],
+        "perm_CCI": [
+          0.9370681249288726,
+          0.9379670523094797,
+          0.9371114198855436,
+          0.9356939508068761,
+          0.9375502853362723
+        ]
+      },
+      "I_QCLI_mean": 0.023209904207249155,
+      "I_QCLI_sd": 0.00020525618253788933,
+      "I_QCLI_range": [
+        0.02292739803212837,
+        0.02347243233751638
+      ],
+      "I_CCI_mean": 0.9285227249563729,
+      "I_CCI_sd": 0.000795363030984466,
+      "I_CCI_range": [
+        0.9276233601657845,
+        0.9294153682103118
+      ],
+      "perm_QCLI_mean": 0.011352561471703073,
+      "perm_QCLI_sd": 4.192636727528858e-05,
+      "perm_QCLI_range": [
+        0.01128521133957068,
+        0.011398398283250254
+      ],
+      "perm_CCI_mean": 0.9370781666534089,
+      "perm_CCI_sd": 0.0008559021386450482,
+      "perm_CCI_range": [
+        0.9356939508068761,
+        0.9379670523094797
+      ],
+      "varies_with_seed": {
+        "I_QCLI": true,
+        "I_CCI": true,
+        "perm_QCLI": true,
+        "perm_CCI": true
+      }
+    },
+    {
+      "label": "Turbulence D2, 18-bit tuples (native K)",
+      "dataset": "turbulence D2",
+      "representation": "18-bit tuples, per-snapshot (N_t=5e4)",
+      "K": 50000,
+      "K_note": "the reference paper's own N_t = 5x10^4 draws per snapshot",
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "per_seed": {
+        "I_QCLI": [
+          0.0910475455380975,
+          0.0910475455380975,
+          0.0910475455380975,
+          0.0910475455380975,
+          0.0910475455380975
+        ],
+        "I_CCI": [
+          0.908505331888029,
+          0.908505331888029,
+          0.908505331888029,
+          0.908505331888029,
+          0.908505331888029
+        ],
+        "perm_QCLI": [
+          0.09841466437808545,
+          0.0984056283831718,
+          0.09898200621495042,
+          0.09714569303931476,
+          0.09754824706019305
+        ],
+        "perm_CCI": [
+          0.8778887951129656,
+          0.87844412120886,
+          0.8783711282378155,
+          0.8782599145304314,
+          0.8778239323958227
+        ]
+      },
+      "I_QCLI_mean": 0.0910475455380975,
+      "I_QCLI_sd": 0.0,
+      "I_QCLI_range": [
+        0.0910475455380975,
+        0.0910475455380975
+      ],
+      "I_CCI_mean": 0.908505331888029,
+      "I_CCI_sd": 0.0,
+      "I_CCI_range": [
+        0.908505331888029,
+        0.908505331888029
+      ],
+      "perm_QCLI_mean": 0.09809924781514309,
+      "perm_QCLI_sd": 0.0007391697361795321,
+      "perm_QCLI_range": [
+        0.09714569303931476,
+        0.09898200621495042
+      ],
+      "perm_CCI_mean": 0.8781575782971791,
+      "perm_CCI_sd": 0.00028361378211597463,
+      "perm_CCI_range": [
+        0.8778239323958227,
+        0.87844412120886
+      ],
+      "varies_with_seed": {
+        "I_QCLI": false,
+        "I_CCI": false,
+        "perm_QCLI": true,
+        "perm_CCI": true
+      }
+    },
+    {
+      "label": "Lens, 10-bit crop pmf",
+      "dataset": "lens",
+      "representation": "10-bit crop pmf, per-image (exact pmf)",
+      "K": "exact pmf",
+      "K_note": "no sampling: the exact population pmf of the 32x32 crop",
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "per_seed": {
+        "I_QCLI": [
+          0.4730663602602453,
+          0.4730663602602453,
+          0.4730663602602453,
+          0.4730663602602453,
+          0.4730663602602453
+        ],
+        "I_CCI": [
+          0.4312965859476324,
+          0.4312965859476324,
+          0.4312965859476324,
+          0.4312965859476324,
+          0.4312965859476324
+        ],
+        "perm_QCLI": [
+          0.17822583043024307,
+          0.17825660719387657,
+          0.17823004332166445,
+          0.17828349436503046,
+          0.17821371895808
+        ],
+        "perm_CCI": [
+          0.9633157349010798,
+          0.9635482577978874,
+          0.9632456614194538,
+          0.9638608488251933,
+          0.9628553152655337
+        ]
+      },
+      "I_QCLI_mean": 0.4730663602602453,
+      "I_QCLI_sd": 0.0,
+      "I_QCLI_range": [
+        0.4730663602602453,
+        0.4730663602602453
+      ],
+      "I_CCI_mean": 0.4312965859476324,
+      "I_CCI_sd": 0.0,
+      "I_CCI_range": [
+        0.4312965859476324,
+        0.4312965859476324
+      ],
+      "perm_QCLI_mean": 0.1782419388537789,
+      "perm_QCLI_sd": 2.801503267422867e-05,
+      "perm_QCLI_range": [
+        0.17821371895808,
+        0.17828349436503046
+      ],
+      "perm_CCI_mean": 0.9633651636418297,
+      "perm_CCI_sd": 0.0003727923749774377,
+      "perm_CCI_range": [
+        0.9628553152655337,
+        0.9638608488251933
+      ],
+      "varies_with_seed": {
+        "I_QCLI": false,
+        "I_CCI": false,
+        "perm_QCLI": true,
+        "perm_CCI": true
+      }
+    }
+  ]
+}

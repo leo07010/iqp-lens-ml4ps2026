@@ -1,0 +1,368 @@
+{
+  "meta": {
+    "generated": "2026-09-09 03:40:04",
+    "seed": 3,
+    "L_subset_budget": 20000,
+    "wallclock_s": 69.14945840835571,
+    "script": "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/paper_suite/map/run_map.py",
+    "sources": {
+      "lens_18bit": "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/outputs_lens_pilot/qcli_cci_lens.json",
+      "d2_18bit": "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/outputs_anchor_fit/qcli_cci_d2.json",
+      "mnist": "<WORK>/data/mnist",
+      "blobs": "qml-benchmarks generate_8blobs configs (hard-copied)"
+    }
+  },
+  "points": [
+    {
+      "dataset": "lens",
+      "representation": "18-bit (x,y,z) tuples, per-image",
+      "n": 18,
+      "M": 4096,
+      "I_QCLI": 0.4715263151895326,
+      "I_CCI": 0.8676898897301594,
+      "null_QCLI": 0.007733319636116076,
+      "null_CCI": 0.9979771281437693,
+      "estimator": "exact 2**18",
+      "note": "mean over 600 val images (3 classes pooled); sd 0.0075 / 0.0078",
+      "sd_QCLI": 0.007533871047919312,
+      "sd_CCI": 0.007836883508754958,
+      "n_images": 600,
+      "source": "round1 json",
+      "perm_QCLI": 0.41534919229135214,
+      "perm_CCI": 0.878378604380839,
+      "perm_note": "kz permuted across the 4096 pixels: keeps the exhaustive (kx,ky) sweep and the exact kz histogram, destroys the spatial layout (50 images/class)"
+    },
+    {
+      "dataset": "lens",
+      "representation": "18-bit (x,y,z) tuples, pooled 100 train",
+      "n": 18,
+      "M": 409600,
+      "I_QCLI": 0.7094532315888582,
+      "I_CCI": 0.8012594288755596,
+      "null_QCLI": 0.40460738170134003,
+      "null_CCI": 0.9997758121784731,
+      "estimator": "exact 2**18",
+      "note": "mean over the 3 classes (spread 0.0047 / 0.0015)",
+      "source": "round1 json"
+    },
+    {
+      "dataset": "lens",
+      "representation": "10-bit crop pmf, per-image (exact pmf)",
+      "n": 10,
+      "M": "exact pmf",
+      "I_QCLI": 0.4730663602602453,
+      "I_CCI": 0.4312965859476324,
+      "null_QCLI": 0.9944124025247316,
+      "null_CCI": 0.0,
+      "estimator": "exact 2**10 on the population pmf",
+      "note": "no sampling; null = the exact uniform pmf. sd 0.0693 / 0.0507",
+      "sd_QCLI": 0.06930483253812421,
+      "sd_CCI": 0.05073338227169603,
+      "n_images": 200,
+      "perm_QCLI": 0.17828349436503046,
+      "perm_CCI": 0.9638608488251933,
+      "perm_note": "pmf values permuted across the 1024 codes"
+    },
+    {
+      "dataset": "lens",
+      "representation": "10-bit crop pmf, per-image (M=4096 draws)",
+      "n": 10,
+      "M": 4096,
+      "I_QCLI": 0.3945394753409528,
+      "I_CCI": 0.5018054419816432,
+      "null_QCLI": 0.6059390213820373,
+      "null_CCI": 0.9747444935895416,
+      "estimator": "exact 2**10 on the empirical pmf",
+      "note": "M/2**n = 4.0: saturated regime, read against the null. sd 0.0489 / 0.0471",
+      "sd_QCLI": 0.04889361753964377,
+      "sd_CCI": 0.04711280490117076,
+      "n_images": 200,
+      "perm_QCLI": 0.16354600367116634,
+      "perm_CCI": 0.9642070669630747,
+      "perm_note": "pmf values permuted across the 1024 codes, then resampled"
+    },
+    {
+      "dataset": "lens",
+      "representation": "10-bit crop pmf, pooled 100 train (exact pmf)",
+      "n": 10,
+      "M": "exact pmf",
+      "I_QCLI": 0.651874333268241,
+      "I_CCI": 0.41121930366900206,
+      "null_QCLI": 0.9944124025247316,
+      "null_CCI": 0.0,
+      "estimator": "exact 2**10 on the population pmf",
+      "note": "mean of the 100 training crops' pmfs",
+      "perm_QCLI": 0.2606499057194525,
+      "perm_CCI": 0.9597683663521894,
+      "perm_note": "pooled pmf values permuted across the 1024 codes"
+    },
+    {
+      "dataset": "lens",
+      "representation": "10-bit crop pmf, pooled 100 train (M=409600 draws)",
+      "n": 10,
+      "M": 409600,
+      "I_QCLI": 0.6475605625679504,
+      "I_CCI": 0.41487093368184047,
+      "null_QCLI": 0.9820606820660307,
+      "null_CCI": 0.9805677965157136,
+      "estimator": "exact 2**10 on the empirical pmf",
+      "note": "100 x 4096 draws"
+    },
+    {
+      "dataset": "turbulence D2",
+      "representation": "18-bit (x,y,|u|) tuples, pooled 11 anchors",
+      "n": 18,
+      "M": 550000,
+      "I_QCLI": 0.161949466275833,
+      "I_CCI": 0.8836839884527844,
+      "null_QCLI": 0.4691168910190519,
+      "null_CCI": 0.9998134722378883,
+      "estimator": "exact 2**18",
+      "note": "paper's N_t=5e4 per anchor; QCLI/CCI reused from round 1, null new",
+      "source": "round1 json + new matched null"
+    },
+    {
+      "dataset": "turbulence D2",
+      "representation": "18-bit tuples, per-snapshot (N_t=5e4)",
+      "n": 18,
+      "M": 50000,
+      "I_QCLI": 0.0910475455380975,
+      "I_CCI": 0.908505331888029,
+      "null_QCLI": 0.08540264101969575,
+      "null_CCI": 0.9996854221205763,
+      "estimator": "exact 2**18",
+      "note": "mean over t = [1, 500, 1000]",
+      "source": "round1 json + new matched null",
+      "perm_QCLI": 0.09714569303931476,
+      "perm_CCI": 0.8782599145304314,
+      "perm_note": "kz permuted over the native grid points, then subsampled to the same M; keeps the |u| histogram, destroys the flow field"
+    },
+    {
+      "dataset": "turbulence D2",
+      "representation": "18-bit tuples, per-snapshot (M=4096)",
+      "n": 18,
+      "M": 4096,
+      "I_QCLI": 0.02292739803212837,
+      "I_CCI": 0.9284565173571745,
+      "null_QCLI": 0.007736082206560775,
+      "null_CCI": 0.9982166794294816,
+      "estimator": "exact 2**18",
+      "note": "NEW: M matched to the lens per-image point; mean over t=1,500,1000",
+      "perm_QCLI": 0.011365945945954135,
+      "perm_CCI": 0.9356939508068761,
+      "perm_note": "kz permuted over the native grid points"
+    },
+    {
+      "dataset": "binarized MNIST",
+      "representation": "16-bit (7x7 mean-pool to 4x4, thr 0.5)",
+      "n": 16,
+      "M": 10000,
+      "I_QCLI": 0.01569820934571298,
+      "I_CCI": 0.12367620996260187,
+      "null_QCLI": 0.06929895566460519,
+      "null_CCI": 0.998432791384971,
+      "estimator": "exact 2**16",
+      "note": "downsampled stand-in for Ref [38]'s MNIST (which is 784-bit)"
+    },
+    {
+      "dataset": "binarized MNIST",
+      "representation": "16-bit (7x7 mean-pool to 4x4, thr 0.5)",
+      "n": 16,
+      "M": 60000,
+      "I_QCLI": 0.014952280339617147,
+      "I_CCI": 0.12254389437448654,
+      "null_QCLI": 0.29370335025651123,
+      "null_CCI": 0.9992527973865998,
+      "estimator": "exact 2**16",
+      "note": "downsampled stand-in for Ref [38]'s MNIST (which is 784-bit)"
+    },
+    {
+      "dataset": "binarized MNIST",
+      "representation": "484-bit (thr 0.5)",
+      "n": 484,
+      "M": 10000,
+      "I_QCLI": 0.009757002308637925,
+      "I_CCI": 0.5704801822854303,
+      "null_QCLI": 0.008252782825811964,
+      "null_CCI": 0.9992584593946628,
+      "estimator": "QCLI: Appendix C MC L=20000; CCI: plug-in from samples",
+      "note": "central 22x22 crop; 484 is Ref [38]'s D-WAVE size, not its MNIST size",
+      "H_joint": 13.287712379549445,
+      "H_marg_sum": 289.7638351157192,
+      "null_H_marg_sum": 483.96518586327466
+    },
+    {
+      "dataset": "binarized MNIST",
+      "representation": "784-bit (thr 0.5)",
+      "n": 784,
+      "M": 10000,
+      "I_QCLI": 0.015609493222712233,
+      "I_CCI": 0.5684099398948081,
+      "null_QCLI": 0.014990218338939702,
+      "null_CCI": 0.9992110649524576,
+      "estimator": "QCLI: Appendix C MC L=20000; CCI: plug-in from samples",
+      "note": "Ref [38]'s own definition (paper.txt:370)",
+      "H_joint": 13.287712379549445,
+      "H_marg_sum": 296.8838274957276,
+      "null_H_marg_sum": 783.9450862827566
+    },
+    {
+      "dataset": "BinaryBlobs",
+      "representation": "16-bit, 8 patterns, flip p=0.05",
+      "n": 16,
+      "M": 10000,
+      "I_QCLI": 0.03171811624254414,
+      "I_CCI": 0.5378891960869465,
+      "null_QCLI": 0.0693658816808,
+      "null_CCI": 0.9982277583165959,
+      "estimator": "exact 2**16",
+      "note": "Ref [38] paper.txt:608 states p=0.05; qml-benchmarks default 0.01"
+    },
+    {
+      "dataset": "BinaryBlobs",
+      "representation": "16-bit, 8 patterns, flip p=0.01",
+      "n": 16,
+      "M": 10000,
+      "I_QCLI": 0.0014849437686212108,
+      "I_CCI": 0.44701770447645783,
+      "null_QCLI": 0.06916678382585675,
+      "null_CCI": 0.998292951026886,
+      "estimator": "exact 2**16",
+      "note": "Ref [38] paper.txt:608 states p=0.05; qml-benchmarks default 0.01"
+    }
+  ],
+  "uniform_null_curves": {
+    "10": [
+      {
+        "M": 1000,
+        "I_QCLI": 0.30303415899386943,
+        "I_CCI": 0.9743774493027934,
+        "M_over_Cnhalf": 3.9682539682539684
+      },
+      {
+        "M": 4096,
+        "I_QCLI": 0.6013334302535277,
+        "I_CCI": 0.9615862108161436,
+        "M_over_Cnhalf": 16.253968253968253
+      },
+      {
+        "M": 10000,
+        "I_QCLI": 0.7720061040130077,
+        "I_CCI": 0.9752377359974825,
+        "M_over_Cnhalf": 39.682539682539684
+      },
+      {
+        "M": 50000,
+        "I_QCLI": 0.923042738902087,
+        "I_CCI": 0.9719379908823149,
+        "M_over_Cnhalf": 198.4126984126984
+      },
+      {
+        "M": 100000,
+        "I_QCLI": 0.9525028306411544,
+        "I_CCI": 0.9737432844946886,
+        "M_over_Cnhalf": 396.8253968253968
+      },
+      {
+        "M": 409600,
+        "I_QCLI": 0.9816094999272089,
+        "I_CCI": 0.9689051296191985,
+        "M_over_Cnhalf": 1625.3968253968253
+      },
+      {
+        "M": 1000000,
+        "I_QCLI": 0.988481957084425,
+        "I_CCI": 0.9664633644415079,
+        "M_over_Cnhalf": 3968.253968253968
+      }
+    ],
+    "16": [
+      {
+        "M": 1000,
+        "I_QCLI": 0.0075782405006432265,
+        "I_CCI": 0.9928213694197978,
+        "M_over_Cnhalf": 0.0777000777000777
+      },
+      {
+        "M": 4096,
+        "I_QCLI": 0.030043373898927094,
+        "I_CCI": 0.9976762371563423,
+        "M_over_Cnhalf": 0.31825951825951826
+      },
+      {
+        "M": 10000,
+        "I_QCLI": 0.06971031881601009,
+        "I_CCI": 0.9985898982918265,
+        "M_over_Cnhalf": 0.777000777000777
+      },
+      {
+        "M": 50000,
+        "I_QCLI": 0.2582154732012687,
+        "I_CCI": 0.9991713403629252,
+        "M_over_Cnhalf": 3.885003885003885
+      },
+      {
+        "M": 100000,
+        "I_QCLI": 0.40020038937947816,
+        "I_CCI": 0.99920855602575,
+        "M_over_Cnhalf": 7.77000777000777
+      },
+      {
+        "M": 409600,
+        "I_QCLI": 0.6982664712238675,
+        "I_CCI": 0.9990963103330541,
+        "M_over_Cnhalf": 31.825951825951826
+      },
+      {
+        "M": 1000000,
+        "I_QCLI": 0.8306701607124761,
+        "I_CCI": 0.9990518094830145,
+        "M_over_Cnhalf": 77.7000777000777
+      }
+    ],
+    "18": [
+      {
+        "M": 1000,
+        "I_QCLI": 0.0018959571876030609,
+        "I_CCI": 0.9925920772328753,
+        "M_over_Cnhalf": 0.020567667626491155
+      },
+      {
+        "M": 4096,
+        "I_QCLI": 0.0077200575793519655,
+        "I_CCI": 0.9979057083576476,
+        "M_over_Cnhalf": 0.08424516659810777
+      },
+      {
+        "M": 10000,
+        "I_QCLI": 0.018584050655409204,
+        "I_CCI": 0.9988933194516033,
+        "M_over_Cnhalf": 0.20567667626491157
+      },
+      {
+        "M": 50000,
+        "I_QCLI": 0.08520876081941153,
+        "I_CCI": 0.9996819032113976,
+        "M_over_Cnhalf": 1.0283833813245578
+      },
+      {
+        "M": 100000,
+        "I_QCLI": 0.15420369577437276,
+        "I_CCI": 0.9996820371952935,
+        "M_over_Cnhalf": 2.0567667626491155
+      },
+      {
+        "M": 409600,
+        "I_QCLI": 0.4042950999523822,
+        "I_CCI": 0.9997499559579458,
+        "M_over_Cnhalf": 8.424516659810777
+      },
+      {
+        "M": 1000000,
+        "I_QCLI": 0.6008681016905182,
+        "I_CCI": 0.9997308207659318,
+        "M_over_Cnhalf": 20.567667626491154
+      }
+    ]
+  }
+}

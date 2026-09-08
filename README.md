@@ -147,6 +147,47 @@ are the write-ups those tables were taken from; each pre-registration
 (`docs/*_PREREGISTRATION.md`) states the falsifiable predictions the
 corresponding results file was scored against, written before the run.
 
+## v11 (five seeds, metric protocol v11)
+
+A later campaign re-scored the main IQP-vs-baseline comparison under a
+revised metric protocol (`code/metrics_v11.py`, `code/evaluate_v11.py`)
+across five random seeds instead of one, with an early-stopping variant and
+a convergence/floor sweep for the classical baselines:
+
+- `code/seeds/` — the five-seed training and diagnostic scripts
+  (`train_iqp_affine_r3_snap.py`, `train_iqp_affine_r3_theta0obj.py`,
+  `select_checkpoint.py`, `rescore_extra_metrics.py`, `floor_bootstrap.py`,
+  `val_extra.py`, plus the `diag_*_seeds.py` robustness probes) and their
+  `submit_seeds_*.sbatch` launchers, including the early-stopping variant
+  (`submit_seeds_iqp_es.sbatch`, `submit_seeds_iqp_es_v11.sbatch`).
+- `code/metrics_v11.py`, `code/evaluate_v11.py`, `code/compare_v11_tables.py`
+  — the v11 metric protocol and the script that turns the seed results into
+  the paper's seed tables.
+- `code/aggregate_seeds.py`, `code/baseline_rbm_sweep.py`,
+  `code/baseline_dcgan_sweep.py`, `code/aggregate_convergence.py`,
+  `code/submit_baseline_convergence.sbatch`, `code/submit_v11_rescore.sbatch`
+  — the classical-baseline convergence/floor sweep and its aggregation, and
+  the batch re-scoring job for existing checkpoints under metrics_v11.
+- `code/turb_aggregate_seeds.py`, `code/turb_seed_extras.py`,
+  `code/turb_facts_addendum.py` — the matching five-seed pass on the
+  turbulence-replication track (Appendix B).
+- `code/paper_suite/map/agg_map_seeds.py`, `code/mech_tests/mech_test2/mech_seeds.py`
+  + `agg_mech_seeds.py`, and `code/paper_suite/controlled/fig3_learner_seeds.py`
+  + `agg_fig34_seeds.py` — the five-seed variants of the correlation-complexity
+  map, mechanism test, and controlled-synthetic (Fig. 3/4) studies, each with
+  its `submit_*_seeds.sbatch` launcher.
+- `results/results_seeds_*.jsonl`, `results/results_v11_*.jsonl`,
+  `results/results_convergence.jsonl`, `results/results_d2_seeds.jsonl`,
+  `results/paper_suite/map/results_map_seed*.json`,
+  `results/mech_tests/mech_test2/results_seeds.json`,
+  `results/outputs_controlled/results_fig34_seeds.json` /
+  `results_fig4_seeds34.jsonl` — the raw per-seed results, plus `meta.json`
+  files (checkpoint-selection and run metadata, no weights) preserved under
+  `results/outputs_seeds*/` and `results/outputs_convergence/`.
+- `paper/v11/seed_tables.md`, `seed_tables_b.md`, `seed_tables_c.md` — the
+  seed-aggregated tables as they appear in the paper. `paper/v11/` will also
+  hold the v11 revision of the paper itself once that is finalized.
+
 ## Notes on the research log in `docs/`
 
 `docs/` is a running lab notebook, not sanitized for publication style: it
