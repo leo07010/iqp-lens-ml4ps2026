@@ -1,0 +1,1294 @@
+#!/usr/bin/env python3
+"""v12 IQP arm: multi-kernel objective + Walsh low-pass + flux resampling.
+
+DERIVED FILE.  A copy of seeds/train_iqp_affine_r3_snap.py.  The circuit, the data split, the
+crops, the paste offsets, the theta0 KL warm start, the joint Adam and its cosine schedule,
+the z penalty, the resample+jitter latent prior, the held-out z-only projection with its
+restart rule, the snapshot machinery and the output contract are all UNCHANGED, so any
+difference in the numbers is one of the four levers below and nothing else.  The baselines,
+the data split and the evaluation (evaluate_v11.py) are not touched by this file at all.
+
+WHY (the three mechanisms the v11 N = 11 table blames the IQP arm's losses on)
+    (i)   phase interference speckle -- gen_max 1.5-2.8 and too much high-order Walsh energy;
+    (ii)  the flux S was handed to every generated image as the TRAINING-set MEAN, a delta at
+          112.34 against a held-out distribution centred on 123.87 with sd 27.8 -- so the raw
+          (un-aligned) MMD^2 paid for a missing scale distribution, not for bad structure
+          (the flat arm's aligned MMD^2 is 0.0274 against a raw 0.0891);
+    (iii) the two kernels each win one metric: the paper (Gaussian, weight-concentrated)
+          kernel matches the intensity histogram (PDF-JS 0.00081), the flat kernel matches
+          structure (aligned MMD^2 0.0274).  Neither wins both.
+
+THE FOUR LEVERS
+  A  --objective multi
+        loss_i = MMD^2_flat,i + lam * MMD^2_paper,i, with lam fixed ONCE, right after the
+        theta0 seed, at lam = L0_flat / L0_paper so the two terms are exactly equal in
+        magnitude at theta0, z = 0.  Both forms are the SAME quadratic in the same residual
+        d_i = <Z>_i - <Z>_data,i with different Walsh weights c_s, so the sum is one
+        quadratic form with weights c_flat + lam * c_paper: the multi-kernel arm costs the
+        same per step as either single-kernel arm.  (--lam overrides the automatic value.)
+
+  B  --mu / --walsh-k0
+        + mu * L0 * mean_i [ H(q_i) / H0 ],   H(q) = sum_{|s| > k0} <Z_s>^2,
+        H0 = H at theta0, z = 0.  Written RELATIVE to L0 and H0 for the same reason --zpen is
+        (see the parent docstring): mu then means "this fraction of the starting loss when the
+        high-order energy sits at its starting level", the same fraction at every objective
+        scale.  H(q) is the speckle: an IQP amplitude built from interfering phases puts
+        energy in high-weight Walsh coefficients that a smooth lensing image does not have.
+        mu = 0 reproduces lever A exactly (the term is not even added to the graph).
+
+  C  --flux resample
+        Generation draws each image's total intensity from the N TRAINING crop totals with
+        replacement plus Gaussian jitter (std = --flux-jitter x the median nearest-neighbour
+        spacing of those totals), instead of giving every image the single mean S.  This is
+        the same resample+jitter rule sample_latents_resample already applies to the latents,
+        applied to the one scalar the codec carries outside the circuit.  It uses TRAINING
+        data only -- at N = 11 the mean stays 9.3% below the held-out mean, which is an honest
+        small-sample estimate; what it recovers is the SPREAD (sd 27.0 vs the held-out 27.8),
+        which the delta at S had none of.  DCGAN already learns its own per-image scale, so
+        this levels the comparison rather than tilting it.
+
+  D  --M 2 or 4 (already a flag; M = 2 was the most stable point of the round-3b sweep).
+
+  E  --objective spatial  (objective_spatial.py)
+        Both Hamming kernels are blind to the pixel grid: they cannot see that code 15 and
+        code 16 are adjacent pixels, while the metric the arms are judged by
+        (evaluate_v11.conv_mmd2) is a Conv2D encoder, a SPATIAL statistic, and the DCGAN's
+        convolutional generator is spatially smooth by construction.  This objective is the
+        exact population MMD^2 of a pixel-space Gaussian kernel,
+        (q - p)^T K (q - p) with K = sum_sigma exp(-||pos - pos'||^2 / 2 sigma^2) over
+        --spatial-sigmas (default 1, 2, 4 crop pixels), optionally plus lam x the flat
+        Hamming MMD (--spatial-flat, and the flat MMD is exactly ||q - p||^2, so that term is
+        an identity component of the same K).  It is estimable on hardware as an ordinary
+        two-sample kernel estimate on sampled bitstrings.  K is never formed: it separates as
+        Kx (x) Ky per bandwidth, so the cost is O(B grid^3), not O(B grid^4).
+
+  F  --encoding lowres8  (codec_v12.py)
+        The 32x32 crop is block-summed 2x2 to 16x16 -> 8 qubits, all 256 Walsh generators
+        trainable, and generation upsamples back with a FIXED bilinear map (no learned
+        parameters) before the flux is applied.  256 + M x 256 + N M parameters -- 768 shared
+        at M = 2 against the 10-qubit arm's 5,120.  The encoding's own ceiling is measured,
+        not assumed: meta's `encode_decode_corr` is the correlation between a real training
+        crop and its own block-sum -> bilinear round trip (0.990 on this data).
+
+  G  --encoding gray10  (codec_v12.py)
+        The same 32x32 crop and the same 1,024 generators, but each axis index is written in
+        reflected Gray code before packing.  A permutation of the code axis cannot change what
+        the circuit can express; what it changes is the KERNEL.  Under the plain binary code
+        a one-pixel step can flip 5 bits (15 -> 16); under a Gray code it flips exactly one
+        (measured: mean adjacent-pixel Hamming distance 1.84 -> 1.00, max 5 -> 1).  This arm
+        asks whether that mismatch is what the Hamming kernels were missing.
+
+  H/I  --latent-map mlp --hidden H   (ported verbatim from train_iqp_affine_mlp.py)
+        theta_i = theta0 + g(z_i) with g(z) = c [tanh(z W1 + b1) - tanh(b1)] W2n, W2n the
+        output rows L2-normalised to PHI_SCALE exactly as Phi's are, and c calibrated ONCE at
+        init so the typical ||g(z)|| equals the affine map's PHI_SCALE ||z||: the comparison
+        is about the SHAPE of the map, not about a bigger phase budget.  g(0) = 0 exactly, so
+        z = 0 still means theta0 and the L0 the z penalty is measured against is unchanged.
+        Part D found H = 32 wins but costs 34k parameters; --hidden 4 / 8 are the
+        same-or-fewer-parameters candidates (1,024 + M H + H + 1,024 H), and --encoding
+        lowres8 with --hidden 8 is arm I.  Phi.npy then holds the least-squares best AFFINE
+        approximation of g on the trained latents and meta's `nonlinearity_ratio` its relative
+        residual -- 0 would mean the MLP collapsed back to the affine map.
+
+Everything below this line is the parent file's docstring, unchanged.
+--------------------------------------------------------------------------------------
+COPY of train_iqp_affine_r3.py with ONE added flag: --save-every.
+
+WHY THIS FORK EXISTS.  The classical baselines now pick their step count on a validation set
+(seeds/select_checkpoint.py), while the IQP arms ran a fixed 4,000 steps.  That asymmetry
+favours the baselines, and a reviewer is entitled to ask what the IQP arms would do under the
+same rule.  Answering it needs intermediate checkpoints, and they cannot be faked by running
+the trainer several times with different --steps: run_adam_scalar drives a CosineAnnealingLR
+whose T_max IS the total step count (train_iqp_affine_r3.py:230), so the first 1,000 steps of
+a 16,000-step run follow a completely different learning-rate trajectory from a 1,000-step
+run.  The snapshots therefore have to come from ONE run.
+
+--save-every takes a list of step counts.  The joint optimiser runs once to the largest of
+them, and at each listed step the CURRENT BEST iterate -- the trainer's own convention, the
+best-so-far rather than the latest (line 226) -- is put through the unchanged held-out
+projection, generation and output-writing path.  Snapshot k lands in `<--out>_s<k/1000>k`,
+the same layout baseline_rbm_sweep.py / baseline_dcgan_sweep.py use, so
+seeds/select_checkpoint.py reads it with no changes at all.
+
+With --save-every unset, or set to a single value equal to --steps, this file reproduces
+train_iqp_affine_r3.py exactly.  The original is not modified.
+
+--------------------------------------------------------------------------------------
+Round-3b IQP generator with LEARNED latent directions in phase space.
+
+docs/IQP_LENS_ROUND3_PREREGISTRATION.md, section "Round 3b -- learned latent directions".
+NEW file. Round 3's 28-job sbatch is queued against train_iqp_r3.py / controls_r3.py /
+evaluate_r3.py / data_lens_r3.py / codec10.py / test_r3.py, so none of those is modified:
+this script only IMPORTS from them (the batched simulator, the flat/auto3 kernel weights,
+the resample prior and the whole data layer), which keeps the circuit, the data split, the
+crops, the scale S and the paste offsets bit-identical to round 3.
+
+Model
+-----
+Round 3 partitioned the 1,024 Walsh coefficients into a shared CORE (974) and a fixed LATENT
+BLOCK (50 chosen a priori). Round 3b instead LEARNS which directions of the 1,024-dimensional
+phase space carry the image-to-image variation:
+
+    theta_i = theta0 + Phi^T z_i ,   theta0 in R^1024,  Phi in R^{M x 1024},  z_i in R^M
+
+with M in {2, 4, 8} (the amendment's grid). Every row of Phi is L2-normalised and rescaled to
+sqrt(1024) = 32, so
+z_m = 1 shifts the 1,024 phases by ~1 rad rms -- z is then in interpretable units and the
+1e-3 L2 penalty on z means the same thing at every M. theta0, Phi and all N latents z_i are
+trained JOINTLY on the mean of the per-image losses.
+
+theta0 is initialised by fitting a single full 1,024-phase hologram to the MEAN training crop
+(--theta0-steps, exact KL, Adam). Mechanism test (scratchpad mech_test2/affine_latent.py):
+that single-image fit reaches corr 0.9997, and the joint fit then reaches train corr 0.958 /
+held-out projection corr 0.911 at M = 4 on 20 images. The seed always uses KL even for the
+MMDflat/auto3 arms, so all arms start from the SAME theta0 and differ only in what they train
+on; meta.json records theta0_seed_objective.
+
+Objectives (--objective)
+------------------------
+kl       exact KL(p_hat_i || q_i), averaged over images -- simulation-only diagnostic.
+mmdflat  sum_s c_s (<Z_s>_i - <Z_s>_data,i)^2 with FLAT Walsh weights c_s = 2^-10
+         (train_iqp_r3.flat_kernel_weights): hardware-compatible, sample-estimable.
+auto3    the same quadratic form with the paper's three-bandwidth Gaussian kernel weights
+         (train_iqp.resolve_sigmas at n = 10, iqp_exact.IQPExact.kernel_weights).
+
+Honest note on the z penalty: --zpen (1e-3 by default, 0.3 for the amendment's M = 8 capacity
+arm, whose name then carries a `-zpen` tag) is a RELATIVE penalty, not a literal add-on: it
+multiplies L0, the chosen --objective's data loss at theta0 (post-seed) with z = 0, a detached
+constant fixed once at the start of training (Phi is irrelevant to L0 -- z = 0 collapses
+theta_of to theta0 regardless of Phi). The joint loss is
+mean_i loss_i + zpen * L0 * mean_i ||z_i||^2 , so --zpen means "this fraction of the STARTING
+loss" at every objective, instead of an absolute number that means different things at
+different scales (the three objectives differ in absolute scale by orders of magnitude: KL ~
+1e-1, the MMD forms ~ 1e-4 -- a literal additive penalty would bite harder on the MMD arms than
+on KL, which is what an earlier version of this script did). The held-out projection inference
+(infer_z_batched) reuses the SAME L0 rather than recomputing one from the held-out crops, so a
+held-out image's penalty is on the same relative scale as a training image's. meta.json carries
+zpen_L0, loss_final_data / loss_final_zpen and zpen_penalty_over_data (= loss_final_zpen /
+loss_final_data), and the run still prints a WARNING when the final penalty exceeds 10% of the
+final data term, so the reader can see the relative weight instead of guessing at it.
+
+Held-out projection (the round-3b extra metric)
+-----------------------------------------------
+For each of the --n-holdout held-out crops, theta0 and Phi are FROZEN and only z is optimised
+(amendment: --infer-steps 1000 at --infer-lr 0.005 -- a fifth of the training LR, because the
+mechanism test measured the model's coherence radius in z at ~0.03-0.05 and a 0.02 step
+overshoots it -- from --infer-restarts starting points). The restarts are, in order:
+
+    0            zeros
+    1            the trained z of the nearest TRAINING image (nearest in pmf L2)
+    2 .. R-1     draws from the Gaussian fitted to the trained z
+
+and the reported number for each image is the BEST image correlation over the restarts. The
+mechanism test is why this exists: with a single zero start, M = 8 collapsed to corr 0.09 on
+held-out images while M = 4 reached 0.91 -- an optimiser failure, not a subspace failure, and
+the restarts are the pre-registered fix. The same report also fixes the reference points this
+arm is read against: a RANDOM Phi reaches 0.67, i.e. no better than theta0 alone (0.67), so
+anything above that is what LEARNING the directions bought. All (image x restart) problems are solved as ONE
+batched Adam (the rows are independent given frozen theta0/Phi, so the batched sum is exactly
+N_ho x R separate optimisations sharing only the LR schedule), chunked by --infer-chunk to
+bound memory. The per-ROW best iterate is kept, not the per-batch one.
+
+meta.json also carries two reference numbers computed on the same held-out crops -- corr to
+the mean training crop and corr to the nearest training crop -- so P18 ("projection corr >=
+0.90, above CTRL-mean ~ 0.74") can be read off a single arm's meta without re-deriving them.
+
+Generation (--prior)
+--------------------
+gauss     Gaussian fitted to the N trained z (full covariance at N >= 100, diagonal below, the
+          same rule round 3 uses for its latent prior).
+resample  a trained z drawn WITH REPLACEMENT plus Gaussian jitter whose typical DISTANCE is
+          0.2 x the median nearest-neighbour spacing of the trained z
+          (train_iqp_r3.sample_latents_resample, imported unchanged).
+
+--n-gen draws -> exact q -> x S (mean total intensity of the TRAINING crops) -> pasted into a
+black 64x64 frame at an offset drawn with replacement from the training (dy, dx), i.e. exactly
+round 3's output contract:
+
+  <out>/generated_{i:03d}.npy        (64, 64) float32
+  <out>/crops/generated_{i:03d}.npy  (32, 32) float32
+  <out>/meta.json , theta0.npy , Phi.npy , z_train.npy , z_holdout.npy , loss_curve.npy
+
+Arm name: IQP-affine-M{M}-{KL|MMDflat|auto3}-{gauss|resample}.
+
+Python 3.9 compatible (no `X | None`).
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import os
+import time
+
+import numpy as np
+import torch
+
+# This copy lives in the repo root, beside the modules it imports.
+import sys as _sys
+_REPO = os.path.dirname(os.path.abspath(__file__))
+if _REPO not in _sys.path:
+    _sys.path.insert(0, _REPO)
+
+import codec10
+import data_lens_r3
+from iqp_exact import IQPExact, fwht
+# round-3 pieces reused verbatim so 3b and 3 share one simulator / one prior implementation
+from train_iqp_r3 import (MMD_OBJECTIVES, flat_kernel_weights, probs_batch,
+                          sample_latents_resample)
+from train_iqp import resolve_sigmas          # pure helper, no side effects on import
+
+import codec_v12
+import objective_spatial
+
+# ---------------------------------------------------------------------------- encoding
+# These four were module CONSTANTS in the parent (10 qubits, 1,024 codes).  They are globals
+# here because --encoding can change them, and they are rebound ONCE, by set_encoding(), before
+# any tensor is built.  --encoding crop10 restores the parent's exact values, which is why the
+# default arm still reproduces the published run bit-for-bit.
+ENC = None
+N_QUBITS = 10
+K_MAX = 10                       # every subset -> the complete Walsh basis of the encoding
+NCODES = 1 << N_QUBITS
+PHI_SCALE = math.sqrt(float(NCODES))     # ||Phi_m||_2 = 32  =>  z_m = 1 is ~1 rad rms of phase
+KL_EPS = 1e-12
+DT = torch.float64
+
+# The pixel-space kernel of --objective spatial, built once in main().  A global for the same
+# reason G_M/G_H below are: it lets every inherited call site of loss_rows keep its signature.
+SPATIAL = None
+
+# ---------------------------------------------------------------------------- latent map
+# "affine" = theta0 + Phi^T z (the parent).  "mlp" = theta0 + g(z), the map ported from
+# train_iqp_affine_mlp.py.  The MLP is carried in ONE flat tensor so that the [theta0,
+# phi_raw, z] parameter list, the snapshot state unpacking and the frozen-map held-out
+# inference all keep working unchanged.
+LATENT_MAP = "affine"
+G_M = 4
+G_H = 32
+G_MODE = "rownorm"
+G_SCALE = 1.0
+
+
+def set_encoding(name):
+    """Rebind the encoding globals.  Called once, at the top of main(), before anything else."""
+    global ENC, N_QUBITS, K_MAX, NCODES, PHI_SCALE
+    ENC = codec_v12.get(name)
+    N_QUBITS = ENC.n_qubits
+    K_MAX = ENC.n_qubits                 # the COMPLETE Walsh basis, as the parent used K = n
+    NCODES = ENC.ncodes
+    PHI_SCALE = ENC.phi_scale
+    return ENC
+
+
+def sample_codes(pmf, n, rng):
+    """codec10.sample_codes_from_pmf without its hard-coded 1,024 (lowres8 has 256 codes).
+    Used only to feed the auto3 bandwidth rule its Monte-Carlo code sample."""
+    p = np.clip(np.asarray(pmf, dtype=np.float64).reshape(-1), 0.0, None)
+    p = p / float(p.sum())
+    return np.asarray(rng.choice(p.size, size=int(n), replace=True, p=p), dtype=np.int64)
+
+
+def g_size(M, H):
+    """Length of the flat MLP vector: W1 (M x H) + b1 (H) + W2 (H x NCODES)."""
+    return int(M) * int(H) + int(H) + int(H) * NCODES
+
+
+def unpack_g(vec):
+    """(W1, b1, W2) views into the flat vector. Autograd-safe (pure reshapes/slices)."""
+    M, H = G_M, G_H
+    i = 0
+    W1 = vec[i:i + M * H].reshape(M, H)
+    i += M * H
+    b1 = vec[i:i + H]
+    i += H
+    W2 = vec[i:i + H * NCODES].reshape(H, NCODES)
+    return W1, b1, W2
+
+
+def init_gvec(M, H, input_scale, bias_std, generator, dtype):
+    """Flat MLP init.  Each hidden unit's input weight vector gets L2 norm `input_scale`: z
+    lives inside a coherence radius of ~0.05, so unit-norm inputs would leave tanh linear to a
+    part in 10^3 and the "non-linear" arm would silently BE the affine one."""
+    W1 = torch.randn(M, H, dtype=dtype, generator=generator)
+    W1 = W1 / W1.norm(dim=0, keepdim=True).clamp_min(1e-12) * float(input_scale)
+    b1 = float(bias_std) * torch.randn(H, dtype=dtype, generator=generator)
+    W2 = torch.randn(H, NCODES, dtype=dtype, generator=generator)
+    return torch.cat((W1.reshape(-1), b1.reshape(-1), W2.reshape(-1)))
+
+
+def effective_affine(vec, z_np):
+    """Least-squares best affine approximation A of g on the trained latents, and the relative
+    residual ||G - Z A||_F / ||G||_F.  A has Phi's shape and units; residual 0 = g is affine."""
+    Z = np.asarray(z_np, dtype=np.float64)
+    with torch.no_grad():
+        G = g_of(vec.detach(), torch.as_tensor(Z, dtype=vec.dtype,
+                                               device=vec.device)).cpu().numpy().astype(np.float64)
+    A, _res, _rank, _sv = np.linalg.lstsq(Z, G, rcond=None)
+    den = float(np.linalg.norm(G))
+    resid = float(np.linalg.norm(G - Z @ A) / den) if den > 0 else 0.0
+    return A, resid, G
+
+
+# --------------------------------------------------------------------------------------
+# model
+# --------------------------------------------------------------------------------------
+def normalise_phi(phi_raw):
+    """Rows L2-normalised then scaled to PHI_SCALE. Autograd-safe."""
+    return phi_raw / phi_raw.norm(dim=1, keepdim=True).clamp_min(1e-12) * PHI_SCALE
+
+
+def g_of(vec, z):
+    """(B, NCODES) phase offset g(z) of the MLP map. g(0) = 0 exactly, as Phi^T 0 = 0."""
+    W1, b1, W2 = unpack_g(vec)
+    h = torch.tanh(z @ W1 + b1) - torch.tanh(b1)
+    raw = h @ normalise_phi(W2)
+    if G_MODE == "zscale":
+        nz = z.norm(dim=1, keepdim=True)
+        return raw / raw.norm(dim=1, keepdim=True).clamp_min(1e-12) * (PHI_SCALE * nz)
+    return G_SCALE * raw
+
+
+def theta_of(theta0, phi_raw, z):
+    """(B, NCODES) parameter matrix: theta0 + Phi^T z_i (affine) or theta0 + g(z_i) (mlp)."""
+    if LATENT_MAP == "mlp":
+        return theta0.unsqueeze(0) + g_of(phi_raw, z)
+    return theta0.unsqueeze(0) + z @ normalise_phi(phi_raw)
+
+
+# --------------------------------------------------------------------------------------
+# losses (per ROW, so the batched held-out inference can keep a per-image best)
+# --------------------------------------------------------------------------------------
+def kl_rows(pmf, q):
+    """KL(p_hat_i || q_i) for every row. Same eps convention as train_iqp_r3.kl_loss."""
+    return (pmf * (torch.log(pmf + KL_EPS) - torch.log(q + KL_EPS))).sum(dim=1)
+
+
+def mmd_rows(q, ez_data, weights):
+    """sum_s c_s (<Z_s>_i - <Z_s>_data,i)^2 for every row."""
+    d = fwht(q) - ez_data
+    return (weights.unsqueeze(0) * d * d).sum(dim=1)
+
+
+def loss_rows(sim, theta, pmf, ez_data, weights, objective):
+    q = probs_batch(sim, theta)
+    if objective == "spatial":
+        return SPATIAL.rows(q - pmf)
+    if objective in MMD_OBJECTIVES or objective in ("auto3", "multi"):
+        return mmd_rows(q, ez_data, weights)
+    return kl_rows(pmf, q)
+
+
+def hi_weight_mask(sim, k0, device, dtype):
+    """(2^n,) 0/1 mask selecting the Walsh coefficients of weight |s| > k0 (lever B)."""
+    pc = torch.as_tensor(sim._popcount_np.astype(np.int64), device=device)
+    return (pc > int(k0)).to(dtype)
+
+
+def rows_and_hi(sim, theta, pmf, ez_data, weights, objective, hi_mask):
+    """(data_rows, hi_rows) in ONE forward pass.
+
+    Both terms are functions of the same q = probs_batch(theta) and the same <Z> = fwht(q), so
+    computing them together costs exactly one probs_batch and one fwht -- the same as the
+    parent's loss_rows -- plus an elementwise product.  hi_mask=None returns hi_rows = None
+    and is then bit-identical to loss_rows.
+
+        data_rows_i = sum_s c_s (<Z_s>_i - <Z_s>_data,i)^2      (or the KL row)
+        hi_rows_i   = sum_{|s| > k0} <Z_s>_i^2
+    """
+    q = probs_batch(sim, theta)
+    ez = fwht(q)
+    if objective == "spatial":
+        data = SPATIAL.rows(q - pmf)
+    elif objective in MMD_OBJECTIVES or objective in ("auto3", "multi"):
+        d = ez - ez_data
+        data = (weights.unsqueeze(0) * d * d).sum(dim=1)
+    else:
+        data = kl_rows(pmf, q)
+    hi = None if hi_mask is None else ((ez * ez) * hi_mask.unsqueeze(0)).sum(dim=1)
+    return data, hi
+
+
+OBJECTIVE_LABEL = {"kl": "KL", "mmdflat": "MMDflat", "auto3": "auto3", "multi": "multi",
+                   "spatial": "spatial"}
+
+
+# --------------------------------------------------------------------------------------
+# correlation (the projection metric)
+# --------------------------------------------------------------------------------------
+def corr_rows(a, b):
+    """Pearson correlation of matching rows of two (m, 1024) arrays.
+
+    Computed in pmf space; corr is invariant to a positive rescaling of either argument, and
+    codec10.pmf_to_image is exactly (reshape, transpose, x S > 0), so this equals the
+    correlation of the 32x32 crops it decodes to. test_r3b.py checks that equality.
+    """
+    a = np.asarray(a, dtype=np.float64)
+    b = np.asarray(b, dtype=np.float64)
+    a = a - a.mean(axis=1, keepdims=True)
+    b = b - b.mean(axis=1, keepdims=True)
+    num = (a * b).sum(axis=1)
+    den = np.sqrt((a * a).sum(axis=1) * (b * b).sum(axis=1))
+    return np.where(den > 0, num / np.maximum(den, 1e-300), 0.0)
+
+
+def corr_matrix(a, b):
+    """(ma, mb) matrix of correlations between every row of `a` and every row of `b`."""
+    a = np.asarray(a, dtype=np.float64)
+    b = np.asarray(b, dtype=np.float64)
+    a = a - a.mean(axis=1, keepdims=True)
+    b = b - b.mean(axis=1, keepdims=True)
+    na = np.sqrt((a * a).sum(axis=1))
+    nb = np.sqrt((b * b).sum(axis=1))
+    den = np.outer(np.maximum(na, 1e-300), np.maximum(nb, 1e-300))
+    return (a @ b.T) / den
+
+
+# --------------------------------------------------------------------------------------
+# latent prior
+# --------------------------------------------------------------------------------------
+def fit_z_gaussian(z, cov_mode):
+    """Gaussian on the trained z. M is small (4 or 8), so this is done directly in z space
+    (no PCA whitening is needed to make it well posed) -- `full` at N >= 100, `diag` below,
+    the same N rule round 3 applies to its own latent prior."""
+    X = np.asarray(z, dtype=np.float64)
+    n, m = X.shape
+    mu = X.mean(axis=0)
+    Xc = X - mu[None, :]
+    cov = (Xc.T @ Xc) / float(max(n - 1, 1))
+    if cov_mode == "diag":
+        cov = np.diag(np.diag(cov))
+    jitter = 1e-12 * max(float(np.trace(cov)) / max(m, 1), 1e-30)
+    chol = np.linalg.cholesky(cov + jitter * np.eye(m))
+    return {"mu": mu, "chol": chol, "cov_mode": cov_mode,
+            "std": np.sqrt(np.maximum(np.diag(cov), 0.0))}
+
+
+def sample_z_gaussian(prior, n, rng):
+    g = rng.standard_normal(size=(int(n), prior["mu"].size))
+    return prior["mu"][None, :] + g @ prior["chol"].T
+
+
+# --------------------------------------------------------------------------------------
+# optimisation helpers
+# --------------------------------------------------------------------------------------
+def run_adam_scalar(params, closure, steps, lr, log_every=0, tag="", t0=None):
+    """Adam + cosine schedule on a scalar closure; returns (best_value, best_state, curve).
+    The best ITERATE is kept, not the last (the mechanism test's convention)."""
+    for p in params:
+        p.requires_grad_(True)
+    opt = torch.optim.Adam(params, lr=lr)
+    sch = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=max(int(steps), 1), eta_min=lr * 0.05)
+    best = float("inf")
+    best_state = [p.detach().clone() for p in params]
+    curve = []
+    for step in range(int(steps)):
+        opt.zero_grad()
+        loss = closure()
+        loss.backward()
+        opt.step()
+        sch.step()
+        v = float(loss.detach())
+        if v < best:
+            best = v
+            best_state = [p.detach().clone() for p in params]
+        if log_every and (step % log_every == 0 or step == int(steps) - 1):
+            curve.append([int(step), v])
+            print("[r3b] %s step %6d  loss=%.6e  (%.1f s)"
+                  % (tag, step, v, (time.time() - t0) if t0 else 0.0), flush=True)
+    return best, best_state, curve
+
+
+def step_tag(steps):
+    """20000 -> 's020k' -- the baseline sweeps' tag, so one selector reads both."""
+    return "s%03dk" % int(round(int(steps) / 1000.0))
+
+
+def run_adam_snapshots(params, closure, steps, lr, snaps, log_every=0, tag="", t0=None):
+    """run_adam_scalar, but also hands back the best-so-far state at each step in `snaps`.
+
+    Identical arithmetic to run_adam_scalar: same Adam, same CosineAnnealingLR with T_max =
+    the FULL step count, same best-iterate bookkeeping.  Taking a snapshot does not perturb
+    the optimiser -- it only clones the current best state -- so the final snapshot is
+    bit-for-bit what run_adam_scalar would have returned.
+    """
+    want = sorted({int(s) for s in snaps if 0 < int(s) <= int(steps)})
+    for p in params:
+        p.requires_grad_(True)
+    opt = torch.optim.Adam(params, lr=lr)
+    sch = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=max(int(steps), 1),
+                                                     eta_min=lr * 0.05)
+    best = float("inf")
+    best_state = [p.detach().clone() for p in params]
+    curve, shots = [], []
+    for step in range(int(steps)):
+        opt.zero_grad()
+        loss = closure()
+        loss.backward()
+        opt.step()
+        sch.step()
+        v = float(loss.detach())
+        if v < best:
+            best = v
+            best_state = [p.detach().clone() for p in params]
+        if log_every and (step % log_every == 0 or step == int(steps) - 1):
+            curve.append([int(step), v])
+            print("[r3b] %s step %6d  loss=%.6e  (%.1f s)"
+                  % (tag, step, v, (time.time() - t0) if t0 else 0.0), flush=True)
+        if want and (step + 1) == want[0]:
+            k = want.pop(0)
+            shots.append((k, best, [b.clone() for b in best_state], list(curve)))
+            print("[r3b] %s snapshot at %d steps (best loss %.6e)" % (tag, k, best), flush=True)
+    return best, best_state, curve, shots
+
+
+def zpen_penalty(z, zpen, L0, reduce="mean"):
+    """zpen * L0 * ||z_i||^2, per image, reduced across images by `reduce`.
+
+    `L0` is the SAME detached constant everywhere this is called (the --objective's data loss
+    at theta0, z = 0 -- see the module docstring's "z penalty" note): it is what makes the same
+    --zpen a comparable fraction of the starting loss at every --objective, instead of an
+    absolute number that means different things at different loss scales.
+
+    reduce='mean' is the joint-training loss's convention (pairs with rows.mean()).
+    reduce='sum' is infer_z_batched's convention: a SUM keeps each row's gradient independent
+    of the batch size B (needed for --infer-chunk invariance -- a mean would divide by B and
+    make chunk size silently change the answer). Both reduce to the SAME per-image penalty,
+    zpen * L0 * ||z_i||^2; they only differ in how the per-image values are combined.
+    """
+    per_image = (z * z).sum(dim=1)
+    if reduce == "mean":
+        return zpen * L0 * per_image.mean()
+    if reduce == "sum":
+        return zpen * L0 * per_image.sum()
+    raise ValueError("zpen_penalty: reduce must be 'mean' or 'sum', got %r" % (reduce,))
+
+
+def walsh_penalty(hi_rows, mu, L0, H0, reduce="mean"):
+    """mu * L0 * (H(q_i) / H0), per image, reduced by `reduce` (lever B).
+
+    Relative in exactly the way zpen_penalty is relative: L0 puts the term on the objective's
+    own scale and H0 (the high-order energy at theta0, z = 0) makes mu dimensionless, so
+    mu = 1e-2 means "1% of the starting loss when the speckle sits at its starting level" at
+    every objective and every k0.  reduce='mean' pairs with the joint loss's rows.mean();
+    reduce='sum' pairs with infer_z_batched's rows.sum(), keeping each row's gradient
+    independent of the chunk size for the same reason the z penalty does.
+    """
+    if hi_rows is None or float(mu) == 0.0:
+        return hi_rows.sum() * 0.0 if hi_rows is not None else 0.0
+    scale = float(mu) * float(L0) / max(float(H0), 1e-300)
+    if reduce == "mean":
+        return scale * hi_rows.mean()
+    if reduce == "sum":
+        return scale * hi_rows.sum()
+    raise ValueError("walsh_penalty: reduce must be 'mean' or 'sum', got %r" % (reduce,))
+
+
+def infer_z_batched(sim, theta0, phi_raw, pmf_t, ez_t, weights, objective, z_init,
+                    steps, lr, zpen, L0, hi_mask=None, mu=0.0, H0=1.0):
+    """Optimise z ONLY, for a batch of independent rows, keeping the per-ROW best iterate.
+
+    theta0/Phi are frozen, so row i's loss depends only on z[i]: the summed objective below is
+    exactly `z_init.shape[0]` separate optimisations that happen to share one LR schedule.
+    The batch objective is a SUM (not a mean) over rows, and the z penalty with it (via
+    zpen_penalty(..., reduce="sum")), so row i's gradient is exactly
+    d/dz_i [loss_i + zpen * L0 * ||z_i||^2] whatever B is: results do not depend on
+    --infer-chunk. (With a mean the per-row gradient would carry a 1/B factor; Adam is almost
+    but not exactly invariant to that, and chunk size would silently change the answer.
+    test_r3b.py checks chunk invariance.) L0 is the SAME detached constant the joint training
+    loss uses (the --objective's data loss at theta0, z = 0), passed in rather than recomputed
+    here, so a held-out image's penalty sits on the same relative scale as a training image's.
+
+    Returns (best_z (B, M), best_row_loss (B,)).
+    """
+    z = z_init.detach().clone().requires_grad_(True)
+    opt = torch.optim.Adam([z], lr=lr)
+    sch = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=max(int(steps), 1), eta_min=lr * 0.05)
+    best_row = torch.full((z.shape[0],), float("inf"), dtype=z.dtype, device=z.device)
+    best_z = z.detach().clone()
+    th0 = theta0.detach()
+    ph = phi_raw.detach()
+    for _step in range(int(steps)):
+        opt.zero_grad()
+        rows, hi = rows_and_hi(sim, theta_of(th0, ph, z), pmf_t, ez_t, weights, objective,
+                               hi_mask if float(mu) != 0.0 else None)
+        total = (rows.sum() + zpen_penalty(z, zpen, L0, reduce="sum")
+                 + walsh_penalty(hi, mu, L0, H0, reduce="sum"))
+        total.backward()
+        opt.step()
+        sch.step()
+        with torch.no_grad():
+            better = rows.detach() < best_row
+            if bool(better.any()):
+                best_row = torch.where(better, rows.detach(), best_row)
+                best_z[better] = z.detach()[better]
+    return best_z, best_row
+
+
+# --------------------------------------------------------------------------------------
+def sample_flux_resample(totals, n, rng, jitter_scale=0.2):
+    """Lever C.  Draw n per-image flux scales from the N TRAINING crop totals with
+    replacement, plus Gaussian jitter whose std is `jitter_scale` x the median
+    nearest-neighbour spacing of those totals.
+
+    The rule is deliberately the 1-D analogue of train_iqp_r3.sample_latents_resample (same
+    0.2, same "with replacement + jitter on the order of the spacing"), so the flux scalar and
+    the latent vector are drawn by one convention rather than two.  In 1-D the per-coordinate
+    std IS the distance, so no sqrt(d) correction appears.  Draws are clipped to be strictly
+    positive (a non-positive total is not a flux; with the measured spread this clip never
+    fires, and meta.json reports the realised mean and sd so it can be checked).
+
+    Returns (S (n,), median_nn_spacing, jitter_std).
+    """
+    x = np.asarray(totals, dtype=np.float64).reshape(-1)
+    if x.size == 0:
+        raise ValueError("sample_flux_resample: no training totals")
+    if x.size == 1:
+        return np.full(int(n), float(x[0]), dtype=np.float64), 0.0, 0.0
+    xs = np.sort(x)
+    gaps = np.diff(xs)
+    # nearest-neighbour distance of each point on the line = min of its two adjacent gaps
+    nn = np.minimum(np.concatenate(([np.inf], gaps)), np.concatenate((gaps, [np.inf])))
+    spacing = float(np.median(nn))
+    jitter_std = float(jitter_scale) * spacing
+    idx = rng.integers(0, x.size, size=int(n))
+    draws = x[idx] + rng.standard_normal(size=int(n)) * jitter_std
+    return np.maximum(draws, 1e-6), spacing, jitter_std
+
+
+def nearest_train_index(ho_pmf, tr_pmf):
+    """For each held-out pmf, the index of the nearest TRAINING pmf in L2."""
+    ho = np.asarray(ho_pmf, dtype=np.float64)
+    tr = np.asarray(tr_pmf, dtype=np.float64)
+    d2 = ((ho * ho).sum(axis=1)[:, None] - 2.0 * (ho @ tr.T) + (tr * tr).sum(axis=1)[None, :])
+    return np.argmin(d2, axis=1)
+
+
+def build_restart_inits(z_train, nearest, restarts, rand_block=None):
+    """(m, R, M) starting points for the held-out z search, in the declared order:
+    restart 0 = zeros, restart 1 = the nearest TRAINING image's trained z, 2..R-1 = the rows of
+    `rand_block` (draws from the Gaussian fitted to the trained z -- random but on the right
+    scale: z lives inside a coherence radius of ~0.03-0.05, so N(0, 1) starts would be off the
+    manifold entirely).
+
+    `rand_block` is drawn ONCE for the whole held-out set and sliced per chunk by the caller,
+    so --infer-chunk changes nothing about which starting points an image gets.
+    """
+    z_train = np.asarray(z_train, dtype=np.float64)
+    nearest = np.asarray(nearest, dtype=np.int64)
+    m = int(nearest.size)
+    M = int(z_train.shape[1])
+    R = max(int(restarts), 1)
+    z0 = np.zeros((m, R, M), dtype=np.float64)
+    if R > 1:
+        z0[:, 1, :] = z_train[nearest]
+    if R > 2:
+        if rand_block is None:
+            raise ValueError("build_restart_inits: R > 2 needs a rand_block")
+        rb = np.asarray(rand_block, dtype=np.float64)
+        if rb.shape != (m, R - 2, M):
+            raise ValueError("build_restart_inits: rand_block %s, expected %s"
+                             % (rb.shape, (m, R - 2, M)))
+        z0[:, 2:, :] = rb
+    return z0
+
+
+def parse_args(argv=None):
+    p = argparse.ArgumentParser(description="Round-3b IQP with learned affine phase latents.")
+    p.add_argument("--M", type=int, default=4, help="latent dimension (round 3b runs 4 and 8)")
+    p.add_argument("--encoding", choices=tuple(sorted(codec_v12.ENCODINGS)), default="crop10",
+                   help="levers F/G: crop10 is the published 10-qubit 32x32 codec, lowres8 the "
+                        "8-qubit 16x16 block-sum + fixed bilinear upsample, gray10 the same "
+                        "32x32 crop with Gray-coded axes")
+    p.add_argument("--latent-map", choices=("affine", "mlp"), default="affine",
+                   help="levers H/I: `affine` is theta0 + Phi^T z; `mlp` is theta0 + g(z) with "
+                        "one tanh hidden layer of width --hidden")
+    p.add_argument("--hidden", type=int, default=8, help="width H of g's hidden layer (mlp)")
+    p.add_argument("--gnorm", choices=("rownorm", "zscale"), default="rownorm",
+                   help="rownorm: output rows normalised like Phi's and ONE scalar calibrated "
+                        "at init so the typical ||g(z)|| = PHI_SCALE*||z||, free to move "
+                        "afterwards. zscale: that magnitude law enforced for every z")
+    p.add_argument("--g-input-scale", type=float, default=20.0,
+                   help="L2 norm of each hidden unit's input weights at init; 1/0.05 puts the "
+                        "typical pre-activation at O(1) over the model's coherence radius")
+    p.add_argument("--g-bias-std", type=float, default=0.5,
+                   help="std of the hidden biases at init (spreads the operating points)")
+    p.add_argument("--spatial-sigmas", default="1,2,4",
+                   help="lever E: Gaussian bandwidths in 32x32-crop PIXELS, summed")
+    p.add_argument("--spatial-flat", default="0",
+                   help="lever E: weight of the added flat-Hamming (= identity) term. A float, "
+                        "or `auto` for L0_spatial / L0_flat (equal magnitude at theta0)")
+    p.add_argument("--spatial-flat-scale", type=float, default=1.0,
+                   help="lever E: multiplies the automatic lam_flat. The two components pull "
+                        "in opposite directions -- smoke 2 measured pure spatial at PDF-JS "
+                        "0.00094 / aligned MMD^2 0.112 and the equal-magnitude mix at 0.00182 "
+                        "/ 0.0266 -- so this scalar IS the trade-off frontier and is swept "
+                        "rather than assumed")
+    p.add_argument("--lam-scale", type=float, default=1.0,
+                   help="lever A: multiplies the automatic lam of --objective multi, so the "
+                        "flat/paper trade-off can be probed without hand-picking a lam")
+    p.add_argument("--objective",
+                   choices=("kl", "mmdflat", "auto3", "multi", "spatial"), default="multi",
+                   help="lever A: `multi` trains on MMD_flat + lam * MMD_paper with lam fixed "
+                        "at L0_flat / L0_paper (equal magnitude at theta0). The three parent "
+                        "objectives are kept so this file can reproduce them.")
+    p.add_argument("--lam", type=float, default=None,
+                   help="override the automatic lam of --objective multi (default: auto)")
+    p.add_argument("--mu", type=float, default=0.0,
+                   help="lever B: weight of the high-order Walsh penalty, RELATIVE to L0 and "
+                        "to H0 (the high-order energy at theta0). 0 disables the term.")
+    p.add_argument("--walsh-k0", type=int, default=3,
+                   help="lever B: Walsh weights |s| > k0 are penalised (pre-registered grid "
+                        "3 or 4)")
+    p.add_argument("--flux", choices=("mean", "resample"), default="mean",
+                   help="lever C: `mean` gives every generated image the training mean S "
+                        "(the parent's behaviour); `resample` draws each image's total from "
+                        "the N training crop totals with replacement plus jitter")
+    p.add_argument("--flux-jitter", type=float, default=0.2,
+                   help="lever C: jitter std as a multiple of the median nearest-neighbour "
+                        "spacing of the training totals (same 0.2 the latent prior uses)")
+    p.add_argument("--prior", choices=("gauss", "resample"), default="gauss")
+    p.add_argument("--n-train", type=int, default=11)
+    p.add_argument("--n-holdout", type=int, default=data_lens_r3.N_HOLDOUT)
+    p.add_argument("--steps", type=int, default=4000, help="joint Adam steps on theta0/Phi/z")
+    p.add_argument("--lr", type=float, default=0.02)
+    p.add_argument("--zpen", type=float, default=1e-3,
+                   help="L2 penalty on z, RELATIVE to L0 (the --objective's data loss at "
+                        "theta0, z=0): loss + zpen*L0*mean_i||z_i||^2, so the same value is "
+                        "the same fraction of the starting loss at every objective "
+                        "(amendment: 0.3 for the M = 8 capacity arm, 1e-3 everywhere else)")
+    p.add_argument("--theta0-steps", type=int, default=1000,
+                   help="steps of the single-hologram KL fit to the mean training crop")
+    p.add_argument("--theta0-lr", type=float, default=0.05)
+    p.add_argument("--n-gen", type=int, default=200)
+    p.add_argument("--save-every", type=int, nargs="+", default=None,
+                   help="step counts at which to emit a COMPLETE output directory "
+                        "(generated_*.npy, crops/, meta.json, the parameter arrays). One "
+                        "training run covers all of them; --steps is forced up to the largest. "
+                        "Snapshot k is written to <--out>_s<k/1000>k, the layout the baseline "
+                        "sweeps use, so select_checkpoint.py reads it unchanged.")
+    p.add_argument("--infer-restarts", type=int, default=8)
+    p.add_argument("--infer-steps", type=int, default=1000,
+                   help="held-out z-only steps (amendment: 1000 at lr 0.005)")
+    p.add_argument("--infer-lr", type=float, default=0.005,
+                   help="LR of the held-out z-only optimiser; deliberately smaller than --lr "
+                        "because z lives inside the model's ~0.03-0.05 coherence radius")
+    p.add_argument("--infer-chunk", type=int, default=50,
+                   help="held-out images per batched inference chunk (memory bound)")
+    p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--out", required=True)
+    p.add_argument("--device", default="cpu")
+    p.add_argument("--sigmas", default="auto3", help="--objective auto3 only")
+    p.add_argument("--phi-init-std", type=float, default=1.0,
+                   help="std of the raw Phi init (immaterial: rows are renormalised)")
+    p.add_argument("--z-init-std", type=float, default=1e-3)
+    p.add_argument("--arm-name", default=None)
+    p.add_argument("--log-every", type=int, default=500)
+    p.add_argument("--threads", type=int, default=4)
+    return p.parse_args(argv)
+
+
+ZPEN_DEFAULT = 1e-3
+
+
+def default_arm_name(args):
+    """IQP-affine-M{M}-{KL|MMDflat|auto3}[-zpen]-{gauss|resample}.
+
+    The `-zpen` tag marks a NON-default z penalty (the amendment's M = 8 capacity arm uses
+    0.3 instead of 1e-3), so two runs that differ only in --zpen cannot collide in the table.
+    """
+    if args.arm_name:
+        return args.arm_name
+    tag = "" if float(args.zpen) == ZPEN_DEFAULT else "-zpen"
+    mu_tag = "" if float(args.mu) == 0.0 else ("-mu%g-k%d" % (float(args.mu), int(args.walsh_k0)))
+    flux_tag = "" if args.flux == "mean" else "-fluxres"
+    enc_tag = "" if args.encoding == "crop10" else ("-%s" % args.encoding)
+    map_tag = "" if args.latent_map == "affine" else ("-mlpH%d" % int(args.hidden))
+    obj_tag = OBJECTIVE_LABEL[args.objective]
+    if args.objective == "multi" and float(args.lam_scale) != 1.0:
+        obj_tag += "x%g" % float(args.lam_scale)
+    if args.objective == "spatial" and str(args.spatial_flat) != "0":
+        obj_tag += "+flat"
+        if float(args.spatial_flat_scale) != 1.0:
+            obj_tag += "x%g" % float(args.spatial_flat_scale)
+    return "IQP-v12%s%s-M%d-%s%s%s%s-%s" % (enc_tag, map_tag, int(args.M), obj_tag, tag,
+                                            mu_tag, flux_tag, args.prior)
+
+
+def main(argv=None):
+    args = parse_args(argv)
+    global LATENT_MAP, SPATIAL, G_M, G_H, G_MODE, G_SCALE
+    set_encoding(args.encoding)
+    LATENT_MAP = args.latent_map
+    t0 = time.time()
+    if str(args.device) == "cpu":
+        torch.set_num_threads(min(int(args.threads), os.cpu_count() or 1))
+    device = torch.device(args.device)
+    if int(args.M) < 1:
+        raise SystemExit("train_iqp_affine_r3.py: --M must be >= 1, got %d" % args.M)
+    if args.save_every:
+        # one run has to reach the last snapshot, and the cosine schedule must be set for that
+        # full length -- shortening it would change every earlier snapshot too
+        args.steps = max(int(args.steps), max(int(s) for s in args.save_every))
+        # step_tag rounds to whole thousands, so two snapshots under 500 steps apart would
+        # write to the same directory and one would silently overwrite the other
+        _tags = [step_tag(x) for x in sorted({int(x) for x in args.save_every})]
+        if len(set(_tags)) != len(_tags):
+            raise SystemExit("--save-every values collide once rounded to whole thousands: "
+                             "%s -> %s" % (sorted({int(x) for x in args.save_every}), _tags))
+    torch.manual_seed(args.seed)
+    rng = np.random.default_rng(args.seed)
+    os.makedirs(args.out, exist_ok=True)
+    os.makedirs(os.path.join(args.out, "crops"), exist_ok=True)
+
+    # ---------------------------------------------------------------- data (identical to r3)
+    d = data_lens_r3.load_r3(args.n_train, seed=args.seed, n_holdout=args.n_holdout)
+    n = d.n_train
+    S = d.S
+    M = int(args.M)
+    # d.train_pmfs is codec10's; recompute through the chosen encoding so every arm reads the
+    # SAME crops through its own codec (crop10 reproduces d.train_pmfs exactly -- test_v12.py).
+    tr_pmf = ENC.pmfs_of_crops(d.train_crops)                                 # (N, NCODES)
+    n_ho = int(d.holdout_crops.shape[0])
+    ho_pmf = (ENC.pmfs_of_crops(d.holdout_crops)
+              if n_ho > 0 else np.zeros((0, NCODES), dtype=np.float64))
+    enc_corr = ENC.roundtrip_corr(d.train_crops)
+    print("[v12] N=%d  M=%d  S=%.4f  crops %s  holdout %d  objective=%s prior=%s"
+          % (n, M, S, (d.train_crops.shape,), n_ho, args.objective, args.prior), flush=True)
+    print("[v12] encoding=%s (n=%d, %d codes, grid %d) latent-map=%s: encode->decode corr on "
+          "the training crops = %.6f"
+          % (ENC.name, N_QUBITS, NCODES, ENC.grid, LATENT_MAP, enc_corr), flush=True)
+
+    sim = IQPExact(N_QUBITS, K_MAX, device=device, dtype=torch.complex128)
+    tr_t = torch.as_tensor(tr_pmf, dtype=DT, device=device)
+    ez_tr = fwht(tr_t)
+    mean_pmf = tr_pmf.mean(axis=0)
+    mean_pmf = mean_pmf / mean_pmf.sum()
+    mean_t = torch.as_tensor(mean_pmf, dtype=DT, device=device).unsqueeze(0)
+
+    # ---------------------------------------------------------------- kernel weights
+    # The paper-kernel bandwidths are resolved for `auto3` AND for `multi` from the same
+    # Monte-Carlo code sample of the first training image, with the same seed rule the parent
+    # uses, so the two arms see the identical kernel.
+    w_flat = flat_kernel_weights(sim.size).to(device=device, dtype=DT)
+    w_paper = None
+    sigmas, mean_weights = [], []
+    if args.objective == "spatial":
+        sp_sigmas = objective_spatial.parse_sigmas(args.spatial_sigmas)
+        SPATIAL = objective_spatial.SpatialMMD(ENC.axis_x, ENC.axis_y, sp_sigmas, device, DT,
+                                               lam_flat=0.0)
+        print("[v12] objective=spatial: sigmas=%s crop pixels on a %dx%d code grid"
+              % (["%.3g" % s for s in sp_sigmas], ENC.grid, ENC.grid), flush=True)
+    else:
+        sp_sigmas = []
+    if args.objective in ("auto3", "multi"):
+        codes1 = sample_codes(tr_pmf[0], 50000, np.random.default_rng(args.seed + 11))
+        sigmas, mean_weights = resolve_sigmas(args.sigmas, N_QUBITS, codes1, args.seed)
+        w_paper = sim.kernel_weights(sigmas).to(device=device, dtype=DT)
+        print("[v12] paper kernel: sigmas=%s -> mean Pauli weights=%s"
+              % (["%.4f" % s for s in sigmas], ["%.3f" % w for w in mean_weights]), flush=True)
+    if args.objective == "kl":
+        weights = torch.ones(sim.size, dtype=DT, device=device)      # unused by the KL path
+    elif args.objective == "mmdflat":
+        weights = w_flat
+        print("[v12] objective=mmdflat: flat Walsh weights c_s=%.6g (sum=%.6f)"
+              % (1.0 / float(sim.size), float(weights.sum())), flush=True)
+    elif args.objective == "auto3":
+        weights = w_paper
+    else:
+        weights = w_flat            # placeholder; rebuilt as w_flat + lam*w_paper after theta0
+
+    # ---------------------------------------------------------------- theta0 seed
+    torch.manual_seed(args.seed)
+    th0 = 0.01 * torch.randn(NCODES, dtype=DT, device=device)
+
+    def seed_closure():
+        # ALWAYS KL, for every objective: all arms then share one theta0 (see the docstring).
+        q = probs_batch(sim, th0.unsqueeze(0))
+        return kl_rows(mean_t, q).mean()
+
+    seed_best, seed_state, _c = run_adam_scalar([th0], seed_closure, args.theta0_steps,
+                                                args.theta0_lr)
+    theta0 = seed_state[0].detach().clone()
+    with torch.no_grad():
+        q_seed = probs_batch(sim, theta0.unsqueeze(0)).cpu().numpy()
+    seed_corr = float(corr_rows(q_seed, mean_pmf[None, :])[0])
+    print("[r3b] theta0 seed: %d KL steps on the mean crop -> KL=%.6e corr=%.4f (%.1f s)"
+          % (args.theta0_steps, seed_best, seed_corr, time.time() - t0), flush=True)
+
+    # ------------------------------------------------------- zpen reference scale L0
+    # L0 = the ACTUAL --objective's data loss at theta0 (post-seed), z = 0, mean over the n
+    # training images -- a detached constant (z = 0 makes theta_of collapse to theta0
+    # regardless of Phi, so this needs no phi_raw). See zpen_penalty() and the module
+    # docstring's "z penalty" note: --zpen then always means "this fraction of L0", the same
+    # fraction at KL (~1e-1) as at the MMD forms (~1e-4).
+    # LEVER A: lam is fixed HERE, once, from the two single-kernel losses at theta0, z = 0.
+    # lam = L0_flat / L0_paper makes the two terms exactly equal at the starting point, which
+    # is what "the two kernels each win one metric" asks for -- neither is allowed to dominate
+    # by being on a larger numerical scale.  Both are quadratic forms in the SAME residual, so
+    # the trained objective is one quadratic form with weights c_flat + lam * c_paper.
+    lam = None
+    with torch.no_grad():
+        theta0_bcast = theta0.unsqueeze(0).repeat(n, 1)
+        if args.objective == "multi":
+            L0_flat = float(loss_rows(sim, theta0_bcast, tr_t, ez_tr, w_flat, "mmdflat")
+                            .mean().item())
+            L0_paper = float(loss_rows(sim, theta0_bcast, tr_t, ez_tr, w_paper, "auto3")
+                             .mean().item())
+            lam = (float(args.lam) if args.lam is not None
+                   else float(args.lam_scale) * L0_flat / max(L0_paper, 1e-300))
+            weights = w_flat + lam * w_paper
+            print("[v12] objective=multi: L0_flat=%.6e L0_paper=%.6e -> lam=%.6e%s"
+                  % (L0_flat, L0_paper, lam, "" if args.lam is None else " (--lam override)"),
+                  flush=True)
+        if args.objective == "spatial" and str(args.spatial_flat).strip().lower() == "auto":
+            # equal magnitude at theta0, the same rule lever A's lam uses
+            L0_sp = float(loss_rows(sim, theta0_bcast, tr_t, ez_tr, weights, "spatial")
+                          .mean().item())
+            L0_fl = float(loss_rows(sim, theta0_bcast, tr_t, ez_tr, w_flat, "mmdflat")
+                          .mean().item())
+            SPATIAL.set_lam_flat(float(args.spatial_flat_scale) * L0_sp / max(L0_fl, 1e-300))
+            print("[v12] spatial + flat: L0_spatial=%.6e L0_flat=%.6e scale=%g -> lam_flat=%.6e"
+                  % (L0_sp, L0_fl, float(args.spatial_flat_scale), SPATIAL.lam_flat), flush=True)
+        elif args.objective == "spatial" and float(args.spatial_flat) != 0.0:
+            SPATIAL.set_lam_flat(float(args.spatial_flat))
+        L0 = float(loss_rows(sim, theta0_bcast, tr_t, ez_tr, weights, args.objective)
+                   .mean().item())
+    print("[v12] zpen reference L0 (%s data loss at theta0, z=0) = %.6e"
+          % (args.objective, L0), flush=True)
+
+    # LEVER B reference scale: H0 = the high-order Walsh energy at theta0, z = 0.  mu is then
+    # dimensionless in the same sense zpen is (see walsh_penalty).
+    hi_mask = hi_weight_mask(sim, args.walsh_k0, device, DT) if float(args.mu) != 0.0 else None
+    H0 = 1.0
+    if hi_mask is not None:
+        with torch.no_grad():
+            _dr, _hr = rows_and_hi(sim, theta0_bcast, tr_t, ez_tr, weights, args.objective,
+                                   hi_mask)
+            H0 = float(_hr.mean().item())
+        print("[v12] walsh low-pass: k0=%d (%d of %d coefficients penalised), H0=%.6e, mu=%g"
+              % (int(args.walsh_k0), int(hi_mask.sum().item()), sim.size, H0, float(args.mu)),
+              flush=True)
+
+    # ---------------------------------------------------------------- joint training
+    gen_t = torch.Generator(device="cpu").manual_seed(int(args.seed) * 1000 + 7)
+    if LATENT_MAP == "mlp":
+        G_M, G_H, G_MODE = M, int(args.hidden), args.gnorm
+        phi_raw = init_gvec(M, G_H, args.g_input_scale, args.g_bias_std, gen_t, DT).to(device)
+        z = (args.z_init_std * torch.randn(n, M, dtype=DT, generator=gen_t)).to(device)
+    else:
+        phi_raw = (args.phi_init_std * torch.randn(M, NCODES, dtype=DT,
+                                                   generator=gen_t)).to(device)
+        z = (args.z_init_std * torch.randn(n, M, dtype=DT, generator=gen_t)).to(device)
+    g_init = {}
+    if LATENT_MAP == "mlp":
+        # ONE calibration constant, fixed here and never trained: it makes the typical
+        # ||g(z)|| at initialisation equal PHI_SCALE*||z||, the affine map's magnitude, so the
+        # comparison is about the map's SHAPE and not about a bigger phase budget.
+        G_SCALE = 1.0
+        with torch.no_grad():
+            _raw = g_of(phi_raw, z)
+            g_calib = float((_raw.norm(dim=1)
+                             / (PHI_SCALE * z.norm(dim=1).clamp_min(1e-30))).mean())
+        if args.gnorm == "rownorm":
+            G_SCALE = 1.0 / max(g_calib, 1e-30)
+        with torch.no_grad():
+            _W1, _b1, _W2 = unpack_g(phi_raw)
+            _pre = z @ _W1 + _b1
+            g_init = {"g_calibration_raw_ratio": g_calib, "g_scale": float(G_SCALE),
+                      "pre_abs_mean_init": float(_pre.abs().mean()),
+                      "g_norm_over_phi_norm_init":
+                          float((g_of(phi_raw, z).norm(dim=1)
+                                 / (PHI_SCALE * z.norm(dim=1).clamp_min(1e-30))).mean())}
+        print("[v12] g: H=%d mode=%s input-scale=%.3g -> c=%.4g, ||g(z)||/(PHI*||z||)=%.4f "
+              "at init" % (G_H, G_MODE, args.g_input_scale, G_SCALE,
+                           g_init["g_norm_over_phi_norm_init"]), flush=True)
+    theta0 = theta0.clone()
+
+    def train_closure():
+        rows, hi = rows_and_hi(sim, theta_of(theta0, phi_raw, z), tr_t, ez_tr, weights,
+                               args.objective, hi_mask)
+        return (rows.mean() + zpen_penalty(z, args.zpen, L0, reduce="mean")
+                + walsh_penalty(hi, args.mu, L0, H0, reduce="mean"))
+
+    _snap_steps = sorted({int(s) for s in (args.save_every or [args.steps]) if int(s) > 0})
+    best, state, loss_curve, _shots = run_adam_snapshots(
+        [theta0, phi_raw, z], train_closure, args.steps, args.lr, _snap_steps,
+        log_every=max(int(args.log_every), 1), tag="joint", t0=t0)
+    train_time = time.time() - t0
+    if not _shots:
+        _shots = [(int(args.steps), best, [p.detach().clone() for p in state], list(loss_curve))]
+    print("[r3b] %d snapshot(s) to emit: %s"
+          % (len(_shots), [s[0] for s in _shots]), flush=True)
+
+    _snap_root = args.out
+    _multi = len(_shots) > 1 or bool(args.save_every)
+    for _snap_k, _snap_best, _snap_state, _snap_curve in _shots:
+        theta0, phi_raw, z = (_snap_state[0].detach(), _snap_state[1].detach(),
+                              _snap_state[2].detach())
+        best = _snap_best
+        loss_curve = _snap_curve
+        args.out = ("%s_%s" % (_snap_root, step_tag(_snap_k))) if _multi else _snap_root
+        os.makedirs(args.out, exist_ok=True)
+        os.makedirs(os.path.join(args.out, "crops"), exist_ok=True)
+        _snap_t = time.time()
+        with torch.no_grad():
+            th_tr = theta_of(theta0, phi_raw, z)
+            q_tr = probs_batch(sim, th_tr).cpu().numpy()
+            _rt, _ht = rows_and_hi(sim, th_tr, tr_t, ez_tr, weights, args.objective,
+                                   hi_weight_mask(sim, args.walsh_k0, device, DT))
+            rows_tr = _rt.cpu().numpy()
+            hi_tr = _ht.cpu().numpy()
+        data_loss = float(rows_tr.mean())
+        walsh_term = float(walsh_penalty(_ht, args.mu, L0, H0, reduce="mean")) if hi_mask is not None else 0.0
+        hi_energy = float(hi_tr.mean())
+        zpen_term = float(zpen_penalty(z, args.zpen, L0, reduce="mean").item())
+        corr_tr = corr_rows(q_tr, tr_pmf)
+        print("[r3b] joint training done in %.1f s: loss=%.6e (data %.6e + zpen %.6e), "
+              "train corr mean=%.4f min=%.4f"
+              % (train_time, best, data_loss, zpen_term, float(corr_tr.mean()), float(corr_tr.min())),
+              flush=True)
+        if data_loss > 0 and zpen_term > 0.1 * data_loss:
+            print("[r3b] WARNING: the z penalty is %.1f%% of the data term -- at this objective's "
+                  "scale --zpen=%g is NOT a mild regulariser (declared value kept, see docstring)"
+                  % (100.0 * zpen_term / data_loss, args.zpen), flush=True)
+
+        z_np = z.cpu().numpy().astype(np.float64)
+        theta0_np = theta0.cpu().numpy().astype(np.float64)
+        g_stats = {}
+        if LATENT_MAP == "mlp":
+            # Phi.npy = the best AFFINE approximation of the learned map on the trained
+            # latents, in Phi's own shape and units; the residual says how much of g is not
+            # affine (0 would mean the MLP collapsed back to the affine arm).
+            phi_np, nonlin_ratio, _G_tr = effective_affine(phi_raw, z_np)
+            with torch.no_grad():
+                _W1, _b1, _W2 = unpack_g(phi_raw)
+                _pre = (z @ _W1 + _b1)
+                g_stats = {"nonlinearity_ratio": float(nonlin_ratio),
+                           "pre_abs_mean": float(_pre.abs().mean()),
+                           "pre_frac_gt1": float((_pre.abs() > 1.0).to(DT).mean()),
+                           "g_norm_mean": float(g_of(phi_raw, z).norm(dim=1).mean()),
+                           "phi_eff_row_norm_mean": float(np.linalg.norm(phi_np, axis=1).mean())}
+            print("[v12] map at %s: nonlinearity ratio=%.4f  |pre| mean=%.3f (%.1f%% > 1)  "
+                  "||g(z)|| mean=%.4f"
+                  % (step_tag(_snap_k), g_stats["nonlinearity_ratio"],
+                     g_stats["pre_abs_mean"], 100.0 * g_stats["pre_frac_gt1"],
+                     g_stats["g_norm_mean"]), flush=True)
+        else:
+            with torch.no_grad():
+                phi_np = normalise_phi(phi_raw).cpu().numpy().astype(np.float64)
+
+        # ---------------------------------------------------------------- held-out projection
+        proj = {"corrs": [], "restart": [], "loss": []}
+        t_proj = time.time()
+        if n_ho > 0:
+            z_prior = fit_z_gaussian(z_np, "full" if n >= 100 else "diag")
+            R = max(int(args.infer_restarts), 1)
+            # restart 1 needs each held-out image's nearest TRAINING image, in pmf L2
+            nearest_train = nearest_train_index(ho_pmf, tr_pmf)
+            rng_r = np.random.default_rng(args.seed + 4321)
+            # drawn once for the WHOLE held-out set (see build_restart_inits): chunk-invariant
+            rand_all = (sample_z_gaussian(z_prior, n_ho * (R - 2), rng_r).reshape(n_ho, R - 2, M)
+                        if R > 2 else None)
+            chunk = max(int(args.infer_chunk), 1)
+            all_corr = np.zeros(n_ho, dtype=np.float64)
+            all_restart = np.zeros(n_ho, dtype=np.int64)
+            all_loss = np.zeros(n_ho, dtype=np.float64)
+            z_ho_best = np.zeros((n_ho, M), dtype=np.float64)
+            for lo in range(0, n_ho, chunk):
+                hi = min(lo + chunk, n_ho)
+                m = hi - lo
+                blk = ho_pmf[lo:hi]                                       # (m, 1024)
+                z0 = build_restart_inits(z_np, nearest_train[lo:hi], R,
+                                         None if rand_all is None else rand_all[lo:hi])
+                flat_z = torch.as_tensor(z0.reshape(m * R, M), dtype=DT, device=device)
+                rep = torch.as_tensor(np.repeat(blk, R, axis=0), dtype=DT, device=device)
+                best_z, best_row = infer_z_batched(sim, theta0, phi_raw, rep, fwht(rep), weights,
+                                                   args.objective, flat_z, args.infer_steps,
+                                                   args.infer_lr, args.zpen, L0,
+                                                   hi_mask=hi_mask, mu=args.mu, H0=H0)
+                with torch.no_grad():
+                    q = probs_batch(sim, theta_of(theta0, phi_raw, best_z)).cpu().numpy()
+                c = corr_rows(q, np.repeat(blk, R, axis=0)).reshape(m, R)
+                pick = np.argmax(c, axis=1)                               # best CORR over restarts
+                idx = np.arange(m) * R + pick
+                all_corr[lo:hi] = c[np.arange(m), pick]
+                all_restart[lo:hi] = pick
+                all_loss[lo:hi] = best_row.cpu().numpy()[idx]
+                z_ho_best[lo:hi] = best_z.cpu().numpy()[idx]
+                print("[r3b] projection %3d-%3d/%d: corr mean=%.4f min=%.4f (%.1f s)"
+                      % (lo, hi - 1, n_ho, float(all_corr[lo:hi].mean()),
+                         float(all_corr[lo:hi].min()), time.time() - t0), flush=True)
+            proj = {"corrs": all_corr.tolist(), "restart": all_restart.tolist(),
+                    "loss": all_loss.tolist()}
+            # reference rows: the same 200 crops against the mean / nearest training crop
+            ref_mean = corr_rows(np.repeat(mean_pmf[None, :], n_ho, axis=0), ho_pmf)
+            ref_near = corr_matrix(ho_pmf, tr_pmf).max(axis=1)
+            print("[r3b] held-out projection corr mean=%.4f min=%.4f | restarts used %s | "
+                  "ref: mean-crop %.4f, nearest-train %.4f (%.1f s)"
+                  % (float(all_corr.mean()), float(all_corr.min()),
+                     np.bincount(all_restart, minlength=R).tolist(),
+                     float(ref_mean.mean()), float(ref_near.mean()), time.time() - t_proj), flush=True)
+        else:
+            z_ho_best = np.zeros((0, M), dtype=np.float64)
+            ref_mean = np.zeros(0)
+            ref_near = np.zeros(0)
+        proj_time = time.time() - t_proj
+
+        # ---------------------------------------------------------------- generation
+        gen_rng = np.random.default_rng(args.seed + 999)
+        if args.prior == "resample":
+            z_gen, spacing, jitter_std = sample_latents_resample(z_np, int(args.n_gen), gen_rng,
+                                                                 jitter_scale=0.2)
+            prior_info = {"kind": "resample-with-gaussian-jitter", "prior_mode": "resample",
+                          "jitter_scale": 0.2, "median_nn_spacing": float(spacing),
+                          "jitter_std": float(jitter_std)}
+            print("[r3b] latent prior: resample + jitter, median NN spacing=%.6g -> jitter std=%.6g"
+                  % (spacing, jitter_std), flush=True)
+        else:
+            cov_mode = "full" if n >= 100 else "diag"
+            g_prior = fit_z_gaussian(z_np, cov_mode)
+            z_gen = sample_z_gaussian(g_prior, int(args.n_gen), gen_rng)
+            prior_info = {"kind": "Gaussian on the trained z", "prior_mode": "gauss",
+                          "cov_mode": cov_mode, "M": M,
+                          "z_mu_absmean": float(np.abs(g_prior["mu"]).mean()),
+                          "z_std_mean": float(g_prior["std"].mean()),
+                          "z_std_min": float(g_prior["std"].min()),
+                          "z_std_max": float(g_prior["std"].max())}
+            print("[r3b] latent prior: %s-covariance Gaussian in R^%d, per-coord std %s"
+                  % (cov_mode, M, ["%.4f" % v for v in g_prior["std"]]), flush=True)
+
+        offsets = data_lens_r3.sample_offsets(d.train_offsets, z_gen.shape[0], gen_rng)
+        # LEVER C: the per-image flux.  `mean` is the parent's single S for every image;
+        # `resample` draws from the N TRAINING crop totals with replacement plus Gaussian
+        # jitter, the same rule (and the same 0.2) sample_latents_resample uses on the
+        # latents.  Held-out totals are never touched.
+        if args.flux == "resample":
+            S_gen, flux_spacing, flux_jit = sample_flux_resample(
+                d.train_totals, int(z_gen.shape[0]), gen_rng, jitter_scale=args.flux_jitter)
+            flux_info = {"mode": "resample", "jitter_scale": float(args.flux_jitter),
+                         "median_nn_spacing": float(flux_spacing),
+                         "jitter_std": float(flux_jit),
+                         "train_total_mean": float(np.mean(d.train_totals)),
+                         "train_total_sd": float(np.std(d.train_totals, ddof=1))
+                                            if d.train_totals.size > 1 else 0.0,
+                         "gen_total_mean": float(S_gen.mean()),
+                         "gen_total_sd": float(S_gen.std(ddof=1)) if S_gen.size > 1 else 0.0}
+            print("[v12] flux: resample from %d training totals (mean %.3f sd %.3f) + jitter "
+                  "std %.3f -> generated mean %.3f sd %.3f"
+                  % (d.train_totals.size, flux_info["train_total_mean"],
+                     flux_info["train_total_sd"], flux_jit, S_gen.mean(),
+                     flux_info["gen_total_sd"]), flush=True)
+        else:
+            S_gen = np.full(int(z_gen.shape[0]), float(S), dtype=np.float64)
+            flux_info = {"mode": "mean", "gen_total_mean": float(S), "gen_total_sd": 0.0,
+                         "train_total_mean": float(np.mean(d.train_totals)),
+                         "train_total_sd": float(np.std(d.train_totals, ddof=1))
+                                            if d.train_totals.size > 1 else 0.0}
+        with torch.no_grad():
+            q_gen = probs_batch(sim, theta_of(theta0, phi_raw,
+                                              torch.as_tensor(z_gen, dtype=DT, device=device))
+                                ).cpu().numpy().astype(np.float64)
+        for i in range(q_gen.shape[0]):
+            crop = ENC.crop_of_pmf(q_gen[i], float(S_gen[i]))
+            np.save(os.path.join(args.out, "crops", "generated_%03d.npy" % i), crop.astype(np.float32))
+            np.save(os.path.join(args.out, "generated_%03d.npy" % i),
+                    codec10.paste(crop, int(offsets[i, 0]), int(offsets[i, 1])).astype(np.float32))
+
+        # ---------------------------------------------------------------- meta
+        pc = np.asarray(proj["corrs"], dtype=np.float64)
+        meta = {
+            # tag the arm with the snapshot exactly as the baseline sweeps do, so the two
+            # protocols land in one selector and one table without colliding
+            "arm": ("%s %s" % (default_arm_name(args), step_tag(_snap_k)) if _multi
+                    else default_arm_name(args)),
+            "arm_base": default_arm_name(args),
+            "snapshot_steps": int(_snap_k),
+            "sweep": "iqp-v12",
+            "script": "train_iqp_affine_v12.py",
+            "round": "v12",
+            # ---- the four v12 levers ----
+            "lever_A_multi_kernel": bool(args.objective == "multi"),
+            "lam": (float(lam) if lam is not None else None),
+            "lam_auto": bool(args.objective == "multi" and args.lam is None),
+            "mu": float(args.mu), "walsh_k0": int(args.walsh_k0),
+            "walsh_H0": float(H0),
+            "walsh_hi_energy_final": float(hi_energy),
+            "walsh_hi_energy_ratio": (float(hi_energy / H0) if H0 > 0 else None),
+            "loss_final_walsh": float(walsh_term),
+            "flux_mode": args.flux, "flux": flux_info,
+            "gen_total_mean": float(flux_info["gen_total_mean"]),
+            "gen_total_sd": float(flux_info["gen_total_sd"]),
+            "n_qubits": N_QUBITS, "K": K_MAX, "ncodes": int(NCODES),
+            "encoding": ENC.name, "encode_decode_corr": float(enc_corr),
+            "latent_map": LATENT_MAP,
+            "hidden": (int(args.hidden) if LATENT_MAP == "mlp" else None),
+            "gnorm": (args.gnorm if LATENT_MAP == "mlp" else None),
+            "spatial_sigmas": [float(s) for s in sp_sigmas],
+            "spatial_lam_flat": (float(SPATIAL.lam_flat) if SPATIAL is not None else None),
+            "spatial_flat_scale": float(args.spatial_flat_scale),
+            "lam_scale": float(args.lam_scale),
+            # shared theta0 + shared map (Phi, or the MLP's W1/b1/W2) + N x M per-image latents
+            "param_count": int(NCODES + (g_size(M, int(args.hidden)) if LATENT_MAP == "mlp"
+                                         else M * NCODES) + n * M),
+            "param_count_shared": int(NCODES + (g_size(M, int(args.hidden))
+                                                if LATENT_MAP == "mlp" else M * NCODES)),
+            "M": M, "latent": "learned-affine", "protocol": "joint-affine",
+            "objective": args.objective, "prior_arg": args.prior,
+            "phi_row_norm": float(PHI_SCALE),
+            "theta0_seed_objective": "kl", "theta0_seed_steps": int(args.theta0_steps),
+            "theta0_seed_loss": float(seed_best), "theta0_seed_corr": seed_corr,
+            "n_train": int(n), "n_gen": int(q_gen.shape[0]), "n_holdout": int(n_ho),
+            "S": float(S), "seed": int(args.seed), "device": str(args.device),
+            "lr": float(args.lr), "steps": int(_snap_k), "zpen": float(args.zpen),
+            "zpen_L0": float(L0),
+            "zpen_penalty_over_data": (float(zpen_term / data_loss) if data_loss > 0 else None),
+            "sigmas": [float(s) for s in sigmas],
+            "sigma_mean_pauli_weights": [float(w) for w in mean_weights],
+            "loss_final_total": float(best),
+            "loss_final_data": data_loss, "loss_final_zpen": zpen_term,
+            "loss_final_per_image_mean": float(rows_tr.mean()),
+            "loss_final_per_image_max": float(rows_tr.max()),
+            "loss_final_per_image_min": float(rows_tr.min()),
+            "loss_first_logged": float(loss_curve[0][1]) if loss_curve else None,
+            "train_corr_mean": float(corr_tr.mean()), "train_corr_min": float(corr_tr.min()),
+            "train_corrs": corr_tr.tolist(),
+            "projection_corr_mean": float(pc.mean()) if pc.size else None,
+            "projection_corr_min": float(pc.min()) if pc.size else None,
+            "projection_corr_median": float(np.median(pc)) if pc.size else None,
+            "projection_corrs": proj["corrs"],
+            "projection_restart_used": proj["restart"],
+            "projection_restart_hist": (np.bincount(np.asarray(proj["restart"], dtype=np.int64),
+                                                    minlength=max(int(args.infer_restarts), 1))
+                                        .tolist() if pc.size else []),
+            "projection_restarts": int(args.infer_restarts),
+            "projection_steps": int(args.infer_steps),
+            "projection_lr": float(args.infer_lr),
+            "projection_seconds": float(proj_time),
+            "ref_projection_mean_crop_corr": float(ref_mean.mean()) if ref_mean.size else None,
+            "ref_projection_nearest_train_corr": float(ref_near.mean()) if ref_near.size else None,
+            "z_norm_mean": float(np.linalg.norm(z_np, axis=1).mean()),
+            "z_norm_max": float(np.linalg.norm(z_np, axis=1).max()),
+            "conditional": False,
+            "prior": prior_info,
+            "g_init": g_init, "g_stats": g_stats,
+            "nonlinearity_ratio": g_stats.get("nonlinearity_ratio"),
+            "train_seconds": float(train_time),
+            "wallclock_seconds": float(time.time() - t0),
+            "gen_offsets": [[int(a), int(b)] for a, b in offsets.tolist()],
+        }
+        with open(os.path.join(args.out, "meta.json"), "w") as fh:
+            json.dump(meta, fh, indent=2, sort_keys=True, default=str)
+        np.save(os.path.join(args.out, "theta0.npy"), theta0_np)
+        np.save(os.path.join(args.out, "Phi.npy"), phi_np)
+        np.save(os.path.join(args.out, "z_train.npy"), z_np)
+        np.save(os.path.join(args.out, "z_holdout.npy"), z_ho_best)
+        np.save(os.path.join(args.out, "loss_curve.npy"), np.asarray(loss_curve, dtype=np.float64))
+        print("[r3b] wrote %d images to %s (arm=%s) in %.1f s"
+              % (q_gen.shape[0], args.out, meta["arm"], time.time() - t0), flush=True)
+        args.out = _snap_root
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

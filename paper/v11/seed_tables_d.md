@@ -157,6 +157,17 @@ removed.  Near 0 means the arm is barely doing better than one shared hologram.
 | DCGAN-32 (Table 2) | 100 | -- | -- | -- | -- | -- | -- |
 | | | | | | | | |
 
+## 3b. Per-seed collapse check
+
+A cell whose seeds do not all behave the same way must not be read as a mean +- sd.
+This lists every (arm, N) cell in which at least one seed ended with a training-set
+correlation below 0.5, i.e. the run did not fit the data it was given at all.
+
+| arm | N | collapsed seeds | per-seed train corr of the collapsed runs |
+|---|---|---|---|
+| IQP-n12-affine-M4 (fixed 4k) | 100 | 2 of 5 | seed 3: 0.004, seed 4: 0.008 |
+| IQP-n12-affine-M4 (val-selected) | 100 | 2 of 5 | seed 3: 0.004, seed 4: 0.008 |
+
 ## 4. Provenance
 
 | what | where |
