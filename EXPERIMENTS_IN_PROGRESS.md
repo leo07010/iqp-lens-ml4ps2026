@@ -39,3 +39,9 @@ job has finished (log: `logs_lens/sync_release_watcher.log` on the cluster).
 
 Next step after that: paper v12 (`paper/v12/`, v11 kept unchanged), 7 pages total, with the
 nonlinear latent map as the main arm if the tables confirm it.
+
+## Update 2026-09-09 23:00: all experiments finished
+
+Parts E (IQP-side levers), F (IQP+MLP suite), G (flux-resampled re-scoring of every arm) are in
+`paper/v11/seed_tables_{e,f,g}.md` with their jsonl under `results/`. Paper **v12** is in
+`paper/v12/` (7 pages). Nothing is running on the cluster.

@@ -1,4 +1,4 @@
-> **Current version: [`paper/v11/main.pdf`](paper/v11/main.pdf)** (five seeds, mean ± sd, metric protocol v11, baselines with validation early stopping). `paper/main.pdf` is the superseded **v10** (single seed, legacy metric protocol, baselines at a fixed 20,000 steps) and is kept only for the record; its Table 2 differs from v11 for those three reasons.
+> **Current version: [`paper/v12/main.pdf`](paper/v12/main.pdf)** (7 pages; non-linear latent map as the main arm, sampled flux, five seeds). `paper/v11/main.pdf` is the previous five-seed version and (five seeds, mean ± sd, metric protocol v11, baselines with validation early stopping). `paper/main.pdf` is the superseded **v10** (single seed, legacy metric protocol, baselines at a fixed 20,000 steps) and is kept only for the record; its Table 2 differs from v11 for those three reasons.
 
 # ML4PS 2026 submission — materials directory
 
