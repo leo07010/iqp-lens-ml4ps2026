@@ -20,3 +20,22 @@ Open decisions left for the author:
    table gives the baselines that validation set.
 2. Deleting the 180 unselected IQP early-stopping snapshot directories (about 1 GB) on the cluster.
 3. Anonymised code link (anonymous.4open.science) for the OpenReview submission, due 2026-09-12 23:59 AoE.
+
+## Update 2026-09-09 18:10
+
+Completed and synced: 12-qubit full-frame and MLP latent-map arms (`paper/v11/seed_tables_d.md`),
+and the internal circuit-free control (`paper/v11/seed_tables_d2.md`, not for the paper).
+
+Running on the cluster:
+- job 362973 `v12_grid`: IQP-side improvements (multi-kernel objective, Walsh low-pass, flux sampled
+  from the training distribution, pixel-space Gaussian MMD, 8-qubit 16x16 + upsampling, Gray-code
+  encoding, small MLP H=4/8) -> `paper/v11/seed_tables_e.md`
+- job 363008 `mlpsw` and its dependent jobs: the full IQP+MLP suite (M in {1,2,3,4,6,8,16} x H in
+  {8,32} x N in {11,100}, N=20 controlled sweep, H sweep, flat vs paper-kernel objectives with the
+  early-stopping check, data scaling, per-class, ablations, samples) -> `paper/v11/seed_tables_f.md`
+
+A login-node watcher copies all of the above into this repo and pushes as soon as every v12*/mlp*
+job has finished (log: `logs_lens/sync_release_watcher.log` on the cluster).
+
+Next step after that: paper v12 (`paper/v12/`, v11 kept unchanged), 7 pages total, with the
+nonlinear latent map as the main arm if the tables confirm it.
