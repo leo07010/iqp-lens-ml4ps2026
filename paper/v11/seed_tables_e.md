@@ -14,16 +14,40 @@ All arms run a FIXED 4,000 joint steps, the same count the published IQP arms us
 
 | Arm | PDF-JS | MMD2 | MMD2_al | Params | beats DCGAN+RBM on all 3 by > baseline sd? |
 |---|---|---|---|---|---|
+| mlpH8, M=4, multi, flux=resample, 16k steps | 0.001162 +- 0.000125 | 0.0508 +- 0.006664 | 0.02689 +- 0.001429 | 9,300 | no |
+| mlpH8, M=4, multi, flux=resample, selected | 0.001217 +- 0.0001823 | 0.0508 +- 0.006596 | 0.0267 +- 0.001283 | 9,300 | no |
+| mlpH8, M=4, multi, flux=resample, 12k steps | 0.001181 +- 0.0001255 | 0.05083 +- 0.006615 | 0.02685 +- 0.001308 | 9,300 | no |
+| mlpH8, M=4, multi, flux=resample, 8k steps | 0.001234 +- 0.0001105 | 0.05091 +- 0.006668 | 0.0268 +- 0.001214 | 9,300 | no |
+| mlpH8, M=4, multi, flux=resample, 4k steps | 0.001405 +- 7.379e-05 | 0.05108 +- 0.006877 | 0.02713 +- 0.001605 | 9,300 | no |
 | mlpH8, M=4, multi, flux=resample | 0.001545 +- 4.807e-05 | 0.05105 +- 0.007075 | 0.02722 +- 0.001877 | 9,300 | no |
-| mlpH8, M=4, spatial+flat, flux=resample | 0.001279 +- 0.0001153 | 0.05126 +- 0.006873 | 0.0294 +- 0.003285 | 9,300 | no |
 | M=4, spatial+flatx0.25, flux=resample | 0.001104 +- 6.543e-05 | 0.05 +- 0.007085 | 0.03213 +- 0.001059 | 5,164 | no |
-| gray10, M=4, spatial+flatx4, flux=resample | 0.002439 +- 5.572e-05 | 0.05142 +- 0.006855 | 0.02779 +- 0.002185 | 5,164 | no |
 | mlpH8, M=2, flat, flux=resample | 0.001851 +- 0.0001456 | 0.05373 +- 0.01234 | 0.02443 +- 0.002838 | 9,262 | no |
-| mlpH8, M=4, flat, flux=resample | 0.001814 +- 0.0001286 | 0.05208 +- 0.008108 | 0.0282 +- 0.002717 | 9,300 | no |
-| M=4, spatial+flat, flux=resample | 0.001791 +- 4.665e-05 | 0.0508 +- 0.007389 | 0.02921 +- 0.002165 | 5,164 | no |
-| gray10, M=4, spatial+flat, flux=resample | 0.001839 +- 7.498e-05 | 0.05078 +- 0.007629 | 0.02896 +- 0.002619 | 5,164 | no |
 | **DCGAN** (Table 2, v11) | 0.001106 +- 0.0005576 | 0.05094 +- 0.01514 | 0.03883 +- 0.0104 | 199,837 | -- |
 | **RBM** (Table 2, v11) | 0.001669 +- 0.0008203 | 0.06537 +- 0.008124 | 0.1106 +- 0.03881 | 11,010 | -- |
+
+## N = 5
+
+| Arm | N | PDF-JS | MMD2 | MMD2_u | MMD2_al | proj. corr. | gen_max | clip frac | gen total (mean/sd) | Params | seeds |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| M=4, spatial+flatx0.25, flux=resample | 5 | 0.0005037 +- 4.704e-05 | 0.02558 +- 0.003135 | 0.02102 +- 0.00314 | 0.03058 +- 0.002525 | 0.8266 +- 0.001514 | 1.97 +- 0.0531 | 0.00112 +- 4.52e-05 | 122.9 / 26.7 | 5,140 | 5 |
+| mlpH8, M=2, flat, flux=resample | 5 | 0.000642 +- 4.895e-05 | 0.0277 +- 0.002632 | 0.02305 +- 0.002577 | 0.03135 +- 0.002229 | 0.8353 +- 0.001077 | 1.9 +- 0.0901 | 0.00116 +- 0.000124 | 124.7 / 27.6 | 9,250 | 5 |
+| mlpH8, M=4, flat, flux=resample | 5 | 0.0008982 +- 0.0001684 | 0.02744 +- 0.003038 | 0.02289 +- 0.003013 | 0.03287 +- 0.00325 | 0.8404 +- 0.003728 | 1.98 +- 0.177 | 0.00103 +- 7.42e-05 | 122.9 / 26.7 | 9,276 | 5 |
+| mlpH8, M=4, multi, flux=resample | 5 | 0.001064 +- 0.0004344 | 0.02968 +- 0.005865 | 0.02513 +- 0.005867 | 0.03611 +- 0.006868 | 0.8255 +- 0.002385 | 2.06 +- 0.0878 | 0.00104 +- 8.81e-05 | 122.9 / 26.7 | 9,276 | 5 |
+| mlpH8, M=4, spatial+flat, flux=resample | 5 | 0.000694 +- 0.0001323 | 0.02703 +- 0.003605 | 0.02248 +- 0.003614 | 0.03301 +- 0.00285 | 0.8334 +- 0.003052 | 1.94 +- 0.153 | 0.00105 +- 7.22e-05 | 122.9 / 26.7 | 9,276 | 5 |
+| gray10, M=4, spatial+flatx4, flux=resample | 5 | 0.0006148 +- 5.379e-05 | 0.02584 +- 0.003298 | 0.0213 +- 0.003299 | 0.02962 +- 0.002775 | 0.8438 +- 0.001913 | 1.84 +- 0.0441 | 0.00112 +- 7.34e-05 | 122.9 / 26.7 | 5,140 | 5 |
+
+### N = 5 -- wins that the seed spread does not support
+
+| metric | best arm (mean) | overlaps it within 1 sd |
+|---|---|---|
+| PDF-JS | M=4, spatial+flatx0.25, flux=resample (0.0005037 +- 4.704e-05) | **none -- the win holds** |
+| MMD2 | M=4, spatial+flatx0.25, flux=resample (0.02558 +- 0.003135) | gray10, M=4, spatial+flatx4, flux=resample, mlpH8, M=4, spatial+flat, flux=resample, mlpH8, M=4, flat, flux=resample, mlpH8, M=2, flat, flux=resample, mlpH8, M=4, multi, flux=resample |
+| MMD2_u | M=4, spatial+flatx0.25, flux=resample (0.02102 +- 0.00314) | gray10, M=4, spatial+flatx4, flux=resample, mlpH8, M=4, spatial+flat, flux=resample, mlpH8, M=4, flat, flux=resample, mlpH8, M=2, flat, flux=resample, mlpH8, M=4, multi, flux=resample |
+| MMD2_al | gray10, M=4, spatial+flatx4, flux=resample (0.02962 +- 0.002775) | M=4, spatial+flatx0.25, flux=resample, mlpH8, M=2, flat, flux=resample, mlpH8, M=4, flat, flux=resample, mlpH8, M=4, spatial+flat, flux=resample, mlpH8, M=4, multi, flux=resample |
+
+### N = 5 -- the pre-registered "clear win" test
+
+**Not applicable at N = 5:** Table 2 (v11) has no DCGAN or RBM row at this N, so the clear-win test has nothing to test against. The rows above are reported for the N-scaling trend only.
 
 ## N = 11 (headline cell)
 
@@ -58,6 +82,11 @@ All arms run a FIXED 4,000 joint steps, the same count the published IQP arms us
 | mlpH8, M=4, flat, flux=mean | 11 | 0.001727 +- 0.0001421 | 0.0881 +- 0.003253 | 0.08493 +- 0.003275 | 0.0282 +- 0.002717 | 0.9087 +- 0.005225 | 1.52 +- 0.0865 | 0.000671 +- 5.24e-05 | 112.3 / 0.0 | 9,300 | 5 |
 | mlpH8, M=4, flat, flux=resample | 11 | 0.001814 +- 0.0001286 | 0.05208 +- 0.008108 | 0.04783 +- 0.008127 | 0.0282 +- 0.002717 | 0.9087 +- 0.005225 | 2.2 +- 0.198 | 0.00106 +- 0.000122 | 112.2 / 25.7 | 9,300 | 5 |
 | mlpH8, M=4, multi, flux=resample | 11 | 0.001545 +- 4.807e-05 | 0.05105 +- 0.007075 | 0.0468 +- 0.007097 | 0.02722 +- 0.001877 | 0.8983 +- 0.004071 | 2.18 +- 0.121 | 0.00108 +- 0.000106 | 112.2 / 25.7 | 9,300 | 5 |
+| mlpH8, M=4, multi, flux=resample, 12k steps | 11 | 0.001181 +- 0.0001255 | 0.05083 +- 0.006615 | 0.04658 +- 0.006641 | 0.02685 +- 0.001308 | 0.8948 +- 0.002291 | 2.13 +- 0.0743 | 0.00108 +- 0.000104 | 112.2 / 25.7 | 9,300 | 5 |
+| mlpH8, M=4, multi, flux=resample, 16k steps | 11 | 0.001162 +- 0.000125 | 0.0508 +- 0.006664 | 0.04655 +- 0.00669 | 0.02689 +- 0.001429 | 0.8945 +- 0.002404 | 2.14 +- 0.0779 | 0.00108 +- 0.000112 | 112.2 / 25.7 | 9,300 | 5 |
+| mlpH8, M=4, multi, flux=resample, 4k steps | 11 | 0.001405 +- 7.379e-05 | 0.05108 +- 0.006877 | 0.04683 +- 0.006902 | 0.02713 +- 0.001605 | 0.8968 +- 0.003656 | 2.15 +- 0.1 | 0.00107 +- 0.000112 | 112.2 / 25.7 | 9,300 | 5 |
+| mlpH8, M=4, multi, flux=resample, 8k steps | 11 | 0.001234 +- 0.0001105 | 0.05091 +- 0.006668 | 0.04666 +- 0.006692 | 0.0268 +- 0.001214 | 0.8956 +- 0.002925 | 2.12 +- 0.0791 | 0.00108 +- 0.000105 | 112.2 / 25.7 | 9,300 | 5 |
+| mlpH8, M=4, multi, flux=resample, selected | 11 | 0.001217 +- 0.0001823 | 0.0508 +- 0.006596 | 0.04656 +- 0.006621 | 0.0267 +- 0.001283 | 0.8952 +- 0.003091 | 2.16 +- 0.0903 | 0.00107 +- 0.000111 | 112.2 / 25.7 | 9,300 | 5 |
 | mlpH8, M=4, spatial+flat, flux=resample | 11 | 0.001279 +- 0.0001153 | 0.05126 +- 0.006873 | 0.047 +- 0.006893 | 0.0294 +- 0.003285 | 0.9039 +- 0.00189 | 2.21 +- 0.139 | 0.00108 +- 9.44e-05 | 112.2 / 25.7 | 9,300 | 5 |
 | mlpH8, M=4, spatial+flatx4, flux=resample | 11 | 0.001692 +- 0.0001959 | 0.05282 +- 0.008853 | 0.04856 +- 0.008865 | 0.03096 +- 0.004117 | 0.9065 +- 0.002994 | 2.23 +- 0.126 | 0.00104 +- 0.000159 | 112.2 / 25.7 | 9,300 | 5 |
 | gray10, M=4, flat, flux=mean | 11 | 0.003182 +- 0.0001964 | 0.08936 +- 0.002276 | 0.08621 +- 0.0023 | 0.02793 +- 0.002019 | 0.9077 +- 0.002382 | 1.38 +- 0.0327 | 0.000665 +- 4.12e-05 | 112.3 / 0.0 | 5,164 | 5 |
@@ -83,9 +112,9 @@ All arms run a FIXED 4,000 joint steps, the same count the published IQP arms us
 | metric | best arm (mean) | overlaps it within 1 sd |
 |---|---|---|
 | PDF-JS | IQP, learned dir. M=4 (paper kernel) (Table 2) (0.0008062 +- 5.176e-05) | DCGAN (Table 2), RBM (Table 2) |
-| MMD2 | M=4, spatial+flatx0.25, flux=resample (0.05 +- 0.007085) | gray10, M=4, spatial+flat, flux=resample, M=4, spatial+flat, flux=resample, DCGAN (Table 2), mlpH8, M=4, multi, flux=resample, mlpH8, M=4, spatial+flat, flux=resample, gray10, M=4, spatial+flatx4, flux=resample, mlpH8, M=4, flat, flux=resample, M=4, spatial+flatx4, flux=resample, M=4, spatial+flat, mu=0.01,k0=3, flux=resample, M=4, spatial+flatx16, flux=resample, M=4, flat, flux=resample, M=4, multi(lam x0.25), flux=resample, mlpH8, M=4, spatial+flatx4, flux=resample, gray10, M=4, flat, flux=resample, M=4, multi(lam x4), flux=resample, M=4, multi, flux=resample, mlpH8, M=2, flat, flux=resample, M=4, multi, mu=0.01,k0=3, flux=resample, mlpH4, M=2, flat, flux=resample, mlpH4, M=4, spatial+flat, flux=resample, M=2, spatial+flat, flux=resample, M=4, paper, flux=resample, M=4, spatial, flux=resample, mlpH4, M=4, flat, flux=resample, M=2, flat, flux=resample, M=2, multi, flux=resample, M=2, multi, mu=0.01,k0=3, flux=resample |
-| MMD2_u | M=4, spatial+flatx0.25, flux=resample (0.04573 +- 0.007105) | gray10, M=4, spatial+flat, flux=resample, M=4, spatial+flat, flux=resample, mlpH8, M=4, multi, flux=resample, mlpH8, M=4, spatial+flat, flux=resample, DCGAN (Table 2), gray10, M=4, spatial+flatx4, flux=resample, mlpH8, M=4, flat, flux=resample, M=4, spatial+flatx4, flux=resample, M=4, spatial+flat, mu=0.01,k0=3, flux=resample, M=4, spatial+flatx16, flux=resample, M=4, flat, flux=resample, M=4, multi(lam x0.25), flux=resample, mlpH8, M=4, spatial+flatx4, flux=resample, gray10, M=4, flat, flux=resample, M=4, multi(lam x4), flux=resample, M=4, multi, flux=resample, mlpH8, M=2, flat, flux=resample, M=4, multi, mu=0.01,k0=3, flux=resample, mlpH4, M=2, flat, flux=resample, mlpH4, M=4, spatial+flat, flux=resample, M=2, spatial+flat, flux=resample, M=4, paper, flux=resample, M=4, spatial, flux=resample, mlpH4, M=4, flat, flux=resample, M=2, flat, flux=resample, M=2, multi, flux=resample, M=2, multi, mu=0.01,k0=3, flux=resample, RBM (Table 2) |
-| MMD2_al | mlpH8, M=2, flat, flux=resample (0.02443 +- 0.002838) | mlpH4, M=2, flat, flux=resample, mlpH8, M=4, multi, flux=resample, IQP, learned dir. M=4 (flat MMD) (Table 2), M=4, flat, flux=resample, M=4, multi(lam x0.25), flux=resample, M=4, multi, mu=0.01,k0=3, flux=mean, M=4, multi, mu=0.01,k0=3, flux=resample, gray10, M=4, spatial+flatx4, flux=resample, gray10, M=4, flat, flux=resample, gray10, M=4, flat, flux=mean, M=4, spatial+flat, mu=0.01,k0=3, flux=resample, M=4, spatial+flatx16, flux=resample, mlpH8, M=4, flat, flux=resample, mlpH8, M=4, flat, flux=mean, M=4, multi, flux=mean, M=4, multi, flux=resample, M=4, spatial+flatx4, flux=resample, gray10, M=4, spatial+flat, flux=resample, M=4, spatial+flat, flux=resample, M=4, spatial+flat, flux=mean, mlpH8, M=4, spatial+flat, flux=resample, mlpH8, M=4, spatial+flatx4, flux=resample |
+| MMD2 | M=4, spatial+flatx0.25, flux=resample (0.05 +- 0.007085) | gray10, M=4, spatial+flat, flux=resample, M=4, spatial+flat, flux=resample, mlpH8, M=4, multi, flux=resample, 16k steps, mlpH8, M=4, multi, flux=resample, selected, mlpH8, M=4, multi, flux=resample, 12k steps, mlpH8, M=4, multi, flux=resample, 8k steps, DCGAN (Table 2), mlpH8, M=4, multi, flux=resample, mlpH8, M=4, multi, flux=resample, 4k steps, mlpH8, M=4, spatial+flat, flux=resample, gray10, M=4, spatial+flatx4, flux=resample, mlpH8, M=4, flat, flux=resample, M=4, spatial+flatx4, flux=resample, M=4, spatial+flat, mu=0.01,k0=3, flux=resample, M=4, spatial+flatx16, flux=resample, M=4, flat, flux=resample, M=4, multi(lam x0.25), flux=resample, mlpH8, M=4, spatial+flatx4, flux=resample, gray10, M=4, flat, flux=resample, M=4, multi(lam x4), flux=resample, M=4, multi, flux=resample, mlpH8, M=2, flat, flux=resample, M=4, multi, mu=0.01,k0=3, flux=resample, mlpH4, M=2, flat, flux=resample, mlpH4, M=4, spatial+flat, flux=resample, M=2, spatial+flat, flux=resample, M=4, paper, flux=resample, M=4, spatial, flux=resample, mlpH4, M=4, flat, flux=resample, M=2, flat, flux=resample, M=2, multi, flux=resample, M=2, multi, mu=0.01,k0=3, flux=resample |
+| MMD2_u | M=4, spatial+flatx0.25, flux=resample (0.04573 +- 0.007105) | gray10, M=4, spatial+flat, flux=resample, M=4, spatial+flat, flux=resample, mlpH8, M=4, multi, flux=resample, 16k steps, mlpH8, M=4, multi, flux=resample, selected, mlpH8, M=4, multi, flux=resample, 12k steps, mlpH8, M=4, multi, flux=resample, 8k steps, mlpH8, M=4, multi, flux=resample, mlpH8, M=4, multi, flux=resample, 4k steps, mlpH8, M=4, spatial+flat, flux=resample, DCGAN (Table 2), gray10, M=4, spatial+flatx4, flux=resample, mlpH8, M=4, flat, flux=resample, M=4, spatial+flatx4, flux=resample, M=4, spatial+flat, mu=0.01,k0=3, flux=resample, M=4, spatial+flatx16, flux=resample, M=4, flat, flux=resample, M=4, multi(lam x0.25), flux=resample, mlpH8, M=4, spatial+flatx4, flux=resample, gray10, M=4, flat, flux=resample, M=4, multi(lam x4), flux=resample, M=4, multi, flux=resample, mlpH8, M=2, flat, flux=resample, M=4, multi, mu=0.01,k0=3, flux=resample, mlpH4, M=2, flat, flux=resample, mlpH4, M=4, spatial+flat, flux=resample, M=2, spatial+flat, flux=resample, M=4, paper, flux=resample, M=4, spatial, flux=resample, mlpH4, M=4, flat, flux=resample, M=2, flat, flux=resample, M=2, multi, flux=resample, M=2, multi, mu=0.01,k0=3, flux=resample, RBM (Table 2) |
+| MMD2_al | mlpH8, M=2, flat, flux=resample (0.02443 +- 0.002838) | mlpH4, M=2, flat, flux=resample, mlpH8, M=4, multi, flux=resample, selected, mlpH8, M=4, multi, flux=resample, 8k steps, mlpH8, M=4, multi, flux=resample, 12k steps, mlpH8, M=4, multi, flux=resample, 16k steps, mlpH8, M=4, multi, flux=resample, 4k steps, mlpH8, M=4, multi, flux=resample, IQP, learned dir. M=4 (flat MMD) (Table 2), M=4, flat, flux=resample, M=4, multi(lam x0.25), flux=resample, M=4, multi, mu=0.01,k0=3, flux=mean, M=4, multi, mu=0.01,k0=3, flux=resample, gray10, M=4, spatial+flatx4, flux=resample, gray10, M=4, flat, flux=resample, gray10, M=4, flat, flux=mean, M=4, spatial+flat, mu=0.01,k0=3, flux=resample, M=4, spatial+flatx16, flux=resample, mlpH8, M=4, flat, flux=resample, mlpH8, M=4, flat, flux=mean, M=4, multi, flux=mean, M=4, multi, flux=resample, M=4, spatial+flatx4, flux=resample, gray10, M=4, spatial+flat, flux=resample, M=4, spatial+flat, flux=resample, M=4, spatial+flat, flux=mean, mlpH8, M=4, spatial+flat, flux=resample, mlpH8, M=4, spatial+flatx4, flux=resample |
 
 ### N = 11 -- the pre-registered "clear win" test
 
@@ -180,6 +209,21 @@ A combination passes only if its MEAN beats BOTH baselines on all three of PDF-J
 | mlpH8, M=4, multi, flux=resample | PDF-JS | -0.79 | -9.13 | 0.15 | 2.59 |
 | mlpH8, M=4, multi, flux=resample | MMD2 | -0.01 | -0.02 | 1.76 | 2.02 |
 | mlpH8, M=4, multi, flux=resample | MMD2_al | 1.12 | 6.18 | 2.15 | 44.42 |
+| mlpH8, M=4, multi, flux=resample, 12k steps | PDF-JS | -0.13 | -0.59 | 0.60 | 3.89 |
+| mlpH8, M=4, multi, flux=resample, 12k steps | MMD2 | 0.01 | 0.02 | 1.79 | 2.20 |
+| mlpH8, M=4, multi, flux=resample, 12k steps | MMD2_al | 1.15 | 9.16 | 2.16 | 64.03 |
+| mlpH8, M=4, multi, flux=resample, 16k steps | PDF-JS | -0.10 | -0.45 | 0.62 | 4.06 |
+| mlpH8, M=4, multi, flux=resample, 16k steps | MMD2 | 0.01 | 0.02 | 1.79 | 2.19 |
+| mlpH8, M=4, multi, flux=resample, 16k steps | MMD2_al | 1.15 | 8.36 | 2.16 | 58.59 |
+| mlpH8, M=4, multi, flux=resample, 4k steps | PDF-JS | -0.54 | -4.05 | 0.32 | 3.57 |
+| mlpH8, M=4, multi, flux=resample, 4k steps | MMD2 | -0.01 | -0.02 | 1.76 | 2.08 |
+| mlpH8, M=4, multi, flux=resample, 4k steps | MMD2_al | 1.12 | 7.29 | 2.15 | 52.01 |
+| mlpH8, M=4, multi, flux=resample, 8k steps | PDF-JS | -0.23 | -1.16 | 0.53 | 3.93 |
+| mlpH8, M=4, multi, flux=resample, 8k steps | MMD2 | 0.00 | 0.00 | 1.78 | 2.17 |
+| mlpH8, M=4, multi, flux=resample, 8k steps | MMD2_al | 1.16 | 9.91 | 2.16 | 69.04 |
+| mlpH8, M=4, multi, flux=resample, selected | PDF-JS | -0.20 | -0.61 | 0.55 | 2.48 |
+| mlpH8, M=4, multi, flux=resample, selected | MMD2 | 0.01 | 0.02 | 1.79 | 2.21 |
+| mlpH8, M=4, multi, flux=resample, selected | MMD2_al | 1.17 | 9.45 | 2.16 | 65.40 |
 | mlpH8, M=4, spatial+flat, flux=resample | PDF-JS | -0.31 | -1.50 | 0.48 | 3.38 |
 | mlpH8, M=4, spatial+flat, flux=resample | MMD2 | -0.02 | -0.05 | 1.74 | 2.05 |
 | mlpH8, M=4, spatial+flat, flux=resample | MMD2_al | 0.91 | 2.87 | 2.09 | 24.72 |
@@ -228,9 +272,61 @@ A combination passes only if its MEAN beats BOTH baselines on all three of PDF-J
 
 **Verdict at N = 11:** no combination passes. No v12 arm beats both baselines on all three columns by more than the baselines' seed sd.
 
+## N = 100
+
+| Arm | N | PDF-JS | MMD2 | MMD2_u | MMD2_al | proj. corr. | gen_max | clip frac | gen total (mean/sd) | Params | seeds |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| M=4, spatial+flatx0.25, flux=resample | 100 | 0.001007 +- 6.842e-05 | 0.02309 +- 0.001968 | 0.01844 +- 0.001934 | 0.02521 +- 0.002625 | 0.9599 +- 0.0007359 | 2.16 +- 0.105 | 0.00112 +- 8.95e-05 | 125.0 / 27.5 | 5,520 | 5 |
+| mlpH8, M=2, flat, flux=resample | 100 | 0.002409 +- 6.98e-05 | 0.02316 +- 0.0009813 | 0.01847 +- 0.0009441 | 0.02123 +- 0.00173 | 0.9699 +- 0.0006758 | 2.12 +- 0.122 | 0.00124 +- 7.66e-05 | 126.4 / 29.7 | 9,440 | 5 |
+| mlpH8, M=4, flat, flux=resample | 100 | 0.002142 +- 0.0001848 | 0.02105 +- 0.002828 | 0.01647 +- 0.002803 | 0.02189 +- 0.003829 | 0.976 +- 0.0008443 | 2.17 +- 0.0952 | 0.00113 +- 8.21e-05 | 125.0 / 27.5 | 9,656 | 5 |
+| mlpH8, M=4, multi, flux=resample | 100 | 0.001928 +- 0.0001809 | 0.02147 +- 0.002354 | 0.01688 +- 0.002339 | 0.02288 +- 0.00314 | 0.9728 +- 0.00306 | 2.08 +- 0.105 | 0.00111 +- 9.95e-05 | 125.0 / 27.5 | 9,656 | 5 |
+| mlpH8, M=4, spatial+flat, flux=resample | 100 | 0.001285 +- 5.44e-05 | 0.02102 +- 0.00231 | 0.01641 +- 0.002279 | 0.02118 +- 0.003781 | 0.9759 +- 9.771e-05 | 2.13 +- 0.0992 | 0.00119 +- 9.24e-05 | 125.0 / 27.5 | 9,656 | 5 |
+| gray10, M=4, spatial+flatx4, flux=resample | 100 | 0.00218 +- 0.0001492 | 0.0223 +- 0.00302 | 0.0177 +- 0.003013 | 0.02455 +- 0.004031 | 0.9682 +- 0.0005552 | 2.1 +- 0.0371 | 0.00102 +- 6.57e-05 | 125.0 / 27.5 | 5,520 | 5 |
+| **DCGAN** (Table 2, v11) | 100 | 0.0005534 +- 0.0001211 | 0.02225 +- 0.003118 | 0.01752 +- 0.003006 | 0.02122 +- 0.004081 | -- | -- | -- | -- | -- | 5 |
+| **RBM** (Table 2, v11) | 100 | 0.0009171 +- 0.000132 | 0.05865 +- 0.004363 | 0.05425 +- 0.004423 | 0.08067 +- 0.02205 | -- | -- | -- | -- | -- | 5 |
+| **IQP, learned dir. M=4 (flat MMD)** (Table 2, v11) | 100 | 0.002912 +- 0.0002788 | 0.07155 +- 0.002939 | 0.06811 +- 0.002961 | 0.02551 +- 0.004413 | -- | -- | -- | -- | -- | 5 |
+| **IQP, learned dir. M=4 (paper kernel)** (Table 2, v11) | 100 | 0.001363 +- 0.0001801 | 0.1132 +- 0.004813 | 0.1095 +- 0.004808 | 0.09991 +- 0.007786 | -- | -- | -- | -- | -- | 5 |
+
+### N = 100 -- wins that the seed spread does not support
+
+| metric | best arm (mean) | overlaps it within 1 sd |
+|---|---|---|
+| PDF-JS | DCGAN (Table 2) (0.0005534 +- 0.0001211) | **none -- the win holds** |
+| MMD2 | mlpH8, M=4, spatial+flat, flux=resample (0.02102 +- 0.00231) | mlpH8, M=4, flat, flux=resample, mlpH8, M=4, multi, flux=resample, DCGAN (Table 2), gray10, M=4, spatial+flatx4, flux=resample, M=4, spatial+flatx0.25, flux=resample, mlpH8, M=2, flat, flux=resample |
+| MMD2_u | mlpH8, M=4, spatial+flat, flux=resample (0.01641 +- 0.002279) | mlpH8, M=4, flat, flux=resample, mlpH8, M=4, multi, flux=resample, DCGAN (Table 2), gray10, M=4, spatial+flatx4, flux=resample, M=4, spatial+flatx0.25, flux=resample, mlpH8, M=2, flat, flux=resample |
+| MMD2_al | mlpH8, M=4, spatial+flat, flux=resample (0.02118 +- 0.003781) | DCGAN (Table 2), mlpH8, M=2, flat, flux=resample, mlpH8, M=4, flat, flux=resample, mlpH8, M=4, multi, flux=resample, gray10, M=4, spatial+flatx4, flux=resample, M=4, spatial+flatx0.25, flux=resample, IQP, learned dir. M=4 (flat MMD) (Table 2) |
+
+### N = 100 -- the pre-registered "clear win" test
+
+A combination passes only if its MEAN beats BOTH baselines on all three of PDF-JS, raw MMD$^2$ and aligned MMD$^2$ by more than the baseline's own seed sd. `gap/sd_base` is the margin in units of the baseline's sd (the literal test); `gap/sd_iqp` is the same gap in units of the IQP arm's own sd (the stricter reading). A negative number means the baseline is still ahead.
+
+| Arm | metric | vs DCGAN gap/sd_base | vs DCGAN gap/sd_iqp | vs RBM gap/sd_base | vs RBM gap/sd_iqp |
+|---|---|---|---|---|---|
+| M=4, spatial+flatx0.25, flux=resample | PDF-JS | -3.75 | -6.63 | -0.68 | -1.32 |
+| M=4, spatial+flatx0.25, flux=resample | MMD2 | -0.27 | -0.43 | 8.15 | 18.07 |
+| M=4, spatial+flatx0.25, flux=resample | MMD2_al | -0.98 | -1.52 | 2.51 | 21.13 |
+| mlpH8, M=2, flat, flux=resample | PDF-JS | -15.33 | -26.59 | -11.31 | -21.38 |
+| mlpH8, M=2, flat, flux=resample | MMD2 | -0.29 | -0.93 | 8.13 | 36.16 |
+| mlpH8, M=2, flat, flux=resample | MMD2_al | -0.00 | -0.00 | 2.70 | 34.35 |
+| mlpH8, M=4, flat, flux=resample | PDF-JS | -13.12 | -8.60 | -9.28 | -6.63 |
+| mlpH8, M=4, flat, flux=resample | MMD2 | 0.38 | 0.42 | 8.62 | 13.29 |
+| mlpH8, M=4, flat, flux=resample | MMD2_al | -0.16 | -0.17 | 2.67 | 15.35 |
+| mlpH8, M=4, multi, flux=resample | PDF-JS | -11.35 | -7.60 | -7.65 | -5.59 |
+| mlpH8, M=4, multi, flux=resample | MMD2 | 0.25 | 0.33 | 8.52 | 15.79 |
+| mlpH8, M=4, multi, flux=resample | MMD2_al | -0.41 | -0.53 | 2.62 | 18.40 |
+| mlpH8, M=4, spatial+flat, flux=resample | PDF-JS | -6.04 | -13.44 | -2.78 | -6.76 |
+| mlpH8, M=4, spatial+flat, flux=resample | MMD2 | 0.39 | 0.53 | 8.62 | 16.29 |
+| mlpH8, M=4, spatial+flat, flux=resample | MMD2_al | 0.01 | 0.01 | 2.70 | 15.73 |
+| gray10, M=4, spatial+flatx4, flux=resample | PDF-JS | -13.43 | -10.90 | -9.57 | -8.46 |
+| gray10, M=4, spatial+flatx4, flux=resample | MMD2 | -0.01 | -0.02 | 8.33 | 12.04 |
+| gray10, M=4, spatial+flatx4, flux=resample | MMD2_al | -0.81 | -0.82 | 2.55 | 13.92 |
+
+**Verdict at N = 100:** no combination passes. No v12 arm beats both baselines on all three columns by more than the baselines' seed sd.
+
 ## Provenance
 
 - runs: `outputs_v12/s{0..4}/*` (`train_iqp_affine_v12.py`)
 - scores: `results_seeds_v12.jsonl` (`evaluate_v11.py --no-legacy`)
+- the `selected` rows: which snapshot the validation block picked comes from `results_seeds_v12_es.jsonl` (`seeds/select_checkpoint.py`); the NUMBERS are the same `results_seeds_v12.jsonl` rows as everywhere else in this file
 - baselines: parsed from `seed_tables.md`, section `## Table 2 (v11)`
 - this file: `experiments/13_iqp_turbulence_replication/v12_aggregate.py`

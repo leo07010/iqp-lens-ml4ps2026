@@ -29,6 +29,7 @@ import numpy as np
 REPO = os.path.dirname(os.path.abspath(__file__))
 PAPER = os.path.join(os.path.dirname(os.path.dirname(REPO)), "paper", "ml4ps2026")
 RESULTS = os.path.join(REPO, "results_seeds_v12.jsonl")
+RESULTS_ES = os.path.join(REPO, "results_seeds_v12_es.jsonl")
 SEED_TABLES = os.path.join(PAPER, "seed_tables.md")
 OUT_MD = os.path.join(PAPER, "seed_tables_e.md")
 
@@ -37,6 +38,7 @@ METRICS = [("pdf_js", "PDF-JS"), ("conv_mmd2", "MMD2"), ("conv_mmd2u", "MMD2_u")
            ("conv_mmd2_aligned", "MMD2_al")]
 VERDICT_COLS = ["pdf_js", "conv_mmd2", "conv_mmd2_aligned"]
 BASELINES = ["DCGAN", "RBM"]
+SELECTED_SUFFIX = " selected"
 
 
 # --------------------------------------------------------------------------------------
@@ -99,6 +101,39 @@ def fmt(mean, sd, sig=4):
     return "%.*g +- %.*g" % (sig, mean, sig, sd)
 
 
+def selected_rows(rows, path=None):
+    """The validation-selected snapshot of the 16k schedule, as extra rows.
+
+    `results_seeds_v12_es.jsonl` is written by `seeds/select_checkpoint.py`, which scores the
+    validation block and records WHICH snapshot it picked per seed; its own metric columns come
+    from a different scorer and lack `conv_mmd2u`.  So this function uses that file only as an
+    index -- it takes the picked `run_dir` and returns the row for that same directory out of
+    `results_seeds_v12.jsonl`, i.e. the identical v11-protocol numbers every other row in this
+    table carries.  Nothing is re-scored and no jsonl is written.
+    """
+    path = path or RESULTS_ES
+    if not os.path.isfile(path):
+        return []
+    by_dir = {os.path.normpath(r["run_dir"]): r for r in rows if r.get("run_dir")}
+    out, missing = [], []
+    for r in load_rows(path):
+        if "early_stopped" not in str(r.get("kind", "")):
+            continue                      # the file also carries the fixed-step reference row
+        src = by_dir.get(os.path.normpath(r.get("run_dir") or ""))
+        if src is None:
+            missing.append(r.get("run_dir"))
+            continue
+        row = dict(src)
+        row["arm"] = str(row["arm_base"] or row["arm"]) + SELECTED_SUFFIX
+        row["selection"] = r.get("selection")
+        row["candidate_steps"] = r.get("candidate_steps")
+        out.append(row)
+    if missing:
+        raise SystemExit("v12_aggregate: %d validation-selected run dir(s) are not in %s: %s"
+                         % (len(missing), RESULTS, missing[:3]))
+    return out
+
+
 # --------------------------------------------------------------------------------------
 def build_groups(rows):
     """{(arm, N): {'rows': [...], 'meta': merged}} keyed on the v12 arm name and n_train."""
@@ -110,11 +145,32 @@ def build_groups(rows):
     return g
 
 
+_SNAP_RE = re.compile(r"\s+s(\d+)k$")
+
+
+def snapshot_tag(arm):
+    """The step marker the trainer appends to an arm name for a schedule snapshot.
+
+    `train_iqp_affine_v12.py` writes `<arm> s016k` into meta["arm"] when it saves the 16k
+    schedule's snapshots, and `selected_rows()` below appends ` selected` for the
+    validation-picked one.  Neither marker is visible in any of the meta fields label() reads
+    (M, objective, mu, flux_mode are identical across the whole schedule), so without this the
+    five schedule arms and the fixed-4k arm all collapse onto one label -- which is exactly the
+    collision that aborted job 363066.  Returns "" for a plain fixed-step arm.
+    """
+    if arm.endswith(SELECTED_SUFFIX):
+        return "selected"
+    m = _SNAP_RE.search(arm or "")
+    return ("%dk steps" % int(m.group(1))) if m else ""
+
+
 def summarise(key, rs):
     arm, n = key
     metas = [meta_of(r["run_dir"]) for r in rs]
     out = {"arm": arm, "n_train": n, "seeds": len(rs),
-           "seed_list": sorted(int(r.get("seed", -1)) for r in rs)}
+           "seed_list": sorted(int(r.get("seed", -1)) for r in rs),
+           "snapshot": snapshot_tag(arm),
+           "steps_list": sorted(int(r.get("selected_steps") or 0) for r in rs)}
     for k, _ in METRICS:
         out[k] = ms([r[k] for r in rs])
     for k in ("gen_max", "gen_clip_frac", "gen_mean_total"):
@@ -166,6 +222,10 @@ def label(s):
     if s["mu"]:
         bits.append("mu=%g,k0=%s" % (s["mu"], s["walsh_k0"]))
     bits.append("flux=%s" % s["flux_mode"])
+    # the snapshot / validation-selected marker.  MUST stay in the label: it is the only thing
+    # separating the 16k schedule's snapshots (and the selected one) from the fixed-4k arm.
+    if s.get("snapshot"):
+        bits.append(s["snapshot"])
     return ", ".join(bits)
 
 
@@ -247,6 +307,13 @@ def overlap_block(fh, summaries, base_rows, n):
 
 def verdict_block(fh, summaries, base_rows, n):
     fh.write("\n### N = %d -- the pre-registered \"clear win\" test\n\n" % n)
+    # N = 5 has no published baseline: saying "no combination passes" there would read as a
+    # negative result when the truth is that the test is not defined at that N.
+    if not any((b, n) in base_rows for b in BASELINES):
+        fh.write("**Not applicable at N = %d:** Table 2 (v11) has no DCGAN or RBM row at this "
+                 "N, so the clear-win test has nothing to test against. The rows above are "
+                 "reported for the N-scaling trend only.\n" % n)
+        return []
     fh.write("A combination passes only if its MEAN beats BOTH baselines on all three of "
              "PDF-JS, raw MMD$^2$ and aligned MMD$^2$ by more than the baseline's own seed sd. "
              "`gap/sd_base` is the margin in units of the baseline's sd (the literal test); "
@@ -287,7 +354,8 @@ def main():
         raise SystemExit("v12_aggregate: %s does not exist -- run the grid first" % RESULTS)
     base_rows = parse_table2(SEED_TABLES)
     rows = load_rows(RESULTS)
-    groups = build_groups(rows)
+    rows_sel = selected_rows(rows)
+    groups = build_groups(rows + rows_sel)
     if not groups:
         raise SystemExit("v12_aggregate: no IQP-v12 rows in %s" % RESULTS)
     summaries = [summarise(k, v) for k, v in groups.items()]
@@ -296,7 +364,8 @@ def main():
         # cheapest models first within a family, so the parameter-count story reads down the page
         return (s["n_train"], s.get("encoding", "crop10"), s.get("latent_map", "affine"),
                 int(s.get("hidden") or 0), int(s["M"] or 0), s["objective"],
-                float(s["mu"] or 0.0), int(s["walsh_k0"] or 0), s["flux_mode"])
+                float(s["mu"] or 0.0), int(s["walsh_k0"] or 0), s["flux_mode"],
+                s.get("snapshot") or "")
 
     ns = sorted({s["n_train"] for s in summaries})
     # fail loudly rather than quietly merging two arms under one label
@@ -381,6 +450,9 @@ def main():
         fh.write("\n## Provenance\n\n")
         fh.write("- runs: `outputs_v12/s{0..4}/*` (`train_iqp_affine_v12.py`)\n")
         fh.write("- scores: `results_seeds_v12.jsonl` (`evaluate_v11.py --no-legacy`)\n")
+        fh.write("- the `selected` rows: which snapshot the validation block picked comes from "
+                 "`results_seeds_v12_es.jsonl` (`seeds/select_checkpoint.py`); the NUMBERS are "
+                 "the same `results_seeds_v12.jsonl` rows as everywhere else in this file\n")
         fh.write("- baselines: parsed from `seed_tables.md`, section `## Table 2 (v11)`\n")
         fh.write("- this file: `experiments/13_iqp_turbulence_replication/v12_aggregate.py`\n")
 
