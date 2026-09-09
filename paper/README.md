@@ -1,3 +1,5 @@
+> **Current version: [`paper/v11/main.pdf`](paper/v11/main.pdf)** (five seeds, mean ± sd, metric protocol v11, baselines with validation early stopping). `paper/main.pdf` is the superseded **v10** (single seed, legacy metric protocol, baselines at a fixed 20,000 steps) and is kept only for the record; its Table 2 differs from v11 for those three reasons.
+
 # ML4PS 2026 submission — materials directory
 
 Target venue: NeurIPS 2026 workshop on Machine Learning and the Physical Sciences
