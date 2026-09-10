@@ -258,7 +258,8 @@ DCGAN~\cite{radford_2015_unsupervised} & 199{,}837   & 1.1\,$\pm$\,0.6 & 5.1\,$\
 In Table~\ref{tab:main} the eleven-image regime is where the IQP arms are competitive. There the
 non-linear arm matches the DCGAN on PDF--JS and raw Conv2D-MMD$^2$ within seed noise ($-0.13$ and
 $-0.04$ of the DCGAN's own sd) and leads on the flux-aligned column ($+1.57$ sd), and it leads the
-RBM on all three by $0.75$, $1.40$ and $2.27$ of the RBM's sd, with six times fewer parameters. Under
+RBM on all three by $0.75$, $1.40$ and $2.27$ of the RBM's sd, at a sixth of the DCGAN's parameters
+and three times the RBM's. Under
 the paper kernel the same map holds the table's best mean PDF--JS, $0.75 \times 10^{-3}$ against the
 DCGAN's $1.11 \pm 0.56$, which leaves the two inside one sd, and trades that for a worse
 flux-aligned column. No arm beats the DCGAN on all three columns by more
