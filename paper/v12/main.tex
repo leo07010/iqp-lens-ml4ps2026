@@ -57,9 +57,9 @@ position we measured, above the turbulence data it was introduced on. The refere
 latent block yields only noise and a learned linear map loses coherence past $M{=}6$, so we let a
 small
 non-linear map carry the latent. At eleven training images the resulting 10-qubit machine matches a
-DCGAN of six times as many parameters on both of the reference paper's metrics within the seed
+DCGAN of six times as many parameters on both generation metrics within the seed
 spread, leads it on a flux-aligned variant, leads an RBM on all three and reconstructs unseen images
-at correlation $0.977$; at $100$ images the DCGAN leads, as that paper predicts. Every
+at correlation $0.977$; at $100$ images the DCGAN leads. Every
 circuit is simulated exactly at $n=10$ qubits over five seeds, so we claim no quantum advantage,
 only a step toward utility where training data are scarce.
 \end{abstract}
@@ -91,8 +91,8 @@ DeepLense~\cite{alexander_2020_deep,alexander_2021_decoding} and contribute thre
 recompute the map on lens crops, which land at its most IQP-compatible position, and show with a
 permutation null that such a position is necessary and not sufficient. We trace why the reference
 latent protocol produces noise on static images and replace its latent map by a non-linear one. We
-then compare against that paper's own RBM and DCGAN under two intensity conventions, and revisit
-its turbulence data in App.~\ref{app:turb}.
+then compare against an RBM and a DCGAN under two intensity conventions, and report a replication
+on the turbulence data in App.~\ref{app:turb}.
 
 \begin{figure}[t]
 \centering
@@ -133,11 +133,11 @@ A trained pmf is a shape, so it is pasted into a $64\times64$ frame at a total i
 training-set offset. The reference convention gives every frame the training-set mean $S$, leaving the
 generated flux with zero variance where real crops spread by about a quarter of their mean, so we
 draw $S$ per image from a kernel density estimate of the $N$ training totals, with no retraining;
-App.~\ref{app:fixedS} repeats everything under the fixed $S$. The baselines are the reference paper's own, a restricted Boltzmann machine
+App.~\ref{app:fixedS} repeats everything under the fixed $S$. The baselines are a restricted Boltzmann machine
 (RBM)~\cite{hinton_2002_training,tieleman_2008_training} and a deep convolutional generative
 adversarial network (DCGAN)~\cite{radford_2015_unsupervised}, both early-stopped on $200$ validation
-images while the IQP arms run a fixed $4{,}000$ steps, which can only favour the baselines. We keep
-that paper's two metrics, the Jensen--Shannon divergence between intensity histograms (PDF--JS) and
+images while the IQP arms run a fixed $4{,}000$ steps, which can only favour the baselines. We score with
+two metrics, the Jensen--Shannon divergence between intensity histograms (PDF--JS) and
 Conv2D-MMD$^2$ in a fixed random encoder's feature space~\cite{gretton_2012_kernel}, and since the
 arms do not agree on how flux is set we add a post-hoc flux-aligned Conv2D-MMD$^2$ rescaling every
 frame to the held-out mean total, plus a held-out projection correlation taken over eight restarts
@@ -224,7 +224,7 @@ $N{=}11$.}
 
 \begin{table}[t]
 \centering
-\caption{Paper-style comparison on lens crops under the sampled intensity, five seeds, PDF--JS in
+\caption{Comparison with the classical baselines on lens crops under the sampled intensity, five seeds, PDF--JS in
 $10^{-3}$ and both MMD$^2$ columns in $10^{-2}$. Lower is better; \textbf{bold} marks a best mean
 leading every other arm by more than both sds, so a column without bold carries no win the seed spread
 supports. Params are totals at $N{=}11\,/\,N{=}100$, the last row a real-vs-real floor, and
@@ -252,7 +252,7 @@ DCGAN~\cite{radford_2015_unsupervised} & 199{,}837   & 1.1\,$\pm$\,0.6 & 5.1\,$\
 \end{tabular}
 \end{table}
 
-\subsection{Comparison with the reference paper's baselines}
+\subsection{Comparison with classical baselines}
 \label{sec:table}
 
 In Table~\ref{tab:main} the eleven-image regime is where the IQP arms are competitive. There the
@@ -263,8 +263,7 @@ the paper kernel the same map holds the table's best mean PDF--JS, $0.75 \times 
 DCGAN's $1.11 \pm 0.56$, which leaves the two inside one sd, and trades that for a worse
 flux-aligned column. No arm beats the DCGAN on all three columns by more
 than a seed sd at either size, and at $100$ images the DCGAN leads on PDF--JS and raw
-Conv2D-MMD$^2$, the flux-aligned $1.8 \pm 0.2$ sitting inside one sd of its $2.1 \pm 0.4$, the
-reference paper's data-scaling picture.
+Conv2D-MMD$^2$, the flux-aligned $1.8 \pm 0.2$ sitting inside one sd of its $2.1 \pm 0.4$.
 
 Two properties bound how the table reads. The flux-aligned column is invariant to the intensity
 convention rather than independent of the raw one, the largest paired difference there being
@@ -298,7 +297,7 @@ not that the model separates them.
 \label{sec:disc}
 
 At eleven training images a $10$-qubit IQP Born machine with a learned non-linear latent map is
-competitive with the reference paper's own baselines and on the flux-aligned metric surpasses both
+competitive with an RBM and a DCGAN and on the flux-aligned metric surpasses both
 at a sixth of the DCGAN's parameters, a step toward utility where training data is the scarce
 resource. Nothing here is evidence of quantum advantage, since every circuit is simulated exactly at
 $n=10$ qubits and the hardness results describe the class at scale, and the standing does not
