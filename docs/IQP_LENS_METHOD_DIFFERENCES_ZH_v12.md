@@ -445,7 +445,7 @@ per-class（`seed_tables_g.md` §4，通量抽樣，各自對照自己的 200-vs
 |---|---|---|---|
 | 1 | **flux-aligned 欄對通量慣例恆等不變** **[v12 caveat 之一]** | 這是 v12 唯一站得住的贏所在的那一欄，所以必須主動說明：`MMD2_al` 在評分前把每張 frame 縮放到 held-out 平均總亮度，等於把 per-image 通量除回去，因此通量慣例對它**在構造上**不可見（325 對配對 run 最大差 6.44e-09）。raw 與 aligned 不是兩個獨立的贏，是「形狀加通量」與「形狀」。正文 §3.3 已寫 | `seed_tables_g.md` 開頭；`v12/main.tex` §3.3 |
 | 2 | **通量抽樣規則對 arm 不中性** **[v12 caveat 之二]** | 同樣的 KDE 讓每個 IQP／MLP arm 的 N=11 raw MMD² 改善 22–39%，卻讓 RBM 變差 20%（N=100 又改善 13%）。所以 N=11 那一格對 RBM 的差距有一部分來自 baseline 自己往下掉。正文 §3.3 已寫 | `seed_tables_g.md` §1c |
-| 3 | **參數量的方向要講清楚** **[v12 修正]** | 主 arm 是 33,910 / 34,088，**約為 DCGAN（199,837）的六分之一，但約為 RBM（11,510 / 15,960）的 3 倍**。`v12/main.tex` §3.3 的「it leads the RBM on all three ... with six times fewer parameters」讀起來像是「比 RBM 少六倍」，實際上六分之一是對 DCGAN 講的。**這句話要改**，見文末「拿不準的譯法／措辭」 | `v12/main.tex` 表 2 與 §3.3 |
+| 3 | **參數量的方向要講清楚** **[v12 修正]** | 主 arm 是 33,910 / 34,088，**約為 DCGAN（199,837）的六分之一，但約為 RBM（11,510 / 15,960）的 3 倍**。`v12/main.tex` §3.3 原本寫「it leads the RBM on all three ... with six times fewer parameters」，讀起來像是「比 RBM 少六倍」，實際上六分之一是對 DCGAN 講的。**已於 2026-09-10 改為「at a sixth of the DCGAN's parameters and three times the RBM's」，中文譯稿同步更新** | `v12/main.tex` 表 2 與 §3.3 |
 | 4 | **N=100 時 DCGAN 領先** | 直說：PDF-JS 與 raw MMD² 兩欄 DCGAN 領先且連 1 sd 都推不翻，flux-aligned 那欄 MLP mean 最佳但與 DCGAN 重疊。摘要與 Discussion 都寫了「the standing does not survive to 100 images」 | `seed_tables_g.md` §1；`v12/main.tex` §4 |
 | 5 | **exact classical simulation** | 全部用三次 FWHT 精確模擬，沒有 Monte-Carlo、沒有抽樣噪音；n=10 只有 1,024 個振幅。摘要與 Discussion 都明講 | `iqp_exact.py:1-11` |
 | 6 | **不主張量子優勢** | 「hardness results 描述的是這個模型族在 scale 上的性質，不是我們的實例」 | `v12/main.tex` §4 |
@@ -547,7 +547,7 @@ per-class（`seed_tables_g.md` §4，通量抽樣，各自對照自己的 200-vs
 | 11 | §6.4 | **新增「試過但沒有用」一節**：12-qubit 整張影像（四指標全部分離變差，N=100 有 2/5 seeds 塌陷）、8-qubit lowres8（aligned 差約 2 倍，encode→decode 天花板只有 0.990）、Gray code（+0% / +2%，null）、Walsh 低通（+4% / −2%，null）、像素空間 kernel（raw −4% 但 aligned +7%，是交換不是增益） | [新增] |
 | 12 | §6.5 | **新增無電路 softmax 對照**（`seed_tables_d2.md`）：32 個比較中對照組 3 勝 28 敗 1 平，三個勝全在 N=11 的 projection corr。**含但書：對照組的超參數沒有為它自己另外調過**，所以只是內部 sanity check、不進論文 | [新增] |
 | 13 | §7.5 | **data scaling 的結論改變**：v11 說「IQP 對 N 平坦」（raw MMD² 0.068–0.095），通量抽樣之後 MLP 從 N=10 的 0.06171 降到 N=100 的 0.02421，**不再平坦** | [數字][修正] |
-| 14 | §9-3 | **參數量方向的措辭修正**：主 arm 33,910 / 34,088 約為 DCGAN 的六分之一，但約為 **RBM 的 3 倍**；`v12/main.tex` §3.3 現在的句子讀起來像「比 RBM 少六倍」，要改 | [修正] |
+| 14 | §9-3 | **參數量方向的措辭修正**：主 arm 33,910 / 34,088 約為 DCGAN 的六分之一，但約為 **RBM 的 3 倍**；`v12/main.tex` §3.3 原句「with six times fewer parameters」讀起來像「比 RBM 少六倍」，**已於 2026-09-10 改為「at a sixth of the DCGAN's parameters and three times the RBM's」**，`docs/IQP_LENS_PAPER_ZH_v12.md` 同步改成「所用參數量是 DCGAN 的六分之一、RBM 的三倍」 | [修正] |
 | 15 | §9 | **誠實邊界表加兩條 v12 caveat**（aligned 欄恆等不變、抽樣規則對 arm 不中性），並新增 N=11 偏暗 9%、12-qubit seed 塌陷兩條 | [新增] |
 | 16 | §2.3、§5.5 | **指標協定沒有動**：v12 全部五份 seed table 都用 `evaluate_v11.py`，`seed_tables_g.md` §6 的 fixed-S 重算與 v11 published cell 最大相對差 0.00042（顯示捨入），這是 v11／v12 數字可逐格並排的前提 | [新增] |
 | 17 | §8 | **§8.2 與 §8.3（support mismatch、QCLI–CCI 上限）已移出 7 頁論文**，數字保留在本文件供內部參考。§8.1 的 map 與 §8.4 的 turbulence 留在論文附錄 | [修正] |
