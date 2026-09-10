@@ -279,7 +279,7 @@ the DCGAN.
 
 \paragraph{Data scaling and per-class training.}
 \label{sec:scaling}
-Across $N \in \{10,\dots,100\}$ (Fig.~\ref{fig:scaling}) the non-linear arm's raw Conv2D-MMD$^2$
+Across $N \in \{10,\dots,100\}$ (Fig.~\ref{fig:scaling}, App.~\ref{app:sweeps}) the non-linear arm's raw Conv2D-MMD$^2$
 falls from $0.062 \pm 0.016$ to $0.024 \pm 0.005$ and the RBM's from $0.091 \pm 0.017$ to
 $0.051 \pm 0.008$, the DCGAN starting ahead at $N{=}10$ ($0.046 \pm 0.017$) and ending level. On the flux-aligned column the non-linear arm holds the lowest mean at every $N$,
 though only at $N{=}10$ and $N{=}70$ by more than a seed sd. Retrained inside one class at $N{=}100$
@@ -356,6 +356,7 @@ DCGAN~\cite{radford_2015_unsupervised} & 199{,}837   & 1.1\,$\pm$\,0.6 & 5.1\,$\
 \end{table}
 
 \section{Latent sweeps and per-class results}
+\label{app:sweeps}
 \begin{figure}[tb]
 \centering
 \figbox{figures/figA_scaling_v12}{1.7in}
