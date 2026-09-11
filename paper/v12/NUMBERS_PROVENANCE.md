@@ -53,7 +53,7 @@ Unchanged from v11 Table 1. Source `seed_tables_c.md` / v11 `NUMBERS_PROVENANCE.
 | affine M=6 0.7378 +- 0.0672 | same file, `["6"]` |
 | affine M=8 0.2184 +- 0.1213 | same file, `["8"]` |
 | nearest-training-image 0.9339 | same file, `references.nearest` |
-| MLP 0.9368 to 0.9519 over M = 1..16 | `results_seeds_mlp_suite.jsonl`, n_train = 20, arms `IQP-mlpH32-M{1,2,3,4,6,8,16}-MMDflat-resample`, run-dir `projection_corr_mean`, means 0.9381 / 0.9429 / 0.9463 / 0.9519 / 0.9486 / 0.9397 / 0.9368 |
+| MLP 0.9368 to 0.9519 over M = 1..16 | tabulated in part F section 1b; `results_seeds_mlp_suite.jsonl`, n_train = 20, arms `IQP-mlpH32-M{1,2,3,4,6,8,16}-MMDflat-resample`, run-dir `projection_corr_mean`, means 0.9381 / 0.9429 / 0.9463 / 0.9519 / 0.9486 / 0.9397 / 0.9368 |
 | MLP M=2 projection 0.9013 +- 0.0012 (N=11), 0.9773 +- 0.0006 (N=100) | part G section 5b, `restart picked by loss, not correlation` rows |
 
 ## Table 2 (main, resampled S) -- part G section 1, "resampled S" columns
@@ -62,7 +62,7 @@ N = 11 (paper units: PDF-JS x1e-3, MMD2 x1e-2)
 
 | row | params | PDF-JS | MMD2 | MMD2_al | source cell (raw) |
 |---|---|---|---|---|---|
-| IQP reference protocol (Alg. 1) | 1,524 / 5,974 | 6.6 +- 0.8 | 14.8 +- 1.6 | 22.5 +- 2.2 | 0.00655 +- 0.0007681 / 0.1477 +- 0.01552 / 0.2251 +- 0.02187 |
+| IQP reference protocol (Alg. 1) | 1,524 / 5,974 | 6.5 +- 0.8 | 14.8 +- 1.6 | 22.5 +- 2.2 | 0.00655 +- 0.0007681 / 0.1477 +- 0.01552 / 0.2251 +- 0.02187 |
 | IQP fixed basis, joint | 1,524 / 5,974 | 1.8 +- 0.4 | 8.7 +- 1.4 | 12.5 +- 1.3 | 0.001773 +- 0.0003711 / 0.08733 +- 0.01363 / 0.1253 +- 0.01326 |
 | IQP linear M=4 (flat MMD) | 5,164 / 5,520 | 2.8 +- 0.1 | 5.6 +- 1.9 | 2.7 +- 0.2 | 0.002834 +- 0.0001348 / 0.05643 +- 0.01939 / 0.02737 +- 0.002194 |
 | IQP linear M=4 (paper kernel) | 5,164 / 5,520 | 1.0 +- 0.05 | 6.3 +- 1.5 | 7.4 +- 0.6 | 0.001034 +- 4.555e-05 / 0.06266 +- 0.01543 / 0.07432 +- 0.006323 |
@@ -199,7 +199,7 @@ v11 `NUMBERS_PROVENANCE.md`.
 | Conv2D-MMD2 bandwidth 0.005547 raw, 0.002558 aligned | v11, unchanged |
 | 8,710 validation images, 20 floor draws | v11, unchanged |
 | Silverman h 14.64 (N=11), 10.36 (N=100) | part G section 1d table |
-| validation rule on IQP arms selects 1k to 16k, no cell moves by more than one sd | part G section 1e |
+| validation rule on IQP arms selects 2k to 16k, no cell moves by more than one sd | part G section 1e. 1k appears only for an M=4 variant that is not in Table 2, so the paper says 2k to 16k |
 | 20,000-step baselines much worse | v11 Table 3 (baselines at a fixed budget) |
 | flat-MMD warm start 0.0231 +- 0.0022 against 0.0225 +- 0.0018 | part G section 5b, `theta0 warm start on MMD, not KL` vs baseline, N=11 MMD2_al |
 | pick-by-loss moves the correlation by 0.0003 | part G section 5b, N=11 proj corr 0.9016 (baseline) vs 0.9013 (pick by loss) |
@@ -264,3 +264,45 @@ A fresh-context agent re-derived every table cell and every quoted number from
 - Also reported: the "29 to 37%" figure, already corrected to "22 to 39%" before the review
   landed (see the row above), and the Section 3.2 sweep numbers, whose sources are named in
   this file and lie outside the three files the reviewer was given.
+
+---
+
+## 2026-09-11 revision (three reviews applied)
+
+Conventions and corrections.
+
+| item | resolution |
+|---|---|
+| Table 2 reference-protocol PDF-JS at N=11 | raw `0.00655 +- 0.0007681` (part G section 1, resampled S) rounds to **6.5 +- 0.8**, not 6.6; the table in `main.tex` was already 6.5 and this file is now corrected |
+| Params column | NOT taken from part G, whose Params column still carries the old one-image convention (e.g. RBM 11,010). App. E states the single convention used, shared parameters (theta0 included) plus N per-image latents, so RBM = 10,960 + 50N = 11,510 / 15,960, fixed-basis arms = 974 + 50N = 1,524 / 5,974, learned-direction arms = 5,120 + MN, DCGAN = generator only (199,837). Totals cross-checked against `seed_tables.md`, "Parameter counts and the flux scale S" |
+| DCGAN sd in Sec. 3.3 | quoted as 1.1 +- 0.6 to match Table 2's digits (raw 0.001106 +- 0.0005576) |
+| duplicate `\label{app:sweeps}` | removed (the stray second one after the scaling figure) |
+
+New numbers introduced by this revision.
+
+| number | where | source |
+|---|---|---|
+| permutation null within 14% of the lens value | Sec. 3.1 | Table 1, lens 18-bit 0.4715 vs null 0.4154 = 1.135x |
+| turbulence within a factor of two of its null | Sec. 3.1 | Table 1, turbulence 18-bit 0.0232 vs null 0.0114 = 2.04x |
+| 10-bit crop pmf sits at I_CCI = 0.43 | Sec. 3.1 | Table 1, row "Lens, 10-bit crop pmf", 0.4313 |
+| turbulence QCLI 0.091 vs null 0.098 at N_t = 5e4 | Sec. 3.1 body (moved out of the Table 1 caption) | unchanged from v12 caption |
+| nearest-training-image projection 0.892 (N=11), 0.970 (N=100) | Sec. 3.2 | `results_seeds_mlp_suite_es.jsonl`, arm `IQP-mlpH32-M2-MMDflat-resample`, field `ref_projection_nearest_train_corr` = 0.8919 / 0.9700 (identical across seeds) |
+| 0.901 / 0.977 (projection, main arm) | Sec. 3.2 | same as before (0.9013 +- 0.0012, 0.9773 +- 0.0006), printed to three digits to save a line |
+| RBM margins 0.75 / 1.40 / 2.27 sd | Sec. 3.3 | part G section 1, N=11 resampled S. (0.001887-0.001176)/0.0009503 = 0.75; (0.07866-0.05153)/0.01932 = 1.40; (0.1106-0.02247)/0.03881 = 2.27 |
+| RBM 6.5 +- 0.8 vs non-linear 8.5 +- 0.2 on raw MMD2 under fixed S | Sec. 3.3 (H5) | part G section 1, N=11 fixed S, 0.06537 +- 0.008124 and 0.08508 +- 0.001855; the same cells already appear in Table 3 |
+| nearest-training-image L2 4.21 +- 0.10 against 2.90 for real held-out frames | Sec. 4 (memorisation check) | `results_seeds_mlp_suite_es.jsonl`, `kind = mlpsuite_fixed_steps`, arm `IQP-mlpH32-M2-MMDflat-resample`, N=11, `nn_train` mean 4.2086 +- 0.1000 over seeds 0-4; the real reference is `results_seeds_table2.jsonl`, arm `HOLDOUT split-half`, N=11, `nn_train` = 2.904. Both computed on frames decoded under the fixed intensity (`evaluate_lens.py::nn_l2`) |
+| Table 4 M=8 row (3.0 +- 1.28 / 6.9 +- 2.3 / 5.0 +- 2.8 and 2.5 +- 0.29 / 2.5 +- 0.4 / 2.1 +- 0.3) | App. C | part G section 2, M=8 rows at N=11 and N=100, resampled S |
+| flux-aligned scaling series 0.026, 0.023, 0.020, 0.016, 0.019, 0.018 and RBM 0.077 to 0.127 | App. C (replaces the deleted scaling figure) | part G section 3, MLP MMD2_al and RBM MMD2_al columns at N = 10, 30, 50, 70, 90, 100 |
+| mean \|z\| 0.101 at M=2 and 0.120 at M=8; affine residual 0.70 to 0.17 | App. C | part F section 1, H=32, N=11 rows, columns `||z||` and `nonlin` |
+| RBM 10 visible, 1,000 hidden, 50 per image = b_v(10) + b_h[:40] | App. E | `baseline_rbm_sweep.py:131-132` and `baseline_rbm.py` (D_LAT = 50); shared 10x1000 + 960 = 10,960 |
+| DCGAN discriminator 53,497; 128-dimensional prior; four transposed convolutions | App. E | `seed_tables.md` parameter table; `baseline_dcgan_r3.py:38-46`; run meta `nz = 128`, `ngf = ndf = 18`, `param_count = 199837` |
+| paper-kernel bandwidth rule | App. E | `docs/REF38_IQPOPT_METHOD_NOTES.md` sections 6.1-6.3. sigma_1 from the mean-Pauli-weight heuristic, sigma_3 = sqrt(median heuristic), sigma_2 = sqrt((sigma_1^2+sigma_3^2)/2); check sqrt((0.989^2+2.236^2)/2) = 1.729 |
+
+Content removed to hold 7 pages (4 + references + 2).
+
+| removed | why it is safe |
+|---|---|
+| Figure 2 (latent width, `fig2_v12_msweep`) | every number it plotted is quoted in Sec. 3.2 (linear 0.906 / 0.738 / 0.218, non-linear 0.9368 to 0.9519, reference 0.9339) and panel (b) repeated Table 2's baseline levels |
+| Figure 4 (data scaling, `figA_scaling_v12`) | endpoints are in Sec. 3.3 and the full six-point flux-aligned series is now written out in App. C |
+| `\cite{hinton_2002_training}` and `\cite{alexander_2021_decoding}` | the RBM is trained with PCD-1 (Tieleman 2008), and DeepLense provenance is carried by `alexander_2020_deep` plus the dataset citation `ml4sci_deeplense`. Dropping two entries was needed to keep the bibliography on page 5 |
+| `\cite{codsi_2025_classically}` | replaced by `maslov_2024_fast` on the citation review's finding that Codsi does not restore classical simulability; the bib entry is kept (with number and doi added) but is no longer cited |

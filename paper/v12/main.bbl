@@ -5,17 +5,6 @@ Stephon Alexander, Sergei Gleyzer, Evan McDonough, Michael~W. Toomey, and Emanue
 \newblock Deep learning the morphology of dark matter substructure.
 \newblock {\em The Astrophysical Journal}, 893(1):15, 2020.
 
-\bibitem{alexander_2023_domain}
-Stephon Alexander, Sergei Gleyzer, Hanna Parul, Pranath Reddy, Marcos Tidball, and Michael~W. Toomey.
-\newblock Domain adaptation for simulation-based dark matter searches with strong gravitational lensing.
-\newblock {\em The Astrophysical Journal}, 954(1):28, 2023.
-\newblock arXiv:2112.12121.
-
-\bibitem{alexander_2021_decoding}
-Stephon Alexander, Sergei Gleyzer, Hanna Parul, Pranath Reddy, Michael~W. Toomey, Emanuele Usai, and Ryker Von~Klar.
-\newblock Decoding dark matter substructure without supervision, 2020.
-\newblock arXiv:2008.12731.
-
 \bibitem{bremner_2011_classical}
 Michael~J. Bremner, Richard Jozsa, and Dan~J. Shepherd.
 \newblock Classical simulation of commuting quantum computations implies collapse of the polynomial hierarchy.
@@ -31,20 +20,10 @@ C.~K. Chow and C.~N. Liu.
 \newblock Approximating discrete probability distributions with dependence trees.
 \newblock {\em IEEE Transactions on Information Theory}, 14(3):462--467, 1968.
 
-\bibitem{codsi_2025_classically}
-Julien Codsi and John van~de Wetering.
-\newblock Classically simulating quantum supremacy {IQP} circuits through a random graph approach.
-\newblock {\em Physical Review A}, 111:012422, 2025.
-
 \bibitem{gretton_2012_kernel}
 Arthur Gretton, Karsten~M. Borgwardt, Malte~J. Rasch, Bernhard Sch{\"o}lkopf, and Alexander Smola.
 \newblock A kernel two-sample test.
 \newblock {\em Journal of Machine Learning Research}, 13(25):723--773, 2012.
-
-\bibitem{hinton_2002_training}
-Geoffrey~E. Hinton.
-\newblock Training products of experts by minimizing contrastive divergence.
-\newblock {\em Neural Computation}, 14(8):1771--1800, 2002.
 
 \bibitem{khojasteh_2022_lagrangian}
 Ali~R. Khojasteh, Sylvain Laizet, Dominique Heitz, and Yin Yang.
@@ -55,6 +34,10 @@ Ali~R. Khojasteh, Sylvain Laizet, Dominique Heitz, and Yin Yang.
 Chen-Yu Liu, Leonardo Placidi, Eric Brunner, and Enrico Rinaldi.
 \newblock Toward generative quantum utility via correlation--complexity map, 2026.
 \newblock arXiv:2603.06440.
+
+\bibitem{maslov_2024_fast}
+Dmitri Maslov, Sergey Bravyi, Felix Tripier, Andrii Maksymov, and Joe Latone.
+\newblock Fast classical simulation of {Harvard}/{QuEra} {IQP} circuits, 2024.
 
 \bibitem{ml4sci_deeplense}
 {ML4SCI Collaboration}.
@@ -68,7 +51,8 @@ Alec Radford, Luke Metz, and Soumith Chintala.
 
 \bibitem{rajakumar_2024_polynomial}
 Joel Rajakumar, James~D. Watson, and Yi-Kai Liu.
-\newblock Polynomial-time classical simulation of noisy {IQP} circuits with constant depth, 2024.
+\newblock Polynomial-time classical simulation of noisy {IQP} circuits with constant depth.
+\newblock In {\em Proceedings of the 2025 Annual ACM-SIAM Symposium on Discrete Algorithms (SODA)}, pages 1037--1056, 2025.
 \newblock arXiv:2403.14607.
 
 \bibitem{recio_2025_train}
@@ -86,10 +70,20 @@ Elad Schneidman, Susanne Still, Michael~J. Berry, and William Bialek.
 \newblock Network information and connected correlations.
 \newblock {\em Physical Review Letters}, 91(23):238701, 2003.
 
+\bibitem{silverman_1986_density}
+Bernard~W. Silverman.
+\newblock {\em Density Estimation for Statistics and Data Analysis}.
+\newblock Chapman and Hall, London, 1986.
+
 \bibitem{tieleman_2008_training}
 Tijmen Tieleman.
 \newblock Training restricted {Boltzmann} machines using approximations to the likelihood gradient.
-\newblock In {\em Proc.\ ICML}, pages 1064--1071, 2008.
+\newblock In {\em Proceedings of the 25th International Conference on Machine Learning (ICML)}, pages 1064--1071, 2008.
+
+\bibitem{walsh_1923_closed}
+Joseph~L. Walsh.
+\newblock A closed set of normal orthogonal functions.
+\newblock {\em American Journal of Mathematics}, 45(1):5--24, 1923.
 
 \bibitem{watanabe_1960_information}
 Satosi Watanabe.
