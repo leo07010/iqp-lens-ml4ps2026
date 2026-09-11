@@ -6,8 +6,8 @@
 #SBATCH -c 8
 #SBATCH --mem=96G
 #SBATCH -t 02:00:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-seeds-v11-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-seeds-v11-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_lens/sbatch-seeds-v11-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_lens/sbatch-seeds-v11-%j.err
 #
 # Re-score every seed's generated images under the v11 metric protocol, then aggregate.
 #
@@ -31,7 +31,7 @@
 set -u
 
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPO=<REPO_ROOT>/code
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 RESULTS="$REPO/results_v11_all.jsonl"
@@ -120,7 +120,7 @@ echo "[$(ts)] START aggregate_seeds.py"
 tail -60 logs_lens/seeds_aggregate_v11.log
 
 echo "[$(ts)] START figA_scaling_seeds"
-"$PY" <HOME>/gsoc2026-deeplense-qml/paper/ml4ps2026/figures/make_figures.py \
+"$PY" <REPO_ROOT>/paper/figures_all/make_figures.py \
     figA_scaling_seeds > logs_lens/seeds_figA.log 2>&1 \
     || { echo "[WARN] figA_scaling_seeds failed"; tail -20 logs_lens/seeds_figA.log; fail=1; }
 

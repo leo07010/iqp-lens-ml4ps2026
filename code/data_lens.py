@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""DeepLense Model II loader for the arXiv 2603.06440 pilot on Leo's lensing images.
+"""DeepLense Model II loader for the arXiv 2603.06440 pilot on <user>'s lensing images.
 
 Mirrors data_d2.py's contract exactly (INTERFACES.md, "data_lens.py contract" section)
 so every arm's `--data lens` branch is a near-copy of its `--data d2` branch:

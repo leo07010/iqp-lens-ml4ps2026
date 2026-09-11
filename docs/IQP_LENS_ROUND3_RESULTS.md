@@ -1,7 +1,7 @@
 # IQP 生成模型於 DeepLense lens 影像 — round 3 與 round 3b 結果（學到的 latent 方向）
 
-Round 3：job **349702**（`dev`，28 jobs，**fail=0**，2026-09-07 02:31:36 → 03:17:38，**46 min 02 s**，node `25a-hgpn006`）。
-Round 3b：job **349854**（`dev`，22 jobs，**fail=0**，2026-09-07 03:05:03 → 03:08:22，**3 min 19 s**，node `25a-hgpn022`）。兩者皆 **單 seed（seed 0）**。
+Round 3：job **349702**（`dev`，28 jobs，**fail=0**，2026-09-07 02:31:36 → 03:17:38，**46 min 02 s**，node `<node>`）。
+Round 3b：job **349854**（`dev`，22 jobs，**fail=0**，2026-09-07 03:05:03 → 03:08:22，**3 min 19 s**，node `<node>`）。兩者皆 **單 seed（seed 0）**。
 協定、25 個 arm 的定義、預測 **P10–P23** 與**兩套 decision rule** 全部寫在跑之前：`docs/IQP_LENS_ROUND3_PREREGISTRATION.md`（主體 ＋ pseudo-time / MMD-flat / latent-prior 三個 addendum ＋ scoring note ＋ Round 3b ＋ 3b amendment ＋ implementation notes）。
 上一輪：`docs/IQP_LENS_ROUND2_RESULTS.md`（判定 failure；pmf 編碼修好的是亮度尺度不是空間結構）。程式與契約：`experiments/13_iqp_turbulence_replication/`。圖：`docs/figures/iqp_lens_round3.png`（生成影像）、`docs/figures/iqp_lens_round3_scores.png`（分數）。
 
@@ -266,8 +266,8 @@ resample（bootstrap 訓練 z ＋ 0.2× 中位最近鄰間距的 jitter）對 IQ
 
 | Job | 名稱 | Partition | Node | 起 → 迄 | Elapsed | Jobs | Fail |
 |---|---|---|---|---|---|---|---|
-| 349702 | `iqp_lens_r3` | dev | 25a-hgpn006 | 2026-09-07 02:31:36 → 03:17:38 | 46 min 02 s | 28（14 arm × 2 N） | 0 |
-| 349854 | `iqp_lens_r3b` | dev | 25a-hgpn022 | 2026-09-07 03:05:03 → 03:08:22 | 3 min 19 s | 22（11 arm × 2 N） | 0 |
+| 349702 | `iqp_lens_r3` | dev | <node> | 2026-09-07 02:31:36 → 03:17:38 | 46 min 02 s | 28（14 arm × 2 N） | 0 |
+| 349854 | `iqp_lens_r3b` | dev | <node> | 2026-09-07 03:05:03 → 03:08:22 | 3 min 19 s | 22（11 arm × 2 N） | 0 |
 
 ### B. 檔案索引（皆在 `experiments/13_iqp_turbulence_replication/`）
 

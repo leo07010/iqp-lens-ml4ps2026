@@ -95,7 +95,7 @@ losses.append(loss(...))   # 對每個 sigma 算一次 loss
 ...
 return sum(losses)/len(losses)   # 簡單算術平均
 ```
-與 eq. 45 完全一致，**確認：Leo 的「簡單取平均」印象正確**。
+與 eq. 45 完全一致，**確認：<user> 的「簡單取平均」印象正確**。
 
 ---
 
@@ -125,7 +125,7 @@ sigma_2 = np.sqrt(-1/(2*np.log(1-4/X.shape[-1])))  # mean operator weight of 2
 ```
 代入 n=16 得 sigma_2 = sqrt(-1/(2*ln(1-4/16))) ≈ **1.318**，與 Table 1 的 1.3 一致，佐證 **Table 1 才是與公式自洽、實際被使用的數字**。
 
-**結論（供實作依據）**：這是原文本身的一個不一致（v2 版本，2026-09-05 確認），**應以 Table 1 的 {1.3, 0.6} 為準**，正文敘述處的「{0.6,0.3}」很可能是筆誤或版本間殘留的舊數字。**Leo 上次印象中的 {0.6,0.3} 出自正文，但與可驗證的公式和 Table 1 不符，不建議照抄，請改用 Table 1 的 {1.3, 0.6}。**
+**結論（供實作依據）**：這是原文本身的一個不一致（v2 版本，2026-09-05 確認），**應以 Table 1 的 {1.3, 0.6} 為準**，正文敘述處的「{0.6,0.3}」很可能是筆誤或版本間殘留的舊數字。**<user> 上次印象中的 {0.6,0.3} 出自正文，但與可驗證的公式和 Table 1 不符，不建議照抄，請改用 Table 1 的 {1.3, 0.6}。**
 
 ### 6.3 更大系統的三 bandwidth 數字（Table 1，`paper.txt:398-428`）
 
@@ -144,7 +144,7 @@ sigma_2 = np.sqrt(-1/(2*np.log(1-4/X.shape[-1])))  # mean operator weight of 2
 
 ---
 
-## 7. Data-dependent 初始化 —— 核對結果：與 Leo 印象一致，且 repo 有精確實作細節（paper 文字沒寫的常數）
+## 7. Data-dependent 初始化 —— 核對結果：與 <user> 印象一致，且 repo 有精確實作細節（paper 文字沒寫的常數）
 
 出處：`paper.txt:430`（Sec. 8.1.2）＋ repo `iqpopt/utils.py::initialize_from_data`
 
@@ -154,7 +154,7 @@ sigma_2 = np.sqrt(-1/(2*np.log(1-4/X.shape[-1])))  # mean operator weight of 2
 - **二體（two-body，兩 qubit 閘，作用在 j,k 上）**：初始化參數**正比於**訓練資料第 j、k 維的**共變異數（covariance）**，其中資料要先轉成 **±1 編碼**（pm1 encoding）而非 0/1。比例常數是留給使用者調的 hyperparameter（論文原文：「the specific constant of proportionality is left as a free hyperparameter」）。
 - 若還有更高階（>2-body）的閘，參數用零均值常態分布初始化，標準差是另一個 hyperparameter。
 
-**核對：與 Leo 印象一致**（「單體用 arcsin(sqrt(mean))、二體用 ±1 編碼共變異數」皆確認屬實，用詞正是 one-body/two-body 對應的「single qubit gates」/「two-qubit gates」）。
+**核對：與 <user> 印象一致**（「單體用 arcsin(sqrt(mean))、二體用 ±1 編碼共變異數」皆確認屬實，用詞正是 one-body/two-body 對應的「single qubit gates」/「two-qubit gates」）。
 
 ### 7.2 Repo 精確實作（paper 文字沒寫清楚的比例常數細節）
 

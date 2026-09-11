@@ -1,6 +1,6 @@
 # Plan — the full analysis suite of arXiv 2603.06440, applied to the DeepLense lens images
 
-Written 2026-09-07 before running. Scope set by Leo: compare only against the baselines the paper used (RBM, DCGAN);
+Written 2026-09-07 before running. Scope set by <user>: compare only against the baselines the paper used (RBM, DCGAN);
 zero-learning controls and the PCA generator are not part of these comparisons. Single seed.
 
 | Paper analysis | Here | Job |

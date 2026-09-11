@@ -1,6 +1,6 @@
 # IQP 生成模型於 DeepLense Model II（暗物質 substructure 影像）— pilot 結果
 
-Job **345400**（`8gpus`，51 jobs，8-wide，**fail=0**，2026-09-06 05:07:38 → 06:29:27，**1 h 22 min**），**單 seed（seed 0）**，依 Leo 的要求。
+Job **345400**（`8gpus`，51 jobs，8-wide，**fail=0**，2026-09-06 05:07:38 → 06:29:27，**1 h 22 min**），**單 seed（seed 0）**，依 <user> 的要求。
 協定與判定規則寫在跑之前：`docs/IQP_LENS_PILOT_PREREGISTRATION.md`。
 程式：`experiments/13_iqp_turbulence_replication/`（與 turbulence 復刻共用同一條 pipeline，`--data lens` 分支，契約見 `INTERFACES.md` 的 `data_lens.py contract` 段）。
 前置的 turbulence 復刻與 root-cause：`docs/IQP_TURBULENCE_REPLICATION_RESULTS.md` / `..._DIAGNOSIS.md`。
@@ -149,7 +149,7 @@ pre-reg 原文：*"IQP is useful on this data" would require IQP to beat CTRL-co
 
 ## 4. 誠實的限制
 
-1. **單 seed（seed 0）**，依 Leo 要求。所有比較都缺 seed 誤差棒，**DCGAN 特別受影響**：18 run 中 5 個 mode collapse（1.2M 崩 4/6、0.2M 崩 cdm@11）＋1 個非崩潰失敗（0.2M cdm@100），51k 六格全存活。表中帶 `†` 的列**不可當 DCGAN 的能力代表**。IQP/RBM 沒有觀察到崩潰，但它們的數字同樣是 n = 1。
+1. **單 seed（seed 0）**，依 <user> 要求。所有比較都缺 seed 誤差棒，**DCGAN 特別受影響**：18 run 中 5 個 mode collapse（1.2M 崩 4/6、0.2M 崩 cdm@11）＋1 個非崩潰失敗（0.2M cdm@100），51k 六格全存活。表中帶 `†` 的列**不可當 DCGAN 的能力代表**。IQP/RBM 沒有觀察到崩潰，但它們的數字同樣是 n = 1。
 2. **字面編碼、無 log 轉換**（pre-reg 明寫）。已知 84% 像素在 bin 0；sqrt 只是 secondary 且只跑 N = 11。因此本文只能說「**在這個編碼下**不 useful」，不能說 IQP 對 lensing 影像的上限就是這樣。
 3. **N_t = 5×10⁴ 抽樣** 而非 `--full-grid`：code pool 就是 4,096 個像素，全格點會給精確經驗 pmf；保留抽樣是為了與 turbulence arm 的資料側雜訊一致，但這確實引入一個已知的、可去除的損失（turbulence §3(d) 量到約 −0.04 corr）。
 4. **latent 的高斯假設**：lens 無時間軸，Eq. 31 無物可插，`gaussian-latent` 是我們自訂的替代。IQP 與 RBM 共用它，所以兩者可比；但「IQP 生成不出弧」有多少該歸給 circuit、多少該歸給這個抽樣假設，**本次沒有拆開**。
@@ -166,7 +166,7 @@ pre-reg 原文：*"IQP is useful on this data" would require IQP to beat CTRL-co
 
 | 項目 | 值 |
 |---|---|
-| Job | **345400**，partition `8gpus`（8×GPU），帳號 `<YOUR_ACCOUNT>`，node `25a-hgpn002` |
+| Job | **345400**，partition `8gpus`（8×GPU），帳號 `<YOUR_ACCOUNT>`，node `<node>` |
 | 時間 | 2026-09-06 05:07:38 → 06:29:27（**1 h 22 min**），51 jobs 8-wide，**fail=0** |
 | 提交腳本 | `experiments/13_iqp_turbulence_replication/submit_lens_pilot.sbatch` |
 | Slurm log | `logs_lens/sbatch-345400.out`（`.err` 為空） |

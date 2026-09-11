@@ -6,8 +6,8 @@
 #SBATCH -c 32
 #SBATCH --mem=128G
 #SBATCH -t 03:00:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_mlpsuite/phase2-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_mlpsuite/phase2-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_mlpsuite/phase2-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_mlpsuite/phase2-%j.err
 #
 # MLP suite, phase 2 -- everything that depends on knowing the best (M, H).
 #
@@ -35,7 +35,7 @@
 # start (except where the ablation says otherwise), 4,000 fixed steps.
 set -u
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPO=<REPO_ROOT>/code
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 ROOT=<WORK>/gsoc_iqp_mlpsuite

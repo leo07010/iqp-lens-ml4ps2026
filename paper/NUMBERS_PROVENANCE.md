@@ -253,7 +253,7 @@ baseline); no figure is quoted in the paper.
 Figure `figB_classes` provenance (arm, directories, selection rule, per-class split) is in
 `figures/FIGURE_PROVENANCE.md`.
 
-## Items that still need Leo's confirmation
+## Items that still need <user>'s confirmation
 
 1. **DeepLense dataset citation.** The paper cites `alexander_2020_deep` (Alexander et al. 2020,
    *Deep Learning the Morphology of Dark Matter Substructure*, ApJ 893:15, arXiv:1909.07346) as the

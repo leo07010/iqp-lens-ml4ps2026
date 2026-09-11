@@ -15,7 +15,7 @@
 # each, one per GPU. Estimated ~11-15 ms/step on H100 (measured in submit_d2_main.sbatch)
 # -> ~18-25 min/config; all 8 run concurrently on the 8 allocated GPUs, so the dominant
 # cost is the single slowest config, well inside the 2h request (dev partition is full,
-# per Leo).
+# per <user>).
 #
 # Also runs the D2 QCLI/CCI diagnostic (pre-registration item P5, missed by
 # submit_d2_main.sbatch's main run) as a 9th, CPU-only, background job alongside the 8

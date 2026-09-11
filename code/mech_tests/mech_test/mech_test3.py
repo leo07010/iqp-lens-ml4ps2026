@@ -10,7 +10,7 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-REPO = "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication"
+REPO = "<REPO_ROOT>/code"
 sys.path.insert(0, REPO)
 sys.path.insert(0, HERE)
 

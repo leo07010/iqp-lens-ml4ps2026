@@ -69,7 +69,7 @@ METRICS = [
 ]
 
 DEFAULT_RESULTS = os.path.join(ROOT, "results_scaling.jsonl")
-DEFAULT_OUT = "<HOME>/gsoc2026-deeplense-qml/docs/figures/iqp_lens_scaling.png"
+DEFAULT_OUT = "<REPO_ROOT>/docs/figures/iqp_lens_scaling.png"
 
 
 def parse_args(argv=None):

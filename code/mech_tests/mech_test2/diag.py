@@ -4,7 +4,7 @@ measure how sharp the latent is (corr vs perturbation radius), and rebuild the f
 """
 from __future__ import annotations
 import json, math, os, sys, time
-sys.path.insert(0, "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication")
+sys.path.insert(0, "<REPO_ROOT>/code")
 import numpy as np, torch
 torch.set_num_threads(4)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

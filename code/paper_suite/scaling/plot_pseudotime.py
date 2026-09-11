@@ -80,7 +80,7 @@ plt.rcParams.update({
 
 DEFAULT_PSEUDOTIME_DIR = os.path.join(ROOT, "outputs_lens_r3", "iqp_pseudotime_n100")
 DEFAULT_RESULTS = os.path.join(ROOT, "results_r3.jsonl")
-DEFAULT_OUT = "<HOME>/gsoc2026-deeplense-qml/docs/figures/iqp_lens_pseudotime.png"
+DEFAULT_OUT = "<REPO_ROOT>/docs/figures/iqp_lens_pseudotime.png"
 
 
 def parse_args(argv=None):

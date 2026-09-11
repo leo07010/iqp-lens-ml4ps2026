@@ -1,0 +1,40 @@
+{
+  "exact_identity_centroid_x": {
+    "max_abs_error": 1.4210854715202004e-14,
+    "note": "centroid is EXACTLY linear in the 6 singleton Walsh coefficients"
+  },
+  "exact_identity_second_moment": {
+    "max_abs_error": 2.1032064978498966e-12,
+    "note": "2nd moments (size, ellipticity) are exactly linear in singleton+pair coeffs"
+  },
+  "class_accuracy_from_latent": {
+    "chance": 0.3333333333333333,
+    "hamming_first50_paper": {
+      "n_features": 50,
+      "train_acc": 0.49266666666666664,
+      "val_acc": 0.4816666666666667
+    },
+    "data_adaptive_top50_by_variance": {
+      "n_features": 50,
+      "train_acc": 0.3526666666666667,
+      "val_acc": 0.335
+    },
+    "all_4096": {
+      "n_features": 4096,
+      "train_acc": 0.7056666666666667,
+      "val_acc": 0.6716666666666666
+    },
+    "high_order_only_|s|>=5_top50": {
+      "n_features": 50,
+      "train_acc": 0.397,
+      "val_acc": 0.35833333333333334
+    },
+    "reference_top50_pixel_PCs": {
+      "train_acc": 0.8826666666666667,
+      "val_acc": 0.8566666666666667,
+      "chance": 0.3333333333333333,
+      "n_train": 3000,
+      "n_val": 600
+    }
+  }
+}

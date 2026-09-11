@@ -7,7 +7,7 @@ from common import *
 import codec
 from iqp_exact import IQPExact, fwht
 
-REPO="<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication"
+REPO="<REPO_ROOT>/code"
 OUT=REPO+"/outputs_d2_main"
 rows=[json.loads(l) for l in open(REPO+"/results_d2_main.jsonl")]
 by_dir={os.path.basename(r["run_dir"].rstrip("/")):r for r in rows}

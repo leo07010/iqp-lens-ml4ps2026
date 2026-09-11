@@ -15,7 +15,7 @@ sys.path.insert(0, HERE)
 from lens_common import fwht, popcount_table, layout_index, image_to_pmf12
 
 SCRATCH = os.environ.get("LENS_SCRATCH", "/tmp")
-FIG = "<HOME>/gsoc2026-deeplense-qml/docs/figures"
+FIG = "<REPO_ROOT>/docs/figures"
 CLASSES = ["axion", "cdm", "no_sub"]
 
 S = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]      # categorical slots 1-4

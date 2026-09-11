@@ -6,8 +6,8 @@
 #SBATCH -c 8
 #SBATCH --mem=64G
 #SBATCH -t 01:00:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-seeds-restart-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-seeds-restart-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_lens/sbatch-seeds-restart-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_lens/sbatch-seeds-restart-%j.err
 #
 # Per-restart decomposition of the held-out projection correlation, for the reviewer objection
 # that restart 1 starts at the nearest training image's trained z.  See
@@ -29,7 +29,7 @@
 set -u
 
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPO=<REPO_ROOT>/code
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 OUT_ROOT="$REPO/outputs_seeds"

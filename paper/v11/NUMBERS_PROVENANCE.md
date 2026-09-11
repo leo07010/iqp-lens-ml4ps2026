@@ -183,7 +183,7 @@ support"**: only the two N=100 DCGAN cells (PDF–JS, raw MMD²) have "none — 
 | exact-KL M=2 arm 0.00172 / 0.00302, MMD² 0.119 / 0.091, aligned 0.046 / 0.075 (seed 0) | V11J, `iqp_m2_kl_resample_n11` and `_n100` |
 | Hamming block 0.00178 (N=11), 0.00175 (N=100), seed 0 | V11J, `iqp_hamming_n11`, `iqp_hamming_n100` |
 | M=8 collapse PDF–JS 0.0102, MMD² 0.241 (N=100, seed 0) | V11J, `iqp_m8_kl_zpen_resample_n100` |
-| 18 conditions (16 IQP arms + RBM + DCGAN) | v10 said 25 including 7 zero-learning/PCA controls; those are removed from v11 by Leo's decision |
+| 18 conditions (16 IQP arms + RBM + DCGAN) | v10 said 25 including 7 zero-learning/PCA controls; those are removed from v11 by <user>'s decision |
 | paper-kernel σ = {0.989, 1.729, 2.236}, mean Pauli weights 2.00 / 0.77 / 0.48 | X-ray 3 H1 |
 | Conv2D bandwidth 0.005547 raw, 0.002558 flux-aligned | FACTS "v11 definitions", Conv2D-MMD² bullet |
 | θ⁰ ablation "changes no metric by more than one sd" | ST2 "theta0 warm-start — wins that the seed spread does not support" (every row overlaps) |
@@ -207,7 +207,7 @@ support"**: only the two N=100 DCGAN cells (PDF–JS, raw MMD²) have "none — 
 | `schneidman_2003_network`: author order now Schneidman, Still, Berry, Bialek | X-ray 4 (wrong order) |
 | `codsi_2025_classically` moved to the noise / classical-simulability clause | X-ray 4 (it is counter-evidence to hardness, not support) |
 
-## Removed in v11 (Leo's decision, not an audit finding)
+## Removed in v11 (<user>'s decision, not an audit finding)
 
 * Discussion sentence "Zero-learning and PCA controls match or exceed the IQP arms on some
   physical-quantity metrics."
@@ -484,7 +484,7 @@ baseline); no figure is quoted in the paper.
 Figure `figB_classes` provenance (arm, directories, selection rule, per-class split) is in
 `figures/FIGURE_PROVENANCE.md`.
 
-## Items that still need Leo's confirmation
+## Items that still need <user>'s confirmation
 
 1. **DeepLense dataset citation.** The paper cites `alexander_2020_deep` (Alexander et al. 2020,
    *Deep Learning the Morphology of Dark Matter Substructure*, ApJ 893:15, arXiv:1909.07346) as the

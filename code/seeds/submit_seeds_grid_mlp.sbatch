@@ -6,8 +6,8 @@
 #SBATCH -c 32
 #SBATCH --mem=128G
 #SBATCH -t 02:30:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_gridmlp/grid-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_gridmlp/grid-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_gridmlp/grid-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_gridmlp/grid-%j.err
 #
 # Two candidate fixes for the v11 paper's stated limitations, on the round-3 protocol exactly
 # as the current best IQP arm (IQP-affine-M4-MMDflat-resample) ran it:
@@ -34,7 +34,7 @@
 #            is NOT the fixed run (different LR trajectory), which is why both exist.
 set -u
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPO=<REPO_ROOT>/code
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 OUT_ROOT=<WORK>/gsoc_iqp_gridmlp/seeds

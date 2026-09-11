@@ -6,8 +6,8 @@
 #SBATCH -c 32
 #SBATCH --mem=128G
 #SBATCH -t 03:30:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-v12grid-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-v12grid-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_lens/sbatch-v12grid-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_lens/sbatch-v12grid-%j.err
 #
 # The v12 IQP-side improvement grid (train_iqp_affine_v12.py), N = 11, seeds 0-4, scored
 # under the UNCHANGED v11 protocol (evaluate_v11.py).  The baselines, the data split, the
@@ -37,7 +37,7 @@
 # ---------------------------------------------------------------------------------------
 set -u
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPO=<REPO_ROOT>/code
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 OUT_ROOT="$REPO/outputs_v12"

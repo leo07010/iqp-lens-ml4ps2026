@@ -9,8 +9,8 @@
 #   3. the table and the sample figures.
 set -u
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
-PAPER=<HOME>/gsoc2026-deeplense-qml/paper/ml4ps2026
+REPO=<REPO_ROOT>/code
+PAPER=<REPO_ROOT>/paper
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 OUT_ROOT=<WORK>/gsoc_iqp_gridmlp/seeds

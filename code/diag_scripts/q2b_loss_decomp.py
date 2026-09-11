@@ -7,7 +7,7 @@ from common import *
 import codec
 from iqp_exact import IQPExact, popcount_table, fwht
 
-OUT="<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/outputs_d2_main"
+OUT="<REPO_ROOT>/code/outputs_d2_main"
 P=pools(); GT=gt_fields()
 pc=popcount_table(18)
 sim=IQPExact(n=18,K=7,device="cpu",dtype=torch.complex64)

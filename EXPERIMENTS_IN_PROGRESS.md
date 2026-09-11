@@ -45,3 +45,13 @@ nonlinear latent map as the main arm if the tables confirm it.
 Parts E (IQP-side levers), F (IQP+MLP suite), G (flux-resampled re-scoring of every arm) are in
 `paper/v11/seed_tables_{e,f,g}.md` with their jsonl under `results/`. Paper **v12** is in
 `paper/v12/` (7 pages). Nothing is running on the cluster.
+
+## Update 2026-09-11: full sync and anonymization
+
+Every experiment batch, result file, script and document listed above (and the ones that
+preceded them) is now in this repository — see the "Everything in this repository" table in
+`README.md` for the batch-to-results map. The two sweeps that ran out of the scratch
+filesystem are under `results/work/`. All filesystem paths, account identifiers, node
+hostnames and the author's name have been replaced with placeholders throughout, including
+inside the compiled PDFs; see the "Anonymization" section of `README.md`. Open decision 3
+above (the anonymised code link) is the only item still outstanding.

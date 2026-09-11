@@ -1,0 +1,26 @@
+{
+  "a_z": 0.0,
+  "anchors": [
+    1,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000
+  ],
+  "arm": "CTRL-marginal+exact",
+  "b_z": 2.034848690032959,
+  "n_synth": 0,
+  "n_t_tuples": 50000,
+  "param_count": 198,
+  "resynth_mode": "exact",
+  "seed": 0,
+  "source_run_dir": "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/outputs_d2_main/ctrl_marginal_seed0",
+  "train_snapshots": 11,
+  "wallclock_s": 4.040905714035034
+}

@@ -6,8 +6,8 @@
 #SBATCH -c 8
 #SBATCH --mem=64G
 #SBATCH -t 02:00:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-conv-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-conv-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_lens/sbatch-conv-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_lens/sbatch-conv-%j.err
 #
 # Baseline convergence sweep (paper addendum, 2026-09-09).
 #
@@ -38,7 +38,7 @@
 # baseline_rbm_r3.py / baseline_dcgan_r3.py / evaluate_r3*.py are imported read-only.
 set -uo pipefail
 
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPO=<REPO_ROOT>/code
 cd "$REPO" || exit 1
 mkdir -p logs_lens
 

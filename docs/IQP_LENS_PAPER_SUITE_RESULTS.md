@@ -1,7 +1,7 @@
 # arXiv 2603.06440 的完整分析套件，套用在 DeepLense 透鏡影像
 
 寫於 2026-09-08。計畫與預測 Q1–Q4 寫在跑之前：`docs/IQP_LENS_PAPER_SUITE_PLAN.md`。
-**比較範圍（Leo 指定）**：只跟論文自己用過的 baseline 比 —— **RBM** 與 **DCGAN**。零學習控制與 PCA 生成器不進本文的任何比較表（它們的數字在 `docs/IQP_LENS_ROUND3_RESULTS.md`，本文只在 §9 提一句它們存在）。
+**比較範圍（<user> 指定）**：只跟論文自己用過的 baseline 比 —— **RBM** 與 **DCGAN**。零學習控制與 PCA 生成器不進本文的任何比較表（它們的數字在 `docs/IQP_LENS_ROUND3_RESULTS.md`，本文只在 §9 提一句它們存在）。
 **單 seed（seed 0）**，所有 arm 用同一組 held-out（200 張 val）、同一份 eval 程式。
 數字來源：`experiments/13_iqp_turbulence_replication/` 下的 `paper_suite/map/results_map.json`、`outputs_controlled/results_fig3.jsonl`、`outputs_controlled/results_fig4.jsonl`、`results_r3.jsonl`、`results_r3b.jsonl`、`results_scaling.jsonl`。論文數字全部出自 `docs/PAPER_2603.06440_SUMMARY.md`。
 
@@ -214,7 +214,7 @@
 5. **Fig. 3／4 都用 exact MMD 與 exact pmf**，不是論文的 500-shot 估計器（repo 全域選擇，`DESIGN_exact_iqp.md`）；訓練 kernel 頻寬用本 repo 的 three-sigma 規則（論文從未寫出頻寬）。
 6. **QCLI 包含 k=0 項**（Eq. 6 的字面寫法）。這使精確均勻分布的 QCLI 接近 1（n=8/12/16：0.9816／0.9984／0.9999）而非 0，也讓任何有限樣本的 QCLI 有一個隨 M 上升的地板。兩個 controlled 腳本都同時報 i.i.d.-uniform null，使這個地板可見。
 7. **pseudo-time arm 是 conditional 的**（生成時看得到每張 held-out 影像的 e1），與其餘無條件 arm 不能直接並排比，表中已標註。
-8. **本文只跟論文用過的 baseline（RBM、DCGAN）比較**，這是 Leo 指定的框架。專案另有零學習控制（CTRL-mean／CTRL-ring／CTRL-copy／CTRL-interp-e1）與像素空間 PCA 生成器（CTRL-pca2／pca4）的完整數字，**其中若干在部分指標上優於此處所有模型**；它們的結果與 round 3／3b 的 pre-registered 判定寫在 `docs/IQP_LENS_ROUND3_RESULTS.md`，不納入本文比較。
+8. **本文只跟論文用過的 baseline（RBM、DCGAN）比較**，這是 <user> 指定的框架。專案另有零學習控制（CTRL-mean／CTRL-ring／CTRL-copy／CTRL-interp-e1）與像素空間 PCA 生成器（CTRL-pca2／pca4）的完整數字，**其中若干在部分指標上優於此處所有模型**；它們的結果與 round 3／3b 的 pre-registered 判定寫在 `docs/IQP_LENS_ROUND3_RESULTS.md`，不納入本文比較。
 9. **Fig. 5 的 D-Wave annealer 與 Google RCS 兩點做不到**（沒有資料源），Lorenz attractor 與 turbulence D1 未做。Table 1（文獻數字）、Appendix H 定理與硬體部署不在範圍內。
 
 ## 10. 附錄：job 與檔案索引

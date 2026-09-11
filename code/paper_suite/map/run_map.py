@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Fig. 5 of arXiv 2603.06440 ("Correlation-Complexity Map") recomputed on Leo's data.
+"""Fig. 5 of arXiv 2603.06440 ("Correlation-Complexity Map") recomputed on <user>'s data.
 
 Every point on the map is a (I_QCLI, I_CCI) pair for one dataset in one representation at
 one sample count M, paired with an i.i.d.-uniform NULL drawn at the SAME (n, M). The null

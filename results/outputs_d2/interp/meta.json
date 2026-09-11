@@ -1,0 +1,14 @@
+{
+  "arm": "CTRL-interp",
+  "param_count": 0,
+  "seed": 0,
+  "anchors": [
+    1,
+    100,
+    200
+  ],
+  "train_snapshots": 3,
+  "a_z": 0.0,
+  "b_z": 2.034848690032959,
+  "wallclock_s": 0.006227016448974609
+}

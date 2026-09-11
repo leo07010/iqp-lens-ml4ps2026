@@ -1,0 +1,81 @@
+{
+  "chance": 0.3333333333333333,
+  "n_train": 3000,
+  "n_val": 600,
+  "note": "val accuracy from three independent linear classifiers; the earlier fixed-step GD logistic probe was under-converged and its numbers are superseded",
+  "val_accuracy": {
+    "hamming_first50_paper": {
+      "n_features": 50,
+      "lda": 0.48833333333333334,
+      "ridge": 0.495,
+      "logistic_irls": 0.48,
+      "logit_final_grad_inf_norm": 2.6905227336721104e-05,
+      "logit_iters": 60,
+      "best": 0.495
+    },
+    "data_adaptive_top50_by_variance": {
+      "n_features": 50,
+      "lda": 0.5716666666666667,
+      "ridge": 0.5616666666666666,
+      "logistic_irls": 0.46166666666666667,
+      "logit_final_grad_inf_norm": 1.4993841451526716e-05,
+      "logit_iters": 60,
+      "best": 0.5716666666666667
+    },
+    "high_order_only_|s|>=5_top50": {
+      "n_features": 50,
+      "lda": 0.405,
+      "ridge": 0.4033333333333333,
+      "logistic_irls": 0.41,
+      "logit_final_grad_inf_norm": 2.190512646387607e-05,
+      "logit_iters": 60,
+      "best": 0.41
+    },
+    "low_order_|s|<=2_top50_by_variance": {
+      "n_features": 50,
+      "lda": 0.6683333333333333,
+      "ridge": 0.6616666666666666,
+      "logistic_irls": 0.6716666666666666,
+      "logit_final_grad_inf_norm": 1.2207795100093106e-05,
+      "logit_iters": 60,
+      "best": 0.6716666666666666
+    },
+    "walsh12_PCA50": {
+      "n_features": 50,
+      "lda": 0.7933333333333333,
+      "ridge": 0.665,
+      "logistic_irls": 0.8566666666666667,
+      "logit_final_grad_inf_norm": 0.002662676633885314,
+      "logit_iters": 60,
+      "best": 0.8566666666666667
+    },
+    "pixel_raw_PCA50": {
+      "n_features": 50,
+      "lda": 0.8016666666666666,
+      "ridge": 0.7533333333333333,
+      "logistic_irls": 0.8483333333333334,
+      "logit_final_grad_inf_norm": 0.0006892602921259337,
+      "logit_iters": 60,
+      "best": 0.8483333333333334
+    },
+    "pixel_pmf_PCA50": {
+      "n_features": 50,
+      "lda": 0.7933333333333333,
+      "ridge": 0.665,
+      "logistic_irls": 0.8566666666666667,
+      "logit_final_grad_inf_norm": 0.002662676633884734,
+      "logit_iters": 60,
+      "best": 0.8566666666666667
+    },
+    "all_4096_walsh": {
+      "n_features": 4096,
+      "lda": 0.73,
+      "ridge": 0.7133333333333334,
+      "logistic_irls": 0.31666666666666665,
+      "logit_final_grad_inf_norm": 0.7742326892548816,
+      "logit_iters": 60,
+      "best": 0.73
+    }
+  },
+  "binomial_se_at_600_val": 0.020412414523193152
+}

@@ -344,7 +344,7 @@ P5 記為 **數值近 0.2 ✓，但指標無解釋力**；要真的檢驗它，�
 fields、11 vs 100 snapshots——完全沒給訓練配方（steps、lr、RBM hidden size 以外的細節、DCGAN input
 size）。這些沒寫的部分是我們自行選的標準預設值。這裡問的是：**在論文有寫的架構限制內，換一套訓練
 配方，能不能對上論文的 baseline 數字？** 設計與事前宣告見
-`docs/IQP_TURBULENCE_REPLICATION_PREREGISTRATION.md`（2026-09-06 addendum，Leo 要求）。
+`docs/IQP_TURBULENCE_REPLICATION_PREREGISTRATION.md`（2026-09-06 addendum，<user> 要求）。
 
 **設計**（單 seed = 0）：
 - **DCGAN@11 訓練步數掃描**：3 個容量（51k/0.2M/1.2M）× 4 個 G-steps（300/1000/3000/20000，20000 =

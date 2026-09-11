@@ -5,7 +5,7 @@ from memory when drafting the paper — copy from here or re-derive with the que
 are single-seed (seed 0) unless stated otherwise. Paths are relative to
 `<HOME>/gsoc2026-deeplense-qml/` unless given absolute.
 
-Framing agreed with Leo (see memory `ml4ps2026-paper.md`): paper-style comparison IQP vs RBM vs DCGAN
+Framing agreed with <user> (see memory `ml4ps2026-paper.md`): paper-style comparison IQP vs RBM vs DCGAN
 only (PDF–JS / Conv2D-MMD², N = 11 vs 100), no quantum-advantage claim, exact classical simulation
 disclosed, single seed disclosed. Core contribution: learned affine latent directions
 (θ = θ⁰ + Φᵀz) let a 10-qubit IQP generate and generalise on lens crops. Secondary: the
@@ -258,7 +258,7 @@ metrics (`docs/IQP_TURBULENCE_REPLICATION_RESULTS.md:16`, TL;DR point 4).
 ## 10. Target paper's own numbers (arXiv 2603.06440 Table 2, for side-by-side reference)
 
 Source: `docs/PAPER_2603.06440_SUMMARY.md` §5.1 (verbatim table, cross-checked against `paper.txt:1400-1463`,
-"逐格核對結果：與 Leo 提供的數字完全一致，無差異").
+"逐格核對結果：與 <user> 提供的數字完全一致，無差異").
 
 | Model (Params.)(# training data) | PDF–JS ↓ | MMD² (Conv2D) ↓ |
 |---|---|---|
@@ -302,7 +302,7 @@ magnitudes across the two datasets.
 - n = 16 (65,536 amplitudes), GPU probe inside job 356097: Adam MMD step with a batch of 70 targets = 14.5 ms (0.21 ms per target-step); SPSA step (batch 3) 4.6 ms.
 - n = 18 (262,144 amplitudes), GPU: 11 ms/step (turbulence replication, docs/IQP_TURBULENCE_REPLICATION_PREREGISTRATION.md).
 - Wall-clock of the lens jobs: round 3 (28 arms) 46 min on 8 H100; round 3b (22 arms) 3 min 19 s; scaling (15 arms) 3 min 28 s; Fig. 3/4 controlled study 10.5 min on 1 GPU.
-- DeepLense Model II dataset attribution: to be confirmed by Leo (candidate: Alexander et al. 2020, arXiv:1909.07346, ApJ 893:15; data distributed via the ML4SCI DeepLense project).
+- DeepLense Model II dataset attribution: to be confirmed by <user> (candidate: Alexander et al. 2020, arXiv:1909.07346, ApJ 893:15; data distributed via the ML4SCI DeepLense project).
 
 ## Addendum 2026-09-08: Fig. 3 v2 (controlled support-mismatch study) — COMPLETE
 - Source: experiments/13_iqp_turbulence_replication/outputs_controlled/results_fig3_v2.jsonl (562 records), done marker outputs_controlled/fig3_v2.done (2026-09-08 07:07:27, wall 897 s, SLURM job 356221, dev partition).
@@ -325,7 +325,7 @@ sees: for class *c* it trains on 100 images of *c* and is scored against 200 hel
 *c*. Same codec (`codec10`), same metric functions (`evaluate_r3` / `evaluate_r3b`), same
 `CONV_SEED`.
 
-**Provenance.** SLURM job **358382**, partition `dev`, node `25a-hgpn024`, account <YOUR_ACCOUNT>,
+**Provenance.** SLURM job **358382**, partition `dev`, node `<node>`, account <YOUR_ACCOUNT>,
 `/usr/bin/python3`, elapsed **00:07:24**, `COMPLETED`, exit 0:0, `fail=0`, 6/6 run dirs.
 - submit script: `experiments/13_iqp_turbulence_replication/submit_lens_class.sbatch`
 - log: `experiments/13_iqp_turbulence_replication/logs_lens/sbatch-class-358382.out`
@@ -384,3 +384,170 @@ the matching N — the same arm, scored the same way, against the *pooled* 200 h
   (`docs/LENS_IMAGE_CHARACTERISTICS.md:195`); nearest-centroid classification on raw pixels is
   38.3 % against a 33.3 % chance baseline (`docs/LENS_IMAGE_CHARACTERISTICS.md:205`). A
   pixel-reconstruction objective is not expected to reproduce it, and this run does not claim to.
+
+---
+
+# Addendum: baseline convergence sweep (2026-09-09, job 360684)
+
+**The question.** Table 2 (`tab:main`) trains both classical baselines for a fixed 20,000 steps.
+At that point the RBM's reconstruction MSE is still falling (0.0662 at 20k against 0.0041 at
+160k for N = 100) and the DCGAN's losses are still oscillating, so a reader is entitled to ask
+whether the baselines were simply stopped too early and whether a longer run would overtake the
+IQP arms.
+
+**What was run.** Each baseline was re-trained for longer and scored at several step counts with
+the *unmodified* `evaluate_r3b.py` — same 200 held-out images, same seed-0 Conv2D encoder, same
+flux-aligned addendum — so every number below is directly comparable to a Table 2 cell.
+
+| arm | N | step counts scored | points |
+|---|---|---|---|
+| `RBM-10bit` | 11, 100 | 20k / 40k / 80k / 160k | 8 |
+| `DCGAN-32` | 11, 100 | every 5k from 5k to 60k | 24 |
+
+Each (arm, N) is **one** training run with snapshots, not one run per step count: both training
+loops are sequential with a single RNG stream and no step-count-dependent schedule, so the state
+after step k is what a standalone `--steps k` run ends with. This was verified before any real
+training, on CPU, by byte-comparing a sweep snapshot against a standalone run of the same length
+— **bit-identical for both models** (`logs_lens/sbatch-conv-360684.out:5-6`).
+
+Scripts: `baseline_rbm_sweep.py`, `baseline_dcgan_sweep.py`, `aggregate_convergence.py`,
+`submit_baseline_convergence.sbatch`. Data: `results_convergence.jsonl` (32 rows),
+`outputs_convergence/` (32 run directories), evaluation table
+`logs_lens/evaluate_convergence.log`, best-of-steps table `logs_lens/aggregate_convergence.log`.
+
+**Reading rule (deliberately generous to the baselines).** "Best over steps" below picks, per
+metric, the step count that scores best *on the held-out set used for scoring*. That is selection
+on the evaluation set, not on a validation split, and no IQP arm in Table 2 is given it: every
+IQP number there comes from one pre-registered step count. The comparison is therefore an upper
+bound on what the baselines can do, not a like-for-like protocol.
+
+## Does a longer run change Table 2?
+
+Best IQP entry per column is recomputed from `results_r3.jsonl` / `results_r3b.jsonl` by
+`aggregate_convergence.iqp_reference`, which asserts it still matches the published table.
+
+| arm | N | metric | Table 2 (20k) | sweep @ 20k | best over steps | @ steps | best IQP | verdict |
+|---|---|---|---|---|---|---|---|---|
+| RBM | 11 | PDF–JS | 0.00632 | 0.006324 | 0.001274 | 160k | **0.00095** | IQP still lower |
+| RBM | 11 | MMD² | **0.0741** | 0.074099 | 0.051279 | 160k | 0.1134 | baseline lower (already was) |
+| RBM | 11 | MMD²al | 0.1240 | 0.123996 | 0.053769 | 160k | **0.0279** | IQP still lower |
+| RBM | 100 | PDF–JS | 0.00195 | 0.001952 | 0.001245 | 80k | **0.00092** | IQP still lower |
+| RBM | 100 | MMD² | 0.0752 | 0.075195 | 0.053830 | 80k | 0.0861 | baseline lower (was 0.0752 vs 0.0861) |
+| RBM | 100 | MMD²al | 0.1144 | 0.114383 | 0.075711 | 80k | **0.0275** | IQP still lower |
+| DCGAN | 11 | PDF–JS | 0.00183 | 0.002638 | 0.001600 | 30k | **0.00095** | IQP still lower |
+| DCGAN | 11 | MMD² | 0.2165 | 0.276108 | 0.047555 | 55k | 0.1134 | **now lower than IQP** |
+| DCGAN | 11 | MMD²al | 0.1241 | 0.100102 | 0.031707 | 30k | **0.0279** | IQP still lower, margin 4.5× → 1.14× |
+| DCGAN | 100 | PDF–JS | 0.00763 | 0.009577 | **0.000436** | 5k | 0.00092 | **BOLD FLIPS to DCGAN** |
+| DCGAN | 100 | MMD² | **0.0371** | 0.060113 | 0.021604 | 5k | 0.0861 | baseline lower (already was) |
+| DCGAN | 100 | MMD²al | 0.0694 | 0.090767 | **0.017574** | 5k | 0.0275 | **BOLD FLIPS to DCGAN** |
+
+Secondary columns (not in Table 2): best NN-holdout is RBM 4.342 @ 40k (N = 11) / 5.211 @ 80k
+(N = 100) and DCGAN 3.482 @ 35k (N = 11) / 3.950 @ 20k (N = 100).
+
+**Answer to the question as asked: no. Longer training does not let either baseline win a column
+it was losing.** Every RBM column and every N = 11 column that IQP held at 20k, IQP still holds
+at the baseline's best step count. The RBM's improvement is large in absolute terms (PDF–JS 5.0×
+better at N = 11, 1.6× at N = 100) and still leaves it above the best IQP PDF–JS and MMD²al at
+both N.
+
+**But a step-count sweep does flip two of the six bold entries — via a *shorter* run, not a
+longer one.** The DCGAN at N = 100 is at its best after **5k** steps, a quarter of the Table 2
+budget: PDF–JS 0.000436 against the best IQP 0.00092, and MMD²al 0.01757 against 0.0275. Its
+flux is also nearly exact there (mean total 124.82 against the held-out 123.87). The one N = 11
+column that changes hands does so between two classical baselines (MMD², RBM 0.0741 → DCGAN
+0.0476), a column IQP never held.
+
+## Three caveats that limit how far the DCGAN result can be pushed
+
+1. **The DCGAN is not reproducible run-to-run on this GPU, and the sweep's own 20k row does not
+   reproduce Table 2's.** cuDNN's transposed-convolution backward accumulates with atomics.
+   Running the *unmodified* `baseline_dcgan_r3.py` twice with identical arguments on the same GPU
+   gives per-pixel max |Δ| = 0.855 and Δ lossG = 2.48 on a 2,000-step smoke; the sweep differs
+   from a standalone run by less than that (0.506 / 0.564)
+   (`logs_lens/sbatch-conv-360684.out:7-9`). Consequently the sweep's DCGAN @ 20k
+   (N = 100: PDF–JS 0.00958, MMD² 0.0601, MMD²al 0.0908) is *not* Table 2's DCGAN @ 20k
+   (0.00763 / 0.0371 / 0.0694), and a best-of-12-steps selection over a non-monotone noisy curve
+   is partly a maximum over run-to-run noise. The **RBM has no such operator and reproduces
+   Table 2's 20k row exactly** at both N (0.006324 / 0.074099 / 0.12400 and 0.001952 / 0.075195 /
+   0.114380), which is what makes the RBM half of this sweep a clean measurement.
+2. **The DCGAN at N = 100 collapses at ~30k.** From step 30,000 to 60,000 `lossD` sits at the
+   BCE clamp (100.0) and `lossG` is exactly 0.0: the discriminator is saturated and the generator
+   receives no gradient. The flat N = 100 plateau in `figA_convergence` panel (b) beyond 30k is
+   a dead model, not a converged one.
+3. **The RBM's late gains come partly from over-dispersion.** Its NN-within rises from 1.022 to
+   3.335 (N = 11) and 1.674 to 5.523 (N = 100) between 20k and 160k, against a held-out NN-within
+   of 0.949. By 160k the RBM's samples are 3.5–5.8× more spread out than the real held-out set,
+   so part of the PDF–JS improvement is added noise rather than better structure. At N = 100 the
+   curve also turns back up after 80k (PDF–JS 0.001245 → 0.001628, MMD²al 0.0757 → 0.1242).
+
+## Suggested final step counts
+
+* **RBM: 80k.** It is the best step on all three Table 2 metrics at N = 100 and within noise of
+  160k at N = 11 (PDF–JS 0.001245 vs 0.001274), it is where the N = 100 curve turns around, and
+  it avoids the worst of the over-dispersion. If one number per N is acceptable, 160k for N = 11
+  and 80k for N = 100. 20k is defensibly *too short* for this arm and saying so is honest.
+* **DCGAN: no single step count is defensible.** Its curve is non-monotone, its N = 100 run is
+  dead after 30k, and its run-to-run spread on this GPU is comparable to the gaps being measured.
+  Keeping the pre-registered 20k is as defensible as any other choice; the honest statement is
+  that this arm's score is set by where training is stopped and by run-to-run noise, and that
+  both are larger than the DCGAN-vs-IQP differences quoted in Table 2.
+
+---
+
+## Addendum 2026-09-09: Appendix B (turbulence replication) at 5 seeds
+
+Every Appendix-B number is now a 5-seed mean ± sd, or is explicitly marked as carrying no seed. Full tables: `paper/ml4ps2026/seed_tables_c.md`; per-seed records: `experiments/13_iqp_turbulence_replication/results_d2_seeds.jsonl`. Seeds 0-2 are the existing runs (job 342220 and the last-write job); seeds 3-4 are new (jobs 360790 / 360773 / 360791, dev partition). `sd` is the sample sd (ddof = 1); the ± values the paper cited before came from `evaluate.py`'s `numpy.std` (ddof = 0) and are smaller by √((n−1)/n) = 0.894 at n = 5.
+
+### Table 2, pre-registered (mean) aggregation, N = 11
+
+| Arm | PDF–JS | Conv2D-MMD² |
+|---|---|---|
+| IQP-31k | 0.2716 ± 0.0036 (n=5) | 0.8187 ± 0.0105 (n=5) |
+| IQP-63k | 0.2360 ± 0.0013 (n=5) | 0.8134 ± 0.0126 (n=5) |
+| RBM-12k | 0.2166 ± 0.0069 (n=5) | 0.7186 ± 0.0189 (n=5) |
+| DCGAN-1.2M | 0.0453 ± 0.0621 (n=5) | 0.3966 ± 0.3829 (n=5) |
+| CTRL-marginal | 0.4205 ± 0.0004 (n=5) | 0.8177 ± 0.0069 (n=5) |
+| CTRL-interp (0 params) | 0.00119 **deterministic** | 0.002218 **deterministic** |
+
+### Table 2, last-write-wins aggregation
+
+| Arm | PDF–JS | Conv2D-MMD² |
+|---|---|---|
+| IQP-31k | 0.0324 ± 0.0011 (n=5) | 0.7106 ± 0.0119 (n=5) |
+| IQP-63k | 0.0473 ± 0.0005 (n=5) | 0.7382 ± 0.0170 (n=5) |
+| RBM-12k | 0.0224 ± 0.0019 (n=5) | 0.6345 ± 0.0171 (n=5) |
+| CTRL-marginal | 0.1486 ± 0.0002 (n=5) | 0.8034 ± 0.0200 (n=5) |
+
+### Anchor fit, model-family ceiling, protocol attribution
+
+| Quantity | 5-seed value | previously cited |
+|---|---|---|
+| IQP-31k anchor corr, 11-anchor mean, sampled / exact | 0.6510 ± 0.0103 (n=5) / 0.7394 ± 0.0100 (n=5) | 0.69 / 0.77 |
+| IQP-31k anchor corr, t = 1, sampled / exact | 0.6700 ± 0.0158 (n=5) / 0.7532 ± 0.0148 (n=5) | 0.774 (exact) |
+| IQP-63k anchor corr, 11-anchor mean, sampled / exact | 0.6885 ± 0.0062 (n=5) / 0.7722 ± 0.0055 (n=5) | — |
+| model-family ceiling (best config of the 8-config sweep) | 0.8921 (seed-independent, n=5) | 0.88–0.89 |
+| Δ corr from stage 1 freezing θ_lat (as attributed before) | -0.1135 ± 0.0209 (n=5) | −0.08 |
+| Δ corr from stage 1 freezing θ_lat, unconfounded (both cells at 5×10⁴ subsample) | -0.1145 ± 0.0024 (n=5) | not reported |
+| Δ corr from the 5×10⁴-sample pmf | -0.0010 ± 0.0222 (n=5) | −0.04 |
+| Δ corr from Algorithm 1 stage 2 | 0.0000 ± 0.0004 (n=5) | +0.0001 |
+
+**Provenance correction on the 0.69 / 0.77 pair.** `docs/IQP_TURBULENCE_REPLICATION_RESULTS.md` §4(2) attributes the 11-anchor mean "0.691 sampled / 0.776 exact" to the IQP-31k main run. Recomputing per arm shows that pair is the **IQP-63k** seed-0 mean (0.6913 / 0.7755); IQP-31k seed 0 is 0.6653 / 0.7538. The diagnostic it came from, `diag_scripts/q2_anchor_fit.py`, loops `[("iqp_K7_seed0", 7), ("iqp_K6_seed0", 6)]` and prints the K=7 block first. What *is* IQP-31k is the anchor t = 1 exact correlation 0.7738, independently confirmed by `anchor_fit_protocol.py --summarize` in job 342685. Appendix B should cite either the IQP-31k 11-anchor mean (0.7394 ± 0.0100 (n=5) exact) or the IQP-31k t = 1 value (0.7532 ± 0.0148 (n=5) exact), not the current pair.
+
+**The ceiling sweep carries no seed.** Run at seeds 0, 1, 2, 3, 4, `anchor_fit_experiment.py` returns bit-identical `corr` for all 8 configs: the pmf is the anchor's full native code pool (no subsample draw), the init is data-dependent, and the `auto3` bandwidths come from that same pool, so nothing in the optimisation consumes the RNG. The seed does reach the run and does move `pdf_js`, which is scored on a sampled field. So `0.88–0.89` is a range across configs, not a seed spread. The protocol rows are different: the two `*subsample5e4` cells draw a 5×10⁴ subsample and `paper_stage1` freezes θ_lat at a random N(0, 0.01) init, so those do vary with the seed.
+
+**The protocol attribution is where 5 seeds change the story.** At seed 0 alone the freeze read −0.078 and the pmf subsample read −0.038, which is the −0.08 / −0.04 split the paper cites. Over 5 seeds the freeze is -0.1135 ± 0.0209 (n=5) and the subsample is -0.0010 ± 0.0222 (n=5): the subsample term is indistinguishable from zero and the freeze absorbs it. The seed-0 split was an artefact of `paper_stage1` landing high at that seed (0.8074 against a 5-seed mean of 0.7646 ± 0.0261 (n=5)) — that cell freezes θ_lat at a random N(0, 0.01) draw and is the most seed-sensitive cell in the table. The 5-seed statement is that stage 1 freezing θ_lat is essentially the whole protocol penalty and the 5×10⁴-sample pmf costs nothing measurable. The two freeze rows now agree because the factor separating them is null.
+
+### Metric-calibration references
+
+| Reference | 5-seed value | previously cited |
+|---|---|---|
+| pixel-shuffled ground truth, Conv2D-MMD² | 0.7045 ± 0.0095 (n=5) | 0.704 |
+| τ-shuffled ground truth, PDF–JS / Conv2D-MMD² | 0.00000 (seed-independent, n=5) / 0.00000 (seed-independent, n=5) | 0 / 0 |
+| zero-parameter linear interpolation, corr | 0.99978 **deterministic** | 0.9998 |
+
+The `linear interpolation` row interpolates the **raw** anchor fields, which is what `diag_scripts/q4_task_triviality.py` did to get the cited 0.9998. It is a different object from the CTRL-interp arm above, which interpolates the **quantised** anchor fields so the zero-parameter control carries the same 6-bit z cap as every generative arm. That is why CTRL-interp scores PDF–JS 0.00119 and this row scores about 0.0001.
+
+### Quantities that carry no seed
+
+The reference paper's own reported values (IQP PDF–JS 0.0238 / 0.0221, its Table 2 Conv2D-MMD² column 0.896–1.472) are citations. The 11-anchor / 200-τ split is fixed by `data_d2.HOLDOUT_SEED = 0`, a constant of the split rather than a run seed, so the ground-truth fields are fixed too. The Conv2D encoder is re-derived from `evaluate.py`'s `CONV_SEED = 0` for every arm, so the feature space is shared and fixed. CTRL-interp and the zero-parameter interpolation correlation draw no random numbers at all (`controls.run_interp`). Parameter counts are exact.
+

@@ -1,0 +1,33 @@
+{
+  "param_count": 55339,
+  "disc_param_count": 6565,
+  "seed": 0,
+  "train_snapshots": 11,
+  "wallclock_s": 94.99215507507324,
+  "arm": "DCGAN-51k",
+  "data": "lens",
+  "tier": "51k",
+  "ngf": 3,
+  "nz": 128,
+  "n_train": 11,
+  "steps": 20000,
+  "lr": 0.0002,
+  "batch": 11,
+  "a_z": 0.0,
+  "b_z": 1.0,
+  "lo": 0.0,
+  "hi": 1.0,
+  "n_gen": 200,
+  "within_10pct_of_target": true,
+  "quantized_training_data": true,
+  "data_seed": null,
+  "class_names": [
+    "axion",
+    "cdm",
+    "no_sub"
+  ],
+  "lens_class": "axion",
+  "lens_sqrt": false,
+  "synth_mode": "unconditional",
+  "aggregation": "n/a"
+}

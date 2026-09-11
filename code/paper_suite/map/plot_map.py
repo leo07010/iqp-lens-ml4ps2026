@@ -27,7 +27,7 @@ from matplotlib.patches import Rectangle            # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 IN_DEFAULT = os.path.join(HERE, "results_map.json")
-OUT_DEFAULT = "<HOME>/gsoc2026-deeplense-qml/docs/figures/iqp_lens_map.png"
+OUT_DEFAULT = "<REPO_ROOT>/docs/figures/iqp_lens_map.png"
 
 FAMILY = {                                          # Okabe-Ito, colourblind safe
     "lens-18": ("#0072B2", "o", "lens, 18-bit (x,y,z) tuples"),

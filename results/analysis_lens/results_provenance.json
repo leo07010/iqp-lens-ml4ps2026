@@ -1,0 +1,37 @@
+{
+  "per_image_normalisation": {
+    "n_images": 8910,
+    "pixels_equal_0_per_image": {
+      "min": 1,
+      "max": 1,
+      "mean": 1.0
+    },
+    "pixels_equal_1_per_image": {
+      "min": 1,
+      "max": 1,
+      "mean": 1.0
+    },
+    "every_image_min_is_0": true,
+    "every_image_max_is_1": true,
+    "total_flux_per_image": {
+      "mean": 125.70351745950225,
+      "std": 28.249681967129114,
+      "min": 70.20875104606843,
+      "max": 204.57480005435107
+    }
+  },
+  "per_class_top50_overlap": {
+    "counts_out_of_50": {
+      "axion_vs_cdm": 48,
+      "axion_vs_no_sub": 44,
+      "cdm_vs_no_sub": 46,
+      "pooled_vs_axion": 48,
+      "pooled_vs_cdm": 50,
+      "pooled_vs_no_sub": 46
+    },
+    "range": [
+      44,
+      50
+    ]
+  }
+}

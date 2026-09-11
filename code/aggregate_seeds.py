@@ -41,7 +41,7 @@ import os
 import sys
 
 REPO = os.path.dirname(os.path.abspath(__file__))
-PAPER = "<HOME>/gsoc2026-deeplense-qml/paper/ml4ps2026"
+PAPER = "<REPO_ROOT>/paper"
 RAW = os.path.join(REPO, "results_seeds_raw")
 
 # ---------------------------------------------------------------------------- the tables

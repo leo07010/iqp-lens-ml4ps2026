@@ -11,7 +11,7 @@
 | 版本 | v2 | `paper.txt:282`（HTML 亦見 `/abs/2603.06440v2`、`/pdf/2603.06440v2`） |
 | 日期 | 2026-05-05（原文：`05 May 2026`） | `paper.txt:282` |
 
-**核對結果**：版本（v2）與日期（2026-05-05）與 Leo 提供的資訊完全一致，無差異。
+**核對結果**：版本（v2）與日期（2026-05-05）與 <user> 提供的資訊完全一致，無差異。
 
 ---
 
@@ -153,7 +153,7 @@ $$
 
 ### 5.1 Table 2：turbulence 生成模型定量比較（出處 `paper.txt:1400-1463`）
 
-逐格核對結果：**與 Leo 提供的數字完全一致，無差異。**
+逐格核對結果：**與 <user> 提供的數字完全一致，無差異。**
 
 | Model (Params.)(# TD.) | PDF–JS ↓ | MMD² (Conv2D) ↓ |
 |---|---|---|
@@ -209,7 +209,7 @@ Ref [38]（Recio-Armengol, Ahmed, Bowles, 2025, *Train on classical, deploy on q
 | D-Wave annealer samples (484 qubits, 100 μs) | All 1- and 2-qubit gates on 484 qubits, $>10^5$ params | RBM, EBM, Bitflip | 沒有模型完美擬合，但 IQP 在比較模型中表現最好；RBM/EBM 在 test MMD 上有時比 random 還差；EBM 在此設定下失敗。 |
 | Binarized MNIST (784 bits) | All-to-all 2-qubit gates, 307,720 params | Bitflip only | IQP 捕捉到大量結構；covariance 大致吻合整體模式，但較弱；test MMD 與 noisy-data reference（約 $p\approx0.3$ 噪聲水準）相當；Bitflip 學不到可比較的結構。 |
 
-**核對結果**：與 Leo 提供的摘要在事實內容上一致，本次核對原文用詞後在「Key outcome」欄補上原文的精確措辭（log-likelihood 數值 $-5.34$ / $-6.35$、$>10^5$ params、noise level $p\approx0.3$ 等），無實質差異。
+**核對結果**：與 <user> 提供的摘要在事實內容上一致，本次核對原文用詞後在「Key outcome」欄補上原文的精確措辭（log-likelihood 數值 $-5.34$ / $-6.35$、$>10^5$ params、noise level $p\approx0.3$ 等），無實質差異。
 
 原文額外評論（`paper.txt:1005-1010`）：這些結果為 correlation–complexity map 提供外部一致性檢驗——在 beyond-pairwise 依賴性高的 regime，classical 訓練不穩定性（RBM 的 mode collapse/imbalance、EBM 的 MCMC mixing 不足）可能主導表現，而 IQP 訓練在相同計算預算下相對穩健。但作者也**明確提醒**（引用 [38] 自身的說明）：他們測試的 classical baseline 並非 state-of-the-art，更強的超參數/初始化/模型選擇可能得到更好的 classical 結果——此提醒對 D-Wave 那個資料點特別重要。
 

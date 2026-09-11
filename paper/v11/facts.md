@@ -5,7 +5,7 @@ from memory when drafting the paper — copy from here or re-derive with the que
 are single-seed (seed 0) unless stated otherwise. Paths are relative to
 `<HOME>/gsoc2026-deeplense-qml/` unless given absolute.
 
-Framing agreed with Leo (see memory `ml4ps2026-paper.md`): paper-style comparison IQP vs RBM vs DCGAN
+Framing agreed with <user> (see memory `ml4ps2026-paper.md`): paper-style comparison IQP vs RBM vs DCGAN
 only (PDF–JS / Conv2D-MMD², N = 11 vs 100), no quantum-advantage claim, exact classical simulation
 disclosed, single seed disclosed. Core contribution: learned affine latent directions
 (θ = θ⁰ + Φᵀz) let a 10-qubit IQP generate and generalise on lens crops. Secondary: the
@@ -258,7 +258,7 @@ metrics (`docs/IQP_TURBULENCE_REPLICATION_RESULTS.md:16`, TL;DR point 4).
 ## 10. Target paper's own numbers (arXiv 2603.06440 Table 2, for side-by-side reference)
 
 Source: `docs/PAPER_2603.06440_SUMMARY.md` §5.1 (verbatim table, cross-checked against `paper.txt:1400-1463`,
-"逐格核對結果：與 Leo 提供的數字完全一致，無差異").
+"逐格核對結果：與 <user> 提供的數字完全一致，無差異").
 
 | Model (Params.)(# training data) | PDF–JS ↓ | MMD² (Conv2D) ↓ |
 |---|---|---|
@@ -302,7 +302,7 @@ magnitudes across the two datasets.
 - n = 16 (65,536 amplitudes), GPU probe inside job 356097: Adam MMD step with a batch of 70 targets = 14.5 ms (0.21 ms per target-step); SPSA step (batch 3) 4.6 ms.
 - n = 18 (262,144 amplitudes), GPU: 11 ms/step (turbulence replication, docs/IQP_TURBULENCE_REPLICATION_PREREGISTRATION.md).
 - Wall-clock of the lens jobs: round 3 (28 arms) 46 min on 8 H100; round 3b (22 arms) 3 min 19 s; scaling (15 arms) 3 min 28 s; Fig. 3/4 controlled study 10.5 min on 1 GPU.
-- DeepLense Model II dataset attribution: to be confirmed by Leo (candidate: Alexander et al. 2020, arXiv:1909.07346, ApJ 893:15; data distributed via the ML4SCI DeepLense project).
+- DeepLense Model II dataset attribution: to be confirmed by <user> (candidate: Alexander et al. 2020, arXiv:1909.07346, ApJ 893:15; data distributed via the ML4SCI DeepLense project).
 
 ## Addendum 2026-09-08: Fig. 3 v2 (controlled support-mismatch study) — COMPLETE
 - Source: experiments/13_iqp_turbulence_replication/outputs_controlled/results_fig3_v2.jsonl (562 records), done marker outputs_controlled/fig3_v2.done (2026-09-08 07:07:27, wall 897 s, SLURM job 356221, dev partition).
@@ -325,7 +325,7 @@ sees: for class *c* it trains on 100 images of *c* and is scored against 200 hel
 *c*. Same codec (`codec10`), same metric functions (`evaluate_r3` / `evaluate_r3b`), same
 `CONV_SEED`.
 
-**Provenance.** SLURM job **358382**, partition `dev`, node `25a-hgpn024`, account <YOUR_ACCOUNT>,
+**Provenance.** SLURM job **358382**, partition `dev`, node `<node>`, account <YOUR_ACCOUNT>,
 `/usr/bin/python3`, elapsed **00:07:24**, `COMPLETED`, exit 0:0, `fail=0`, 6/6 run dirs.
 - submit script: `experiments/13_iqp_turbulence_replication/submit_lens_class.sbatch`
 - log: `experiments/13_iqp_turbulence_replication/logs_lens/sbatch-class-358382.out`

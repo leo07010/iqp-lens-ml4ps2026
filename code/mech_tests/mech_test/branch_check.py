@@ -5,7 +5,7 @@ with each branch carrying mass exactly 1/2 for EVERY theta. So the ancilla gener
 change the mixing weight -- there is no 'mixing angle' to tune."""
 import sys, os, numpy as np, torch
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication")
+sys.path.insert(0, "<REPO_ROOT>/code")
 sys.path.insert(0, HERE)
 torch.set_num_threads(4)
 import mech_test as M, mech_test2 as M2

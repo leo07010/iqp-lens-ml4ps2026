@@ -127,7 +127,7 @@ All fields match (sole author). doi: n/a. Source: arXiv API.
 | title/authors/year/primaryclass | — | match | match | arXiv API |
 | doi | **missing** | **10.1038/s41467-021-22539-9** | **MISMATCH → fixed** | arXiv `<arxiv:doi>` + Crossref bibliographic search |
 
-### recio_2025_iqpopt (arXiv 2501.04776) — NEEDS LEO'S JUDGMENT
+### recio_2025_iqpopt (arXiv 2501.04776) — NEEDS AUTHOR'S JUDGMENT
 | Field | Bib | Official | Match | Source |
 |---|---|---|---|---|
 | title/year/primaryclass | — | match | match | arXiv API |
@@ -237,7 +237,7 @@ All fields match (volume/issue/pages confirmed via JSTOR/AMS listing; Crossref's
 | authors (BibTeX family/given split) | `{Rahimi Khojasteh, Ali}` → parses as family="Rahimi Khojasteh" | Crossref splits as given="Ali Rahimi", family="**Khojasteh**" | **MISMATCH (structural) → fixed** to `{Khojasteh, Ali Rahimi}` so bibliography styles sort/render the surname correctly | https://api.crossref.org/works/10.1016/j.dib.2021.107725 |
 | title/journal/vol/pages/year/doi | — | match | match | Crossref |
 
-### ml4sci_deeplense — NEEDS LEO'S JUDGMENT (not a hard error)
+### ml4sci_deeplense — NEEDS AUTHOR'S JUDGMENT (not a hard error)
 | Field | Bib | Official | Match | Source |
 |---|---|---|---|---|
 | repo exists | github.com/ML4SCI/DeepLense | confirmed exists, org type, created 2021-08-13 | match | https://api.github.com/repos/ML4SCI/DeepLense |
@@ -292,7 +292,7 @@ All fields match. doi kept as-is (arXiv preprint DOI) — Crossref bibliographic
 
 None. All 52 entries' primary sources (arXiv record or DOI) resolved successfully.
 
-## Judgment calls for Leo (not auto-applied in refs_verified.bib beyond adding an explanatory `note`)
+## Judgment calls for <user> (not auto-applied in refs_verified.bib beyond adding an explanatory `note`)
 
 1. **`recio_2025_iqpopt`** — arXiv's own metadata for 2501.04776 names the first author "Erik Armengol", while the companion paper 2503.02934 (`recio_2025_train`) and general usage elsewhere use "Erik Recio-Armengol". Kept as "Recio-Armengol, Erik" in `refs_verified.bib` for internal consistency with the other citation, with a `note` documenting the discrepancy — flip it if you want literal per-paper accuracy instead.
 2. **`ml4sci_deeplense`** — "ML4SCI Collaboration" isn't a literal GitHub-registered entity name; the org is just "ML4SCI" and the repo has individual GSoC contributors, not a formal byline. Left unchanged; consider `{ML4SCI}` if you want stricter accuracy.

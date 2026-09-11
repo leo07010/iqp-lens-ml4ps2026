@@ -2,8 +2,8 @@
 
 Written 2026-09-06 before any run. Follows the replication pipeline in `experiments/13_iqp_turbulence_replication/`
 (exact 18-qubit IQP, Algorithm 1 of arXiv 2603.06440, RBM / DCGAN baselines, controls, PDF–JS and Conv2D-MMD²).
-Single seed (seed 0) throughout, at Leo's request. Purpose: see whether the paper's method does anything useful on
-Leo's own data, with the controls that the turbulence replication showed to be necessary.
+Single seed (seed 0) throughout, at <user>'s request. Purpose: see whether the paper's method does anything useful on
+<user>'s own data, with the controls that the turbulence replication showed to be necessary.
 
 ## Data
 
@@ -60,7 +60,7 @@ CTRL-mean, in the N = 100 regime. Anything less is reported as "not useful under
 
 51 jobs (17 per class, incl. the sqrt secondary arm), 8gpus packed 8-wide; the N = 100 IQP/RBM arms (~3.3×10^5 steps ≈ 1 h each) dominate.
 
-## Addendum 2026-09-06 — round 2, declared before running: image-specific fixes for IQP (requested by Leo)
+## Addendum 2026-09-06 — round 2, declared before running: image-specific fixes for IQP (requested by <user>)
 
 Round 1 (job 345400) verdict: not useful under this protocol; IQP was the worst trained model. Three image-specific
 mechanisms were identified: (i) 84% of pixels sit in intensity bin 0, so the tuple pool is mostly background;

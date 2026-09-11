@@ -12,7 +12,7 @@ from common import *
 import codec
 from iqp_exact import IQPExact, popcount_table
 
-OUT="<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/outputs_d2_main"
+OUT="<REPO_ROOT>/code/outputs_d2_main"
 GT=gt_fields(); P=pools()
 pc = popcount_table(18)
 pc_t = torch.as_tensor(pc.astype(np.int64))

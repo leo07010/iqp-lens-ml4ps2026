@@ -1,0 +1,33 @@
+{
+  "param_count": 11988,
+  "seed": 0,
+  "train_snapshots": [
+    1,
+    100,
+    200
+  ],
+  "wallclock_s": 1.42169189453125,
+  "arm": "RBM-12k",
+  "data": "synthetic",
+  "hidden": 630,
+  "n_tuples": 2000,
+  "steps_core": 30,
+  "steps_lat": 5,
+  "lr": 0.001,
+  "n_chains_pcd": 20,
+  "gen_chains": 50,
+  "gen_sweeps": 10,
+  "gen_keep": 3,
+  "a_z": 1.3158033652871381e-05,
+  "b_z": 0.9728681445121765,
+  "n_holdout": 4,
+  "holdout_ts": [
+    46,
+    64,
+    138,
+    157
+  ],
+  "d_lat": 50,
+  "latent_order": "[b_v(18), b_h[:32]]",
+  "data_seed": 0
+}

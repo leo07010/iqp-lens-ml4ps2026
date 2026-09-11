@@ -1,0 +1,65 @@
+{
+  "K": 6,
+  "a_z": 1.3158033652871381e-05,
+  "anchors": [
+    1,
+    100,
+    200
+  ],
+  "arm": "IQP-31k",
+  "b_z": 0.9728681445121765,
+  "config": {
+    "K": 6,
+    "anchors_max": 3,
+    "d_lat": 50,
+    "data": "synthetic",
+    "device": "cpu",
+    "dtype": "complex64",
+    "full_grid": false,
+    "init": "data",
+    "init_noise": 0.0,
+    "init_std": 0.01,
+    "lat_init": "random",
+    "lat_std": 0.01,
+    "log_every": 500,
+    "lr": 0.0001,
+    "n_holdout": 4,
+    "n_snapshots": 1000,
+    "n_synth": 2000,
+    "n_tuples": 2000,
+    "out": "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/outputs/iqp",
+    "seed": 0,
+    "sigmas": "auto3",
+    "steps_core": 50,
+    "steps_lat": 10
+  },
+  "d_lat": 50,
+  "data_seed": 0,
+  "final_loss_stage1": 0.03170078992843628,
+  "final_loss_stage2": [
+    0.03179058060050011,
+    0.029631545767188072
+  ],
+  "mean_pauli_weights": [
+    2.0,
+    0.7828046354643717,
+    0.4863647798391113
+  ],
+  "n_qubits": 18,
+  "param_count": 31180,
+  "seed": 0,
+  "sigmas": [
+    1.41051039403614,
+    2.344092529283346,
+    3.0
+  ],
+  "sigmas_mode": "auto3",
+  "train_snapshots": 3,
+  "unseen": [
+    46,
+    64,
+    138,
+    157
+  ],
+  "wallclock_s": 3.1832668781280518
+}

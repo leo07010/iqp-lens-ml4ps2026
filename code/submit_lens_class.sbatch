@@ -6,8 +6,8 @@
 #SBATCH -c 8
 #SBATCH --mem=64G
 #SBATCH -t 02:00:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-class-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-class-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_lens/sbatch-class-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_lens/sbatch-class-%j.err
 #
 # APPENDIX RUN: the paper's best arm, trained SEPARATELY on each of the three dark-matter
 # substructure classes (axion / cdm / no_sub).
@@ -40,7 +40,7 @@
 #    sequentially, which is simpler than sharing and still fits many times over.
 set -uo pipefail
 
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPO=<REPO_ROOT>/code
 cd "$REPO"
 mkdir -p logs_lens
 

@@ -6,8 +6,8 @@
 #SBATCH -c 12
 #SBATCH --mem=64G
 #SBATCH -t 02:00:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-v12flux-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-v12flux-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_lens/sbatch-v12flux-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_lens/sbatch-v12flux-%j.err
 #
 # Re-score every run the v12 tables quote under BOTH total-intensity conventions
 # (fixed S = training mean, and S_i resampled from a Silverman KDE of the N training crop
@@ -19,7 +19,7 @@
 # ---------------------------------------------------------------------------------------
 set -u
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPO=<REPO_ROOT>/code
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 OUT=<WORK>/gsoc_iqp_fluxres

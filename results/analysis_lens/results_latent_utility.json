@@ -1,0 +1,102 @@
+{
+  "latent_to_physics_R2": {
+    "data_adaptive_top50": {
+      "centroid_x": 0.9999505448908412,
+      "centroid_y": 0.9999648054050961,
+      "total_flux": 0.8866616311024617,
+      "ellip_cos2t": 0.9859701744231307,
+      "ellip_sin2t": 0.9989761245169058,
+      "MEAN": 0.974304656067687
+    },
+    "hamming_first50_paper": {
+      "centroid_x": 0.9999999713303183,
+      "centroid_y": 0.9999999980170399,
+      "total_flux": 0.9362740148872329,
+      "ellip_cos2t": 0.9806984605187392,
+      "ellip_sin2t": 0.9890672830226359,
+      "MEAN": 0.9812079455551933
+    }
+  },
+  "generator_budget_table": [
+    {
+      "scheme": "18-bit tuple (paper), raw z, |s|<=6",
+      "n_generators": 31180,
+      "walsh_energy_covered": 0.798901051481565
+    },
+    {
+      "scheme": "18-bit tuple (paper), sqrt z, |s|<=6",
+      "n_generators": 31180,
+      "walsh_energy_covered": 0.6390935836235682
+    },
+    {
+      "scheme": "18-bit tuple, raw z, |s|<=4",
+      "n_generators": 4048,
+      "walsh_energy_covered": 0.6534567735592525
+    },
+    {
+      "scheme": "12-bit image-as-pmf, standard, |s|<=4",
+      "n_generators": 794,
+      "walsh_energy_covered": 0.741797018856768
+    },
+    {
+      "scheme": "12-bit image-as-pmf, standard, |s|<=6",
+      "n_generators": 2510,
+      "walsh_energy_covered": 0.9562515399183996
+    },
+    {
+      "scheme": "12-bit image-as-pmf, gray, |s|<=2",
+      "n_generators": 79,
+      "walsh_energy_covered": 0.5169911932776301
+    },
+    {
+      "scheme": "12-bit image-as-pmf, gray, |s|<=4",
+      "n_generators": 794,
+      "walsh_energy_covered": 0.867724853111646
+    },
+    {
+      "scheme": "12-bit image-as-pmf, gray, |s|<=6",
+      "n_generators": 2510,
+      "walsh_energy_covered": 0.9871341873607481
+    },
+    {
+      "scheme": "12-bit, data-adaptive top-50",
+      "n_generators": 50,
+      "walsh_energy_covered": 0.6780350648506027
+    },
+    {
+      "scheme": "12-bit, data-adaptive top-100",
+      "n_generators": 100,
+      "walsh_energy_covered": 0.7808673350303663
+    },
+    {
+      "scheme": "12-bit, data-adaptive top-200",
+      "n_generators": 200,
+      "walsh_energy_covered": 0.8619355999583816
+    },
+    {
+      "scheme": "12-bit, data-adaptive top-500",
+      "n_generators": 500,
+      "walsh_energy_covered": 0.9431687930340812
+    },
+    {
+      "scheme": "12-bit, data-adaptive top-1000",
+      "n_generators": 1000,
+      "walsh_energy_covered": 0.9799360569938096
+    },
+    {
+      "scheme": "12-bit, data-adaptive top-2510",
+      "n_generators": 2510,
+      "walsh_energy_covered": 0.9985590817586323
+    },
+    {
+      "scheme": "10-bit 32x32 image-as-pmf, |s|<=4",
+      "n_generators": 386,
+      "walsh_energy_covered": 0.7612908333608683
+    },
+    {
+      "scheme": "10-bit 32x32 image-as-pmf, |s|<=6",
+      "n_generators": 848,
+      "walsh_energy_covered": 0.9669188765045321
+    }
+  ]
+}

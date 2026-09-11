@@ -6,8 +6,8 @@
 #SBATCH -c 12
 #SBATCH --mem=64G
 #SBATCH -t 02:00:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_controlled/mechseed-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_controlled/mechseed-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_controlled/mechseed-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_controlled/mechseed-%j.err
 #
 # ===========================================================================================
 # Fig. 2(a): the M sweep {0, 2, 4, 6, 8, 16} over 5 model seeds.
@@ -32,7 +32,7 @@
 # ===========================================================================================
 set -uo pipefail
 
-REPL=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPL=<REPO_ROOT>/code
 DIR="$REPL/mech_tests/mech_test2"
 LOGS="$REPL/logs_controlled"
 cd "$DIR"

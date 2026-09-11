@@ -22,7 +22,7 @@ import torch
 
 torch.set_num_threads(4)
 
-REPO = "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication"
+REPO = "<REPO_ROOT>/code"
 sys.path.insert(0, REPO)
 os.chdir(REPO)  # data_lens's on-disk cache is resolved relative-safe, but be tidy anyway
 

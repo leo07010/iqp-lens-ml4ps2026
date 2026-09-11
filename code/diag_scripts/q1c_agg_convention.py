@@ -6,7 +6,7 @@ sys.path.insert(0,'.')
 import common; from common import *
 import codec
 from iqp_exact import IQPExact
-OUT="<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/outputs_d2_main"
+OUT="<REPO_ROOT>/code/outputs_d2_main"
 GT=gt_fields(); P=pools(); A=[int(a) for a in ANCHORS]; H=[int(h) for h in HOLDOUT][:60]
 gts=GT[[T2I[t] for t in H]].astype(np.float32)
 

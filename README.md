@@ -17,18 +17,32 @@ repository.
 ## What is (and is not) in this folder
 
 ```
-paper/      placeholder — the LaTeX source, compiled PDF, and figure-generation
-            scripts are added separately; see paper/README.md
+paper/      the submission itself, in all three revisions that were compiled:
+            paper/          v10 (superseded, single seed, legacy metrics)
+            paper/v11/      v11 (five seeds, metric protocol v11)
+            paper/v12/      v12 (current: non-linear latent map, sampled flux)
+            each holds main.tex, main.pdf, refs.bib, the NeurIPS style files,
+            NUMBERS_PROVENANCE.md and its own figures/ directory
+            paper/seed_tables/  the seed-aggregated tables (seed_tables*.md)
+                            and the make_seed_tables_*.py scripts that build
+                            them from results/
+            paper/figures_all/  the complete figure set: every figure script
+                            (*.py) with its rendered *.pdf/*.png, including
+                            panels that were cut from the final PDFs, plus
+                            FIGURE_PROVENANCE.md
 code/       every script used to run the experiments (data loading, IQP
             training/inference, classical baselines (RBM/DCGAN), evaluation,
             diagnostics, and the SLURM submission scripts used to launch them)
 results/    the numeric outputs those scripts produced: per-arm metric jsonl
             logs, per-run meta.json files, and a 20-image sample of generated
-            output for the six arms shown in the paper's figures
+            output for the six arms shown in the paper's figures.
+            results/work/ holds the two sweeps that ran out of the scratch
+            filesystem (the MLP suite and the MLP/affine grid)
 docs/       the running research log: pre-registrations (written and
             committed BEFORE each experiment ran, with numbered predictions),
-            results write-ups, and a literature/method summary of the
-            replicated paper
+            results write-ups, the Chinese-language long-form paper and
+            method-difference documents (v10/v11/v12, .md + .pdf), and a
+            literature/method summary of the replicated paper
 data/       README only — raw data is not redistributed here, see data/README.md
 ```
 
@@ -108,15 +122,16 @@ backend.
    (`evaluate_r3.py` is the round-3-only equivalent that produced
    `results/results_r3.jsonl`.)
 
-5. **Regenerate the figures**, once `paper/` has been populated (see
-   `paper/README.md`):
+5. **Regenerate the figures.** Each figure is a standalone script that reads
+   `results/` and writes its own `.pdf`/`.png` next to itself:
    ```
-   cd paper/figures
-   python3 make_figures.py
+   cd paper/figures_all
+   python3 fig1_compact.py        # and fig2_*.py, figA_*.py, figB_*.py, ...
    ```
-   `paper/figures/FIGURE_PROVENANCE.md` (once `paper/` is populated) and
-   `docs/` list, panel by panel, which `results/*.jsonl` file, `meta.json`
-   key, or `code/` script each figure and number is computed from.
+   `paper/figures_all/FIGURE_PROVENANCE.md` lists, panel by panel, which
+   `results/*.jsonl` file, `meta.json` key, or `code/` script each figure and
+   number is computed from. `code/analysis_lens/make_figures.py` regenerates
+   the dataset-characterisation figures in `docs/figures/`.
 
 The other pipelines in this repository (the correlation–complexity "map" of
 Fig. 1a, the two controlled-synthetic falsification studies of Appendix C/D,
@@ -129,11 +144,10 @@ together.
 
 ## Where each paper number comes from
 
-Once `paper/` is populated it will contain `NUMBERS_PROVENANCE.md` (every
-number in the submitted PDF, traced to a `docs/*.md` line or a `results/`
-file+field) and `figures/FIGURE_PROVENANCE.md` (every figure panel, traced
-the same way, plus the exact rendering decisions). Short version, so you can
-find things even before that:
+`paper/NUMBERS_PROVENANCE.md` (and its `paper/v11/`, `paper/v12/` revisions)
+traces every number in the submitted PDF to a `docs/*.md` line or a
+`results/` file+field; `paper/figures_all/FIGURE_PROVENANCE.md` does the same
+for every figure panel, plus the exact rendering decisions. Short version:
 
 | Paper section | Primary results file(s) |
 |---|---|
@@ -186,17 +200,70 @@ a convergence/floor sweep for the classical baselines:
   `results_fig4_seeds34.jsonl` — the raw per-seed results, plus `meta.json`
   files (checkpoint-selection and run metadata, no weights) preserved under
   `results/outputs_seeds*/` and `results/outputs_convergence/`.
-- `paper/v11/seed_tables.md`, `seed_tables_b.md`, `seed_tables_c.md` — the
-  seed-aggregated tables as they appear in the paper. `paper/v11/` will also
-  hold the v11 revision of the paper itself once that is finalized.
+- `paper/seed_tables/` — the seed-aggregated tables as they appear in the
+  paper (`seed_tables.md` through `seed_tables_g.md`, covering the v11 and
+  v12 campaigns) together with the `make_seed_tables_*.py` scripts that build
+  them. `paper/v11/` holds the frozen v11 copies of the tables it cites.
 
-## Notes on the research log in `docs/`
+## Everything in this repository
 
-`docs/` is a running lab notebook, not sanitized for publication style: it
-keeps absolute filesystem paths, cluster account identifiers, and
-first-person reasoning exactly as written at the time (deliberately —
-`file:line` references elsewhere depend on it), and it includes the honest
-negative results (e.g. `docs/IQP_TURBULENCE_REPLICATION_RESULTS.md`) alongside
-the positive ones. `code/INTERFACES.md` retains the same kind of environment
-notes (a cluster path and account identifier) for the same reason; both are
-left as-is intentionally rather than edited into anonymized instructions.
+This release is a complete record of the project, not only the runs that made
+the paper: every experiment batch that was launched is here, including the
+ones that were refuted, abandoned, or superseded. The table below maps each
+batch to where its outputs live.
+
+| Batch | What it was | Results |
+|---|---|---|
+| Pilot (round 1) | first per-class IQP fit on lensing images, 3 classes | `results/outputs_lens_pilot/`, `results/results_lens_{axion,cdm,no_sub}.jsonl` |
+| Round 2 | per-class re-run with the corrected aggregation and a clipped-intensity variant | `results/outputs_lens_round2/`, `results/results_lens_round2_*.jsonl` |
+| Round 3 | 28-arm sweep: fixed-basis IQP, RBM/DCGAN baselines, four zero-learning controls | `results/outputs_lens_r3/`, `results/results_r3.jsonl`, `results/r3_latent_select.json` |
+| Round 3b | learned-latent-direction IQP, M ∈ {2,4,8} × 3 objectives × 2 priors, N ∈ {11,100} — the paper's main arm | `results/outputs_lens_r3b/`, `results/results_r3b.jsonl` |
+| Paper suite — map | correlation–complexity map (Fig. 1a), single seed and five seeds | `results/paper_suite/map/results_map*.json` |
+| Paper suite — controlled | the two controlled-synthetic falsification studies (support mismatch, QCLI–CCI ceiling; ref. Figs. 3–4) | `results/outputs_controlled/results_fig3*.jsonl`, `results_fig4*.jsonl`, `results_fig34_seeds.json` |
+| Paper suite — scaling | N-scaling of IQP vs RBM vs DCGAN, N = 10…100 | `results/outputs_lens_scaling/`, `results/results_scaling.jsonl`, `results/results_seeds_scaling*.jsonl` |
+| Convergence | baseline-fairness sweep: are RBM/DCGAN simply stopped too early? | `results/outputs_convergence/`, `results/results_convergence.jsonl`, `results/results_convergence_eval.jsonl` |
+| Mechanism tests | what the IQP arm is actually doing (interpolation, affine latent, branch checks) | `results/mech_tests/` |
+| Seeds (v11) | five-seed re-run of the main comparison under metric protocol v11, with an early-stopping variant, a floor/bootstrap pass and robustness probes | `results/outputs_seeds*/`, `results/results_seeds_*.jsonl`, `results/results_v11_*.jsonl`, `results/results_seeds_raw/` |
+| θ₀ objective | ablation on the θ₀ pre-training objective | `results/outputs_seeds_theta0/`, `results/results_seeds_theta0.jsonl` |
+| Class-conditional | per-class (axion / cdm / no_sub) arms under v11 metrics | `results/outputs_lens_class/`, `results/results_class.jsonl`, `results/results_seeds_class*.jsonl` |
+| v12 arms | the v12 campaign: non-linear (MLP) latent map, sampled flux, scheduled variants, 5 seeds + smoke tests | `results/outputs_v12/`, `results/outputs_v12_smoke{,2}/`, `results/results_seeds_v12.jsonl`, `results/results_seeds_v12_es.jsonl` |
+| Grid-MLP | latent-map capacity grid (M × hidden width) plus its zero-learning controls | `results/work/gsoc_iqp_gridmlp/`, `results/results_seeds_gridmlp.jsonl`, `results/results_seeds_gridmlp_es.jsonl` |
+| MLP control | classical MLP decoder trained on the same targets, as a null model for the quantum core | `results/results_seeds_mlpctrl.jsonl`, `results/work/gsoc_iqp_gridmlp/ctrl/` |
+| MLP suite | the large MLP sweep and its phase-2 ablations (pick-loss, R1/R2, θ₀-MMD, per-class) | `results/work/gsoc_iqp_mlpsuite/`, `results/results_seeds_mlp_suite.jsonl`, `results/results_seeds_mlp_suite_es.jsonl` |
+| Flux residual | v12 flux-residual diagnostic (`docs/figures/diag_v12_flux_*.png`) | `results/results_v12_fluxres.jsonl` |
+| Turbulence (Appendix B) | the independent replication attempt on Khojasteh et al. 2022 D2 — reported as a negative result | `results/outputs_d2*/`, `results/results_d2_*.jsonl`, `results/results_smoke_d2.jsonl` |
+| Anchor fit | the anchor-fitting protocol sweeps that diagnosed the turbulence failure (5 seeds × several protocols) | `results/outputs_anchor_fit*/`, `results/outputs_anchor_fit_protocol*/` |
+| Dataset characterisation | the measurements behind `docs/LENS_IMAGE_CHARACTERISTICS.md` | `results/analysis_lens/` |
+
+Pre-registrations and write-ups for these batches are in `docs/`: every
+`docs/*_PREREGISTRATION.md` was committed before its run and states numbered,
+falsifiable predictions; the matching `docs/*_RESULTS.md` scores the run
+against them. `docs/IQP_LENS_METHOD_DIFFERENCES_ZH*.md` (v10/v11/v12, with
+PDFs) is the line-by-line account of how this replication departs from
+arXiv:2603.06440, and `docs/IQP_LENS_PAPER_ZH*.md` is the long-form Chinese
+version of the paper.
+
+## Anonymization
+
+All filesystem paths and account identifiers in this repository have been
+replaced with placeholders, in every text file (`.md`, `.py`, `.sbatch`,
+`.sh`, `.json`, `.jsonl`, `.tex`, `.bib`, `.txt`) and in the compiled PDFs:
+
+| Placeholder | Was |
+|---|---|
+| `<HOME>` | the researcher's home directory on the cluster |
+| `<WORK>` | the scratch/data root (caches such as `<WORK>/data/lens_cache` and `<WORK>/data/turbulence_khojasteh2022/d2_cache` live there) |
+| `<user>` | the cluster username, and the author's name where it appeared in the research log |
+| `<YOUR_ACCOUNT>` | the SLURM charge account in the `.sbatch` files |
+| `<node>` | individual compute-node hostnames in run logs |
+
+Nothing else was edited: SLURM job IDs, timestamps, hyperparameters and all
+numeric results are the originals. Before running anything you will need to
+substitute your own values — either in place, or by overriding the
+`CACHE_DIR_DEFAULT` constants in `code/data_lens.py`, `code/data_lens_r3.py`
+and `code/data_d2.py` and the header of each `.sbatch` file.
+
+`docs/` remains a running lab notebook rather than polished prose: it keeps
+the first-person reasoning exactly as written at the time, and it includes
+the honest negative results (e.g. `docs/IQP_TURBULENCE_REPLICATION_RESULTS.md`)
+alongside the positive ones.

@@ -78,7 +78,7 @@ two page-number placeholders for PRA/PRX Quantum publications still in press as 
   page 5 and the appendix runs pages 6–8. After any edit, check with
   `python3 -c "import fitz; d=fitz.open('main.pdf'); print(d[4].get_text().startswith('References'))"`.
 - `NUMBERS_PROVENANCE.md` lists the source of every number printed in the PDF, plus the items still
-  needing Leo's confirmation.
+  needing <user>'s confirmation.
 - `refs.bib` was edited on 2026-09-08 (backup `refs.bib.backup-20260908`): all `note = {...}` fields
   removed so internal TODO annotations do not print in the bibliography, and the `...` placeholder
   author tokens removed so BibTeX does not typeset them.

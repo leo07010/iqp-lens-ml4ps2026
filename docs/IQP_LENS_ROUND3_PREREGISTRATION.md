@@ -1,7 +1,7 @@
 # Pre-registration — round 3: IQP as a generator of plausible lens images (goal B)
 
 Written 2026-09-06 before any run. Builds on round 1 (job 345400), round 2 (job 347344, running) and the step-0
-image analysis (`docs/LENS_IMAGE_CHARACTERISTICS.md`). Goal chosen by Leo: (B) show whether the IQP model family can
+image analysis (`docs/LENS_IMAGE_CHARACTERISTICS.md`). Goal chosen by <user>: (B) show whether the IQP model family can
 generate plausible gravitational-lens images, judged on physical quantities, not on class conditioning. Single seed.
 
 ## Representation (decided from measurements)
@@ -64,7 +64,7 @@ its physics score is within 1.2× of CTRL-ring's. **Weak success** = beats CTRL-
 
 18 jobs (9 arms × 2 N), all cheap at n = 10 (1,024 amplitudes); one 8gpus node, < 1 h.
 
-## Addendum (before running) — pseudo-time arm, added at Leo's request on 2026-09-06
+## Addendum (before running) — pseudo-time arm, added at <user>'s request on 2026-09-06
 
 The paper's Algorithm 1 needs a 1-D conditioning variable. Lens images have none, so two more arms use a measured
 physical scalar as pseudo-time: the training images are sorted by ellipticity e1 (from the centred crop's second
@@ -86,7 +86,7 @@ samples paired with held-out images at random) gives the floor of the paired met
   pseudo-time IQP is no better than the unconditional arm.
 Total jobs: 22 (11 arms × 2 N).
 
-## Addendum (before running) — hardware-compatible objective arm, added 2026-09-07 at Leo's request
+## Addendum (before running) — hardware-compatible objective arm, added 2026-09-07 at <user>'s request
 
 The KL arm needs the values q(x), which only exact classical simulation provides; a quantum device only yields
 samples, and the paper's MMD is chosen because it is a sum of squared expectation-value differences, all estimable

@@ -6,8 +6,8 @@
 #SBATCH -c 16
 #SBATCH --mem=96G
 #SBATCH -t 01:30:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-v12smoke2-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-v12smoke2-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_lens/sbatch-v12smoke2-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_lens/sbatch-v12smoke2-%j.err
 #
 # SMOKE 2: the coordinator's arms E (pixel-space kernel), F (8-qubit 16x16 + bilinear),
 # G (Gray code), H (small MLP latent map) and I (lowres8 + MLP).  One seed each, N = 11.
@@ -21,7 +21,7 @@
 # ---------------------------------------------------------------------------------------
 set -u
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPO=<REPO_ROOT>/code
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 SM="$REPO/outputs_v12_smoke2"
@@ -34,7 +34,7 @@ echo "[$(ts)] 1/4 py_compile + unit checks"
     v12_figs.py || { echo "[FATAL] py_compile"; exit 1; }
 "$PY" - <<'PYEOF' || { echo "[FATAL] unit checks failed"; exit 1; }
 import sys
-sys.path.insert(0, "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication")
+sys.path.insert(0, "<REPO_ROOT>/code")
 import numpy as np, torch
 import codec_v12, objective_spatial, data_lens_r3, codec10
 d = data_lens_r3.load_r3(11, n_holdout=20)
@@ -71,7 +71,7 @@ CUDA_VISIBLE_DEVICES=0 "$PY" -u train_iqp_affine_v12.py \
 "$PY" - <<'PYEOF' || { echo "[FATAL] regression comparison failed"; exit 1; }
 import glob, json, os
 import numpy as np
-R = "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication"
+R = "<REPO_ROOT>/code"
 ref = os.path.join(R, "outputs_lens_r3b", "iqp_m4_mmdflat_resample_n11")
 new = os.path.join(R, "outputs_v12_smoke2", "regress_flat_n11")
 n = len(glob.glob(os.path.join(ref, "generated_*.npy")))
@@ -128,7 +128,7 @@ echo "scoring ${#RUNS[@]} run dirs"
     || { echo "[FATAL] evaluate_v11 failed"; tail -40 logs_lens/v12_smoke2_eval.log; exit 1; }
 "$PY" - <<'PYEOF'
 import json, os
-p = "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/outputs_v12_smoke2/results_smoke2.jsonl"
+p = "<REPO_ROOT>/code/outputs_v12_smoke2/results_smoke2.jsonl"
 rows = [json.loads(l) for l in open(p) if l.strip()]
 hdr = ("%-46s %9s %9s %9s %8s %7s %7s %8s" %
        ("arm (N=11, seed 0)", "PDF-JS", "MMD2", "MMD2_al", "proj", "gmax", "clip%", "params"))

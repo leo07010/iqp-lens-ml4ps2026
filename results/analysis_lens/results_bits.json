@@ -1,0 +1,52 @@
+{
+  "multiset_maxreldiff_vs_standard_morton": 2.220446049250313e-16,
+  "multiset_maxreldiff_vs_standard_gray": 0.0,
+  "per_image_sorted_energy_maxreldiff_gray": 0.0,
+  "note": "multiset of Walsh energies is invariant under both layouts; only the |s| labelling changes",
+  "variance_mass_touching_bit": {
+    "y0": 0.03891197907732685,
+    "y1": 0.1279215456768721,
+    "y2": 0.32085585763132646,
+    "y3": 0.5884667083977889,
+    "y4": 0.501786674413794,
+    "y5": 0.5011204007716521,
+    "x0": 0.038579597547699886,
+    "x1": 0.13245842081333212,
+    "x2": 0.3116101020152163,
+    "x3": 0.5843433747741862,
+    "x4": 0.5011736428938895,
+    "x5": 0.5005568921250446
+  },
+  "coarse6": {
+    "n_subsets": 64,
+    "variance_frac": 0.43295769564272846,
+    "energy_frac": 0.6122257707481261
+  },
+  "fine6": {
+    "n_subsets": 64,
+    "variance_frac": 0.006729086934271573,
+    "energy_frac": 0.08330540769502463
+  },
+  "top50_touching_a_fine_bit": 18,
+  "top200_touching_a_fine_bit": 148,
+  "top50_within_coarse6": 32,
+  "downsample32": {
+    "order_spectrum": [
+      0.08357722038459973,
+      0.02784232516767099,
+      0.278195241867502,
+      0.12556778410326444,
+      0.2461082618378312,
+      0.12766454751710876,
+      0.077963495626555,
+      0.02702141293741251,
+      0.005041827594800906,
+      0.000994344242688649,
+      2.353872056589911e-05
+    ],
+    "mean_|s|": 3.2901419166188193,
+    "energy_k<=4": 0.7612908333608683,
+    "energy_k<=6": 0.9669188765045321,
+    "n_subsets_le4_10bit": 386
+  }
+}

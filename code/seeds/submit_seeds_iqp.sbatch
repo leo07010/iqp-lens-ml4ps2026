@@ -6,8 +6,8 @@
 #SBATCH -c 32
 #SBATCH --mem=128G
 #SBATCH -t 02:30:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-seeds-iqp-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-seeds-iqp-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_lens/sbatch-seeds-iqp-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_lens/sbatch-seeds-iqp-%j.err
 #
 # Seed replicates 1-4 of every IQP number in the ML4PS-2026 paper, so each can be quoted as
 # mean +- sd over five seeds (0-4).  Seed 0 already exists (results_r3.jsonl / results_r3b.jsonl
@@ -84,7 +84,7 @@
 set -u
 
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPO=<REPO_ROOT>/code
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 OUT_ROOT="$REPO/outputs_seeds"
@@ -115,7 +115,7 @@ command -v flock >/dev/null 2>&1 || { echo "[FATAL] flock not available, the wor
 echo "[$(ts)] pre-check: the data split is invariant under --seed"
 "$PY" - <<'PYEOF' || { echo "[FATAL] the data split MOVES with --seed -- stop, the design is wrong"; exit 1; }
 import sys
-sys.path.insert(0, "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication")
+sys.path.insert(0, "<REPO_ROOT>/code")
 import numpy as np
 import data_lens_r3, data_lens_class
 ref = data_lens_r3.load_r3(100, seed=0, n_holdout=200)

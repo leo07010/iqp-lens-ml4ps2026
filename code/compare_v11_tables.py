@@ -10,7 +10,7 @@ the data range v11 clips to.  Read-only; it does not recompute anything.
 """
 import json, os, sys
 
-REPO = "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication"
+REPO = "<REPO_ROOT>/code"
 rows = [json.loads(l) for l in open(os.path.join(REPO, "results_v11_seed0.jsonl"))
         if l.strip()]
 runs = [r for r in rows if r.get("run_dir")]

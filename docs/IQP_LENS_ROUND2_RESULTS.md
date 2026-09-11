@@ -1,6 +1,6 @@
 # IQP 生成模型於 DeepLense Model II — round 2 結果（image-as-pmf 編碼與協定修正）
 
-Job **347344**（`8gpus`，30 jobs，8-wide，**fail=0**，2026-09-06 16:43:40 → 18:42:36，**1 h 58 min 56 s**，node `25a-hgpn009`），**單 seed（seed 0）**。
+Job **347344**（`8gpus`，30 jobs，8-wide，**fail=0**，2026-09-06 16:43:40 → 18:42:36，**1 h 58 min 56 s**，node `<node>`），**單 seed（seed 0）**。
 協定、5 個 arm 的定義、預測 P6–P9 與 decision rule 全部寫在跑之前：`docs/IQP_LENS_PILOT_PREREGISTRATION.md` 的 **Addendum 2026-09-06 — round 2**（含最後的 pmf scoring note）。
 Round 1（job 345400）結果與 root-cause：`docs/IQP_LENS_PILOT_RESULTS.md`；跑前的影像特性量測：`docs/LENS_IMAGE_CHARACTERISTICS.md`。程式與契約：`experiments/13_iqp_turbulence_replication/` 與 `INTERFACES.md` 的「Round-2 lens arms」段。圖：`docs/figures/iqp_lens_round2.png`。
 本文的**指標數字全部取自** `results_lens_round2_{class}.jsonl` 與 `results_lens_round2_clipped_{class}.jsonl`（已與 `logs_lens/evaluate_round2*.log` 逐格核對）；協定欄位（`stage1_latent_shift`、`intensity_scale_S` 等）取自各 run 的 `meta.json`。**唯一的例外是 §5(a) 的空間結構診斷與「總亮度對齊後」重評分**——那是事後另外算的、非 pre-registered 的診斷（腳本重算的 raw 欄與 jsonl 逐位相同以確認實作一致），不進 §4 的判定。
@@ -192,7 +192,7 @@ step-0 第 1 條建議「放棄 18-bit tuple，改用 12-bit image-as-pmf」，�
 
 ## 6. 誠實的限制
 
-1. **單 seed（seed 0）**，依 Leo 要求，所有比較都沒有誤差棒。§4 三個子條款的差距（0.2–1.3）看起來大於單 seed 噪音但**沒有量過**；P8 的「無差別」則是安全方向（觀測差距 ≤ 0.027，小於任何合理的 seed 噪音）。
+1. **單 seed（seed 0）**，依 <user> 要求，所有比較都沒有誤差棒。§4 三個子條款的差距（0.2–1.3）看起來大於單 seed 噪音但**沒有量過**；P8 的「無差別」則是安全方向（觀測差距 ≤ 0.027，小於任何合理的 seed 噪音）。
 2. **pmf 的尺度 confound（pre-reg 已標記，本輪量化）**：pmf arm 的總亮度 S 是外部設定成訓練集平均值的，其他 arm 的是模型自己產生的。§5(a) 的對齊檢驗顯示 pmf 在 MMD² 上的優勢**幾乎全部是這個贈與**。該檢驗本身是 **post-hoc、非 pre-registered** 的探索性診斷（單 seed、一個常數縮放、沒有另訂 decision rule），只能用來解釋機制、不能用來宣告任何 arm 勝出；正式判定仍以 §4 的原始分數為準（兩者結論相同）。
 3. **Gaussian latent prior 沒有被檢驗**。lens 無時間軸，`gaussian-latent` 是自訂替代；IQP 與 RBM 共用它故兩者可比，但「生成不出弧」有多少歸給 circuit、多少歸給 N(μ, diag σ²)，round 2 仍**沒有拆開**（round 1 限制 4 原封不動）；§5(a) 只是把嫌疑更明確地指向 latent/prior 側。
 4. **沒有物理量指標、沒有分類器指標**。PDF–JS / MMD² / NN 都是像素空間的分布距離，§5(a)、(c) 顯示它們在這批影像上高度受總亮度尺度支配。centroid / flux / rms radius / ellipticity 這些「這張圖像不像一個透鏡」才問得出來的量，**round 3 才會測**。
@@ -208,7 +208,7 @@ step-0 第 1 條建議「放棄 18-bit tuple，改用 12-bit image-as-pmf」，�
 
 | 項目 | 值 |
 |---|---|
-| Job | **347344** `iqp_lens_round2`，partition `8gpus`，node `25a-hgpn009`，30 jobs 8-wide，**fail=0** |
+| Job | **347344** `iqp_lens_round2`，partition `8gpus`，node `<node>`，30 jobs 8-wide，**fail=0** |
 | 時間 | 2026-09-06 16:43:40 → 18:42:36（**1 h 58 min 56 s**） |
 | 提交 / log | `submit_lens_round2.sbatch`；`logs_lens/sbatch-round2-347344.out`（`.err` 空）、跑前檢查 `logs_lens/precheck_r2_test_lens_round2.log` |
 | 評估表 | primary `logs_lens/evaluate_round2_{class}.log`；clip 次評分 `logs_lens/evaluate_round2_clipped_{class}.log`（job **349157**，2026-09-07 00:46） |

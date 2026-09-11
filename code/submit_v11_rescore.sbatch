@@ -6,8 +6,8 @@
 #SBATCH -c 8
 #SBATCH --mem=64G
 #SBATCH -t 01:00:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/v11-rescore-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/v11-rescore-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_lens/v11-rescore-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_lens/v11-rescore-%j.err
 #
 # Re-score every seed-0 lens output under metric protocol v11 (metrics_v11.py / evaluate_v11.py).
 # NEW files only: metrics.py, evaluate_r3.py, evaluate_r3b.py, evaluate_class.py and every
@@ -17,7 +17,7 @@
 # because every partition on this cluster is a GPU partition.
 set -euo pipefail
 
-cd <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+cd <REPO_ROOT>/code
 PY=/usr/bin/python3
 
 # fail fast: a broken interpreter must not waste the allocation (memory qc-llm-env-broken.md)

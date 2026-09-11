@@ -4,7 +4,7 @@ import numpy as np
 sys.path.insert(0,'.')
 import common
 from common import *
-OUT="<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/outputs_d2_main"
+OUT="<REPO_ROOT>/code/outputs_d2_main"
 GT=gt_fields(); A=[int(a) for a in ANCHORS]; H=[int(h) for h in HOLDOUT]
 anch=GT[[T2I[a] for a in A]].reshape(11,-1).astype(np.float64)
 def norm(x): 

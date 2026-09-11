@@ -1,0 +1,16 @@
+{
+  "arm": "CTRL-marginal",
+  "param_count": 54,
+  "seed": 0,
+  "anchors": [
+    1,
+    100,
+    200
+  ],
+  "train_snapshots": 3,
+  "a_z": 1.3158033652871381e-05,
+  "b_z": 0.9728681445121765,
+  "n_synth": 1000,
+  "n_t_tuples": 1000,
+  "wallclock_s": 0.01117563247680664
+}

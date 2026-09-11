@@ -32,7 +32,7 @@ $$
 
 ### 2.2 何時可古典模擬：expectation value vs. sampling 的關鍵區分
 
-這是對 Leo 專案最重要的一組結果：**估計 expectation value（尤其是 Pauli-$Z$ 型觀測量）與「抽樣整個輸出分布」是兩件複雜度完全不同的任務。**
+這是對 <user> 專案最重要的一組結果：**估計 expectation value（尤其是 Pauli-$Z$ 型觀測量）與「抽樣整個輸出分布」是兩件複雜度完全不同的任務。**
 
 - IQPopt 系列論文（2501.04776, 2503.02934）明確指出：IQP 電路的 **Pauli-$Z$ observable 期望值可以被古典演算法有效估計**（因為對易 diagonal 結構讓期望值化簡為對隨機變數取平均，可用抽樣/解析方式在古典端算出），但**抽樣整個輸出分布仍被信為古典困難**。這使得訓練（只需要 loss 的梯度，梯度是期望值的函數）可以完全在古典硬體、甚至 GPU 上完成，只有「部署後去抽樣」這一步才需要量子硬體，即所謂 **"train on classical, deploy on quantum"** 範式。
 - 雜訊會讓「抽樣也變得可古典模擬」：Rajakumar–Watson–Liu（2403.14607, 2024）證明，只要 dephasing 或 depolarizing 雜訊使電路深度超過某個 $O(1)$ 臨界深度，輸出分布本身也能被古典多項式時間抽樣——且**不需要**假設電路架構或 anti-concentration 性質，機制是雜訊在 IQP 的 diagonal gate 區段中累積，造成大規模糾纏崩潰。
@@ -80,7 +80,7 @@ IQP 電路作為 feature map 的用法可追溯到 Havlíček et al.（1804.1132
   - Spectral Born machines（Huang–Maxwell–Belis–Peters–Pye–Jahangiri–Bowles, 2607.06675）用 group Fourier analysis 把 IQP Born machine 推廣到一般「spectral」架構，用於整數結構資料，展示 190-qubit、百萬參數規模訓練 RNA 序列分布的可行性，且觀察到 overparameterization 不易 overfit。
   - Qudit 版本（Banks–Crippa–Traube–Unger–Ertler–Lechner, 2606.28236）把 parameterized IQP 電路推廣到 qudit，直接編碼整數值特徵，避免 binary 展開破壞原始度量結構，在 CLIC 探測器量能器的真實整數值資料上驗證。
 - **物理／應用導向的初始化與部署**：
-  - Correlation-Complexity Map（Liu–Placidi–Brunner–Rinaldi, 2603.06440，**Leo 目標復刻論文**）提出 QCLI（Quantum Correlation-Likeness Indicator，比較資料集的 correlation-order 頻譜與 IQP 電路自然產生的頻譜有多接近）與 CCI（Classical Correlation-Complexity Indicator，衡量最優 Chow-Liu tree 近似無法捕捉的 correlation 比例），作為「這個資料集適不適合上 IQP 生成模型」的**訓練前診斷工具**；並用一個緊湊 IQP 電路搭配 latent-parameter 內插的方式，跨時間序列重複使用同一電路，在 turbulence（紊流）資料的低資料量、低參數量場景中對比古典基準表現有競爭力。
+  - Correlation-Complexity Map（Liu–Placidi–Brunner–Rinaldi, 2603.06440，**<user> 目標復刻論文**）提出 QCLI（Quantum Correlation-Likeness Indicator，比較資料集的 correlation-order 頻譜與 IQP 電路自然產生的頻譜有多接近）與 CCI（Classical Correlation-Complexity Indicator，衡量最優 Chow-Liu tree 近似無法捕捉的 correlation 比例），作為「這個資料集適不適合上 IQP 生成模型」的**訓練前診斷工具**；並用一個緊湊 IQP 電路搭配 latent-parameter 內插的方式，跨時間序列重複使用同一電路，在 turbulence（紊流）資料的低資料量、低參數量場景中對比古典基準表現有競爭力。
   - 同一組作者的後續工作（Liu–Placidi–Ballarin–Rinaldi, 2607.28866）用古典 physics-informed neural network（PINN）求解 Burgers' equation 的表示，作為 IQP 生成模型的 latent 初始化起點，取代隨機初始化，在多個黏滯係數設定下一致優於隨機初始化。
 
 ### 3.3 硬體上的 shallow IQP 生成模型
@@ -111,7 +111,7 @@ Balló-Gimbernat–Arroyo-Sánchez–García-Molina–Garriga–Vilariño（2511
 | 2025 (PRA 2026) | 2511.05267 | Shallow instantaneous quantum polynomial-time circuits for generative modeling on NISQ hardware | Balló-Gimbernat, Arroyo-Sánchez, García-Molina, Garriga, Vilariño | 28–153 qubit 硬體示範 graph generation；局部 correlation 高度 robust | 硬體/QML-Generative |
 | 2026 | 2602.11042 | Characterizing Trainability of Instantaneous Quantum Polynomial Circuit Born Machines | Shen, Pielawa, Dunjko, Wang | 梯度變異數解析界；稀疏 IQP 可訓練且維持難模擬 | QML-Generative-Trainability |
 | 2026 | 2603.05920 | Classical simulability of quantum circuits followed by sparse classical post-processing | Takahashi, Miyamoto, Kunihiro | IQP+稀疏後處理的古典可模擬充要條件 | 複雜度-古典模擬 |
-| 2026 | 2603.06440 | Toward Generative Quantum Utility via Correlation-Complexity Map | Liu, Placidi, Brunner, Rinaldi | QCLI/CCI 診斷工具；IQP 生成模型應用於 turbulence（**Leo 目標復刻論文**） | QML-Generative-應用 |
+| 2026 | 2603.06440 | Toward Generative Quantum Utility via Correlation-Complexity Map | Liu, Placidi, Brunner, Rinaldi | QCLI/CCI 診斷工具；IQP 生成模型應用於 turbulence（**<user> 目標復刻論文**） | QML-Generative-應用 |
 | 2026 | 2603.14576 | IQP Born Machines under Data-dependent and Agnostic Initialization Strategies | Lerch, Bowles, Puig, Armengol, Holmes, Thanasilp | 證明 barren plateau，提出 data-dependent 初始化 | QML-Generative-Trainability |
 | 2026 | 2604.21908 | Efficient Classical Simulation of Heuristic Peaked Quantum Circuits | Kremer, Dupuis | 張量網路收縮，1 GPU ~1 小時反駁 2510.25838 的指數優勢宣稱 | 驗證/Peaked（反駁） |
 | 2026 | 2606.10179 | Trainability of IQP Quantum Circuit Born Machines Under Gaussian Initialization | De Luca | Stein's lemma 分析 Gaussian 初始化下梯度變異數界 | QML-Generative-Trainability |
@@ -147,23 +147,23 @@ Balló-Gimbernat–Arroyo-Sánchez–García-Molina–Garriga–Vilariño（2511
 | PennyLane `qml.IQPEmbedding` | https://docs.pennylane.ai/en/stable/code/api/pennylane.IQPEmbedding.html | 標準 IQP feature map 模板（Havlíček et al. 架構），可設定 `n_repeats`、自訂 entangler pattern；**features 對輸入不可微分**，僅電路參數可微分 |
 | PennyLane `qml.IQPEmbedding` 原始碼 | https://github.com/PennyLaneAI/qml/blob/master/demonstrations/tutorial_iqp_circuit_optimization_jax.py | IQPopt 官方 demo script |
 
-**未找到公開程式碼的論文**：Quantinuum 的 Correlation-Complexity Map（2603.06440，Leo 目標復刻論文）與其後續 latent 初始化論文（2607.28866）在 WebSearch 中**沒有找到對應 GitHub repo**——復刻時需要完全依論文描述的 QCLI/CCI 指標定義與 latent-parameter 內插方案自行實作，這點請 Leo 特別注意（無官方程式碼可對照除錯）。
+**未找到公開程式碼的論文**：Quantinuum 的 Correlation-Complexity Map（2603.06440，<user> 目標復刻論文）與其後續 latent 初始化論文（2607.28866）在 WebSearch 中**沒有找到對應 GitHub repo**——復刻時需要完全依論文描述的 QCLI/CCI 指標定義與 latent-parameter 內插方案自行實作，這點請 <user> 特別注意（無官方程式碼可對照除錯）。
 
 ---
 
-## 7. 對 Leo 專案的評估
+## 7. 對 <user> 專案的評估
 
-專案背景：Leo 正在復刻 2603.06440（IQP 生成模型 + Correlation-Complexity Map，應用於 turbulence 資料），gsoc2026-deeplense-qml repo 過去也做過 QML 用於重力透鏡影像分類（DeepLense）的多個實驗（QVF、QOVT、QPE 等）。以下評估同時涵蓋「IQP 用於分類」與「IQP 用於生成（本次復刻對象）」兩條應用線：
+專案背景：<user> 正在復刻 2603.06440（IQP 生成模型 + Correlation-Complexity Map，應用於 turbulence 資料），gsoc2026-deeplense-qml repo 過去也做過 QML 用於重力透鏡影像分類（DeepLense）的多個實驗（QVF、QOVT、QPE 等）。以下評估同時涵蓋「IQP 用於分類」與「IQP 用於生成（本次復刻對象）」兩條應用線：
 
-1. **「訓練可在 GPU 古典完成」是 IQP 生成模型最實際的優勢，也是本次復刻可行的原因。** IQPopt 系列（2501.04776, 2503.02934）與 Correlation-Complexity Map 論文本身都依賴「Pauli-$Z$ expectation value 可古典估計」這個性質——這代表 Leo 復刻整個訓練 pipeline（含 MMD loss 梯度）不需要排隊等真實量子硬體或跑指數級 statevector 模擬，可以直接在 NANO4 的 GPU partition 上用 JAX/PyTorch 跑完，**只有最終「抽樣」這步在概念上需要量子硬體或難以規模化的古典抽樣模擬**——這與 repo 過去的 QVF/QOVT 系列用 statevector 模擬器硬跑的做法有本質差異，值得在復刻的 sbatch/README 中明確寫清楚「這裡在做的是古典可行的訓練，不是量子優勢展示」。
+1. **「訓練可在 GPU 古典完成」是 IQP 生成模型最實際的優勢，也是本次復刻可行的原因。** IQPopt 系列（2501.04776, 2503.02934）與 Correlation-Complexity Map 論文本身都依賴「Pauli-$Z$ expectation value 可古典估計」這個性質——這代表 <user> 復刻整個訓練 pipeline（含 MMD loss 梯度）不需要排隊等真實量子硬體或跑指數級 statevector 模擬，可以直接在 NANO4 的 GPU partition 上用 JAX/PyTorch 跑完，**只有最終「抽樣」這步在概念上需要量子硬體或難以規模化的古典抽樣模擬**——這與 repo 過去的 QVF/QOVT 系列用 statevector 模擬器硬跑的做法有本質差異，值得在復刻的 sbatch/README 中明確寫清楚「這裡在做的是古典可行的訓練，不是量子優勢展示」。
 
-2. **「Expectation value 可古典估計」同時是復刻的可行性保證，也是任何「量子優勢」敘事的天花板——寫論文/報告時要避免過度宣稱。** 正因為訓練端本質上是古典演算法（只是恰好被設計成「未來可搬到量子硬體抽樣」的形式），Leo 若要在復刻報告中討論「量子優勢」，必須清楚區分「這個 IQP 模型的抽樣分布被信為古典難模擬」（複雜度理論的猜想）與「我們的訓練/推論流程有沒有實際跑在量子硬體上」（工程事實）。參照 §2.3 的教訓——過去兩個 IQP 硬體優勢宣稱（QuEra 48q、Quantinuum H2 56q）都在數月內被反駁——任何「IQP 對 turbulence/影像資料有優勢」的結論都應該保守表述為「同參數量下表現具競爭力」而非「證明量子優勢」，並且要對照 judgment-rubric 的「單一指標差 <3% 當噪音」原則來看待與古典基準的比較。
+2. **「Expectation value 可古典估計」同時是復刻的可行性保證，也是任何「量子優勢」敘事的天花板——寫論文/報告時要避免過度宣稱。** 正因為訓練端本質上是古典演算法（只是恰好被設計成「未來可搬到量子硬體抽樣」的形式），<user> 若要在復刻報告中討論「量子優勢」，必須清楚區分「這個 IQP 模型的抽樣分布被信為古典難模擬」（複雜度理論的猜想）與「我們的訓練/推論流程有沒有實際跑在量子硬體上」（工程事實）。參照 §2.3 的教訓——過去兩個 IQP 硬體優勢宣稱（QuEra 48q、Quantinuum H2 56q）都在數月內被反駁——任何「IQP 對 turbulence/影像資料有優勢」的結論都應該保守表述為「同參數量下表現具競爭力」而非「證明量子優勢」，並且要對照 judgment-rubric 的「單一指標差 <3% 當噪音」原則來看待與古典基準的比較。
 
-3. **雜訊敏感性是復刻若涉及真實硬體部署時的關鍵風險**：1610.01808 與 2403.14607 都指出，一旦雜訊使電路深度超過某臨界值（或反集中程度足夠），IQP 電路連「抽樣」本身都會變成可古典模擬——換言之，在真實 NISQ 硬體上部署 IQP 生成模型，若電路夠深或雜訊夠大，聲稱的「量子難模擬」性質可能在部署當下就已經名存實亡。若 Leo 的復刻計畫包含在真實硬體（或 noisy simulator）上測試，應先估算目標電路深度與雜訊率是否落在「仍然難模擬」的理論安全區，否則跑硬體實驗的意義會被削弱。
+3. **雜訊敏感性是復刻若涉及真實硬體部署時的關鍵風險**：1610.01808 與 2403.14607 都指出，一旦雜訊使電路深度超過某臨界值（或反集中程度足夠），IQP 電路連「抽樣」本身都會變成可古典模擬——換言之，在真實 NISQ 硬體上部署 IQP 生成模型，若電路夠深或雜訊夠大，聲稱的「量子難模擬」性質可能在部署當下就已經名存實亡。若 <user> 的復刻計畫包含在真實硬體（或 noisy simulator）上測試，應先估算目標電路深度與雜訊率是否落在「仍然難模擬」的理論安全區，否則跑硬體實驗的意義會被削弱。
 
 4. **QCLI/CCI 診斷工具沒有公開程式碼，是復刻的最大工程風險，而非理論風險。** 目標論文 2603.06440 的核心貢獻——用 correlation-order 頻譜比對（QCLI）與 Chow-Liu tree 殘差（CCI）預先判斷資料集適不適合上 IQP 生成模型——完全沒有找到開源實作。復刻時這兩個指標的具體計算細節（例如 Walsh-Hadamard 頻譜的 binning 方式、Jensen-Shannon divergence 的具體 reference 分布參數）需要從論文文字重建，建議先寫一個小型單元測試（例如對已知的簡單合成分布手算 QCLI/CCI 驗證實作對不對），再套用到真正的 turbulence 資料，避免指標算錯導致後續生成模型比較全部失焦。
 
-5. **對 DeepLense／影像分類這條線的啟示（如果 Leo 之後想把 IQP embedding 用回分類任務）**：Havlíček 型 IQP feature map（1804.11326, PennyLane `IQPEmbedding`）與 Huang et al. 的「power of data」結果（2011.01938）放在一起看，意味著單純把 IQP 當作影像分類的 feature map，若沒有搭配資料集本身在複雜度理論意義上「貼近 IQP 電路自然分布」（也就是 §3.2 提到的 QCLI 概念，但用在分類而非生成場景），很可能被一個參數量相當的古典模型追平——這與 repo memory 中 `feedback_scope_vit_family_only.md` 記錄的「量子方法要跟同量級古典方法比較」原則完全一致，建議在任何未來的 IQP-分類實驗中，比照 QOVT ablation 的作法設計 param-matched 古典基準，而不是只跟 plain baseline 比。
+5. **對 DeepLense／影像分類這條線的啟示（如果 <user> 之後想把 IQP embedding 用回分類任務）**：Havlíček 型 IQP feature map（1804.11326, PennyLane `IQPEmbedding`）與 Huang et al. 的「power of data」結果（2011.01938）放在一起看，意味著單純把 IQP 當作影像分類的 feature map，若沒有搭配資料集本身在複雜度理論意義上「貼近 IQP 電路自然分布」（也就是 §3.2 提到的 QCLI 概念，但用在分類而非生成場景），很可能被一個參數量相當的古典模型追平——這與 repo memory 中 `feedback_scope_vit_family_only.md` 記錄的「量子方法要跟同量級古典方法比較」原則完全一致，建議在任何未來的 IQP-分類實驗中，比照 QOVT ablation 的作法設計 param-matched 古典基準，而不是只跟 plain baseline 比。
 
 ---
 

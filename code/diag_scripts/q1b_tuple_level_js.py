@@ -7,7 +7,7 @@ import common; from common import *
 import codec
 from metrics import pdf_js
 from iqp_exact import IQPExact
-OUT="<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/outputs_d2_main"
+OUT="<REPO_ROOT>/code/outputs_d2_main"
 GT=gt_fields(); P=pools(); A=[int(a) for a in ANCHORS]; H=[int(h) for h in HOLDOUT]
 # data-side reference: dequantized z of the native pool, pooled over the 200 held-out tau
 zdat=np.concatenate([common._ZLUT[P[T2I[t]].astype(np.int64)&63] for t in H[:40]])

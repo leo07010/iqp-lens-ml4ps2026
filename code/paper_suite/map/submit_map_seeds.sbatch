@@ -6,8 +6,8 @@
 #SBATCH -c 8
 #SBATCH --mem=48G
 #SBATCH -t 01:00:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_controlled/mapseed-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_controlled/mapseed-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_controlled/mapseed-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_controlled/mapseed-%j.err
 #
 # ===========================================================================================
 # Table 1 (correlation-complexity map) over 5 seeds.
@@ -27,7 +27,7 @@
 # ===========================================================================================
 set -uo pipefail
 
-REPL=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPL=<REPO_ROOT>/code
 DIR="$REPL/paper_suite/map"
 LOGS="$REPL/logs_controlled"
 cd "$DIR"

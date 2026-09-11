@@ -1,6 +1,6 @@
 # Module interfaces (fixed 2026-09-04 before implementation; all agents code against this)
 
-Directory: <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/
+Directory: <REPO_ROOT>/code/
 Python: /usr/bin/python3 = 3.9.21 (NO `X | None` syntax, no match statements), torch 2.8.0+cu128, numpy 1.26.
 Login node: only unit tests that finish in seconds on CPU. All training/evaluation goes through SLURM
 (account <YOUR_ACCOUNT>, partitions dev = 4 h / 8gpus = 2 d, `module load cuda/13.0`).

@@ -1,7 +1,7 @@
 import os, sys, json
 import numpy as np, torch
 torch.set_num_threads(4)
-REPO="<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication"
+REPO="<REPO_ROOT>/code"
 sys.path.insert(0, REPO)
 import codec
 from metrics import pdf_js, conv_mmd2

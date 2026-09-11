@@ -11,7 +11,7 @@ import os
 import sys
 import time
 
-REPO = "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication"
+REPO = "<REPO_ROOT>/code"
 sys.path.insert(0, REPO)
 
 import numpy as np

@@ -1,6 +1,6 @@
 # 我們的方法與原論文（arXiv:2603.06440）差在哪：資料、影像與協定的逐項說明
 
-**用途**：給 Leo 與合作者的內部說明文件，不是論文。比論文詳細、比論文白話，但技術術語、表格 header、程式檔名一律用英文。
+**用途**：給 <user> 與合作者的內部說明文件，不是論文。比論文詳細、比論文白話，但技術術語、表格 header、程式檔名一律用英文。
 **對照的原論文**：Liu, Placidi, Brunner, Rinaldi（Quantinuum），*Toward Generative Quantum Utility via Correlation–Complexity Map*，arXiv:2603.06440 v2，2026-05-05（`docs/PAPER_2603.06440_SUMMARY.md:7-12`）。以下一律稱「原論文」。
 **我們的投稿**：NeurIPS ML4PS 2026 workshop，稿件在 `paper/ml4ps2026/main.tex`。
 **寫作日期**：2026-09-08。所有數字後面括號註明來源檔，數字不憑印象。
@@ -255,7 +255,7 @@
 | 1 | **exact classical simulation** | 全部用三次 FWHT 精確模擬，沒有 Monte-Carlo、沒有抽樣噪音；n=10 只有 1,024 個振幅。摘要與 Discussion 都明講 | `facts.md §9`；`iqp_exact.py:1-11`；`main.tex:74-75,310-312` |
 | 2 | **single seed** | 所有 lens 與 turbulence 生成實驗都是 seed 0，沒有重複；用 DCGAN 在 scaling 上的 3 倍起伏當「這個尺度的噪音長什麼樣」的示範 | `main.tex:313-314`；`facts.md §9` |
 | 3 | **不主張量子優勢** | 「hardness results 描述的是這個模型族在 scale 上的性質，不是我們的實例」。摘要最後一句就是這句 | `main.tex:74-75,310-312` |
-| 4 | **只比 RBM 與 DCGAN** | 這是 Leo 指定的框架：只跟原論文自己跑過的 baseline 比，不引入原論文沒跑的古典模型 | `docs/IQP_LENS_PAPER_SUITE_RESULTS.md:4`；memory `feedback-paper-baselines-only.md` |
+| 4 | **只比 RBM 與 DCGAN** | 這是 <user> 指定的框架：只跟原論文自己跑過的 baseline 比，不引入原論文沒跑的古典模型 | `docs/IQP_LENS_PAPER_SUITE_RESULTS.md:4`；memory `feedback-paper-baselines-only.md` |
 | 5 | **零學習與 PCA 控制在部分指標上更好** | 這件事**寫進 Discussion**，不藏：「Zero-learning and PCA controls match or exceed the IQP arms on some physical-quantity metrics」 | `main.tex:314-315`；完整數字在 `R3RES:18`（CTRL-ring physics 0.215 對最好的 IQP 0.513） |
 | 6 | **KL 不進正文** | KL 需要完整模擬分布、無法從硬體 shot 估計，所以只放 App. E | `main.tex:427-428` |
 | 7 | **flux-aligned 是 post-hoc** | 主表列出來但明確標註 post-hoc，因為它不在 round 3 的 pre-registration 裡 | `main.tex:154-155`；`docs/IQP_LENS_PAPER_SUITE_RESULTS.md:211` |

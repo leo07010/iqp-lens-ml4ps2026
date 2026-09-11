@@ -6,8 +6,8 @@
 #SBATCH -c 32
 #SBATCH --mem=128G
 #SBATCH -t 03:00:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-seeds-base-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-seeds-base-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_lens/sbatch-seeds-base-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_lens/sbatch-seeds-base-%j.err
 #
 # Seed replicates 1-4 of the two classical baselines, for Table 2 and Figure 5.
 # Companion to seeds/submit_seeds_iqp.sbatch, which covers every IQP arm and Table 3.
@@ -47,7 +47,7 @@
 set -u
 
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPO=<REPO_ROOT>/code
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 OUT_ROOT="$REPO/outputs_seeds"
@@ -186,7 +186,7 @@ echo "[$(ts)] START aggregate_seeds.py"
 tail -40 logs_lens/seeds_aggregate_with_base.log
 
 echo "[$(ts)] START figA_scaling_seeds"
-"$PY" <HOME>/gsoc2026-deeplense-qml/paper/ml4ps2026/figures/make_figures.py \
+"$PY" <REPO_ROOT>/paper/figures_all/make_figures.py \
     figA_scaling_seeds > logs_lens/seeds_figA.log 2>&1 \
     || { echo "[WARN] figA_scaling_seeds failed"; tail -20 logs_lens/seeds_figA.log; fail=1; }
 

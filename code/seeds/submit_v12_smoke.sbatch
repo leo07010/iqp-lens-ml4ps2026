@@ -6,8 +6,8 @@
 #SBATCH -c 8
 #SBATCH --mem=64G
 #SBATCH -t 00:40:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-v12smoke-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-v12smoke-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_lens/sbatch-v12smoke-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_lens/sbatch-v12smoke-%j.err
 #
 # SMOKE for train_iqp_affine_v12.py, before any grid is submitted.
 #
@@ -21,7 +21,7 @@
 # ---------------------------------------------------------------------------------------
 set -u
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPO=<REPO_ROOT>/code
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 SM="$REPO/outputs_v12_smoke"
@@ -55,7 +55,7 @@ echo "[$(ts)] regression run took $(( $(date +%s) - t0 )) s"
 "$PY" - <<'PYEOF'
 import json, os, glob
 import numpy as np
-REPO = "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication"
+REPO = "<REPO_ROOT>/code"
 ref = os.path.join(REPO, "outputs_lens_r3b", "iqp_m4_mmdflat_resample_n11")
 new = os.path.join(REPO, "outputs_v12_smoke", "regress_flat_n11")
 n = len(glob.glob(os.path.join(ref, "generated_*.npy")))
@@ -94,7 +94,7 @@ echo "[$(ts)] 5/5 evaluate_v11 on the three full runs"
     || { echo "[FATAL] evaluate_v11 failed"; tail -40 logs_lens/v12_smoke_eval.log; exit 1; }
 "$PY" - <<'PYEOF'
 import json
-p = "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/outputs_v12_smoke/results_smoke_v12.jsonl"
+p = "<REPO_ROOT>/code/outputs_v12_smoke/results_smoke_v12.jsonl"
 print("%-46s %2s %10s %8s %8s %8s %8s %8s" % ("arm", "N", "PDF-JS", "MMD2", "MMD2_al", "gen_max", "clip%", "genTot"))
 for line in open(p):
     r = json.loads(line)

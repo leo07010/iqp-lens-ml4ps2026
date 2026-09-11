@@ -6,8 +6,8 @@
 #SBATCH -c 8
 #SBATCH --mem=64G
 #SBATCH -t 01:00:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_mlpsuite/phase3-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_mlpsuite/phase3-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_mlpsuite/phase3-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_mlpsuite/phase3-%j.err
 #
 # MLP suite, phase 3: checkpoint selection, the tables and the figures.  No training.
 #
@@ -20,8 +20,8 @@
 #      missing panel is recoverable, a missing table is the deliverable.
 set -u
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
-PAPER=<HOME>/gsoc2026-deeplense-qml/paper/ml4ps2026
+REPO=<REPO_ROOT>/code
+PAPER=<REPO_ROOT>/paper
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 OUT=<WORK>/gsoc_iqp_mlpsuite/phase2

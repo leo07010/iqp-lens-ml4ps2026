@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 sys.path.insert(0,'.')
 import common; from common import *
 
-OUT="<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/outputs_d2_main"
-FIG="<HOME>/gsoc2026-deeplense-qml/docs/figures/iqp_turbulence_replication.png"
+OUT="<REPO_ROOT>/code/outputs_d2_main"
+FIG="<REPO_ROOT>/docs/figures/iqp_turbulence_replication.png"
 GT=gt_fields(); H=[int(h) for h in HOLDOUT]; TAUS=[101,502,947]
-R=[json.loads(l) for l in open("<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/results_d2_main.jsonl")]
+R=[json.loads(l) for l in open("<REPO_ROOT>/code/results_d2_main.jsonl")]
 bydir={os.path.basename(r["run_dir"].rstrip("/")):r for r in R}
 def cond(d,tau): return np.load(os.path.join(OUT,d,"generated_t%d.npy"%tau))
 def uncond(d,i):

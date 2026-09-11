@@ -1,6 +1,6 @@
 # 我們的方法與原論文（arXiv:2603.06440）差在哪：資料、影像與協定的逐項說明（v11）
 
-**用途**：給 Leo 與合作者的內部說明文件，不是論文。比論文詳細、比論文白話，但技術術語、表格 header、程式檔名一律用英文。
+**用途**：給 <user> 與合作者的內部說明文件，不是論文。比論文詳細、比論文白話，但技術術語、表格 header、程式檔名一律用英文。
 **對照的原論文**：Liu, Placidi, Brunner, Rinaldi（Quantinuum），*Toward Generative Quantum Utility via Correlation–Complexity Map*，arXiv:2603.06440 v2，2026-05-05（`docs/PAPER_2603.06440_SUMMARY.md:7-12`）。以下一律稱「原論文」。
 **我們的投稿**：NeurIPS ML4PS 2026 workshop，稿件在 `paper/ml4ps2026/v11/main.tex`。
 **版本**：v11，2026-09-09。相對 v10（`docs/IQP_LENS_METHOD_DIFFERENCES_ZH.md`，2026-09-08）的差異列在文末第 11 節。
@@ -407,7 +407,7 @@ projection corr 是普通的影像相關係數，不受 v11 指標協定影響�
 | 1 | **exact classical simulation** | 全部用三次 FWHT 精確模擬，沒有 Monte-Carlo、沒有抽樣噪音；n=10 只有 1,024 個振幅。摘要與 Discussion 都明講 | `v11/facts.md §9`；`iqp_exact.py:1-11` |
 | 2 | **seed 數** **[v11 修正]** | v10 是 single seed。**v11 全部生成實驗改成 5 seeds 的 mean ± sd（ddof=1）**，且每一個「贏」都附一句「1 sd 內誰與它重疊」。不再需要拿 DCGAN 的起伏當噪音示範 | `seed_tables.md` 開頭與各 wins 表 |
 | 3 | **不主張量子優勢** | 「hardness results 描述的是這個模型族在 scale 上的性質，不是我們的實例」 | `v11/main.tex:74-75,310-312` |
-| 4 | **只比 RBM 與 DCGAN** **[v11 措辭統一]** | **本文不與原論文未使用的古典模型比較。** 這是 Leo 指定的框架，v11 把文件裡所有涉及自訂控制組的段落收斂成這一句 | memory `feedback-paper-baselines-only.md` |
+| 4 | **只比 RBM 與 DCGAN** **[v11 措辭統一]** | **本文不與原論文未使用的古典模型比較。** 這是 <user> 指定的框架，v11 把文件裡所有涉及自訂控制組的段落收斂成這一句 | memory `feedback-paper-baselines-only.md` |
 | 5 | **DCGAN 不可重現** **[v11 新增]** | cuDNN 沒有 deterministic transposed-convolution kernel：同 config 同 seed 重跑，raw MMD² 差最大 57.0%、PDF–JS 最大 74.1%，與 DCGAN 對 IQP 的差距同一量級。RBM 與所有 IQP config 重跑 bit-identical | `seed_tables.md`「Repeat runs of an identical configuration」與「Protocol notes」 |
 | 6 | **Baseline 曾經被欠訓練** **[v11 新增]** | v10 的固定 20k 步讓 RBM 的 reconstruction MSE 還在降（N=100：0.0662 對 160k 的 0.0041）。v11 改成 validation early stopping，這只可能對 baseline 有利；IQP 仍固定 4,000 步，且被證明給它同樣的規則也不會動超過 1 sd | `v11/facts.md`「baseline convergence sweep」；`seed_tables.md`「Does early stopping change the IQP numbers by more than 1 sd?」 |
 | 7 | **projection corr 的選擇偏差** **[v11 新增]** | 論文報的是「八個 restart 取與 held-out 影像相關最高的那個」，也就是拿被報的指標本身去選。v11 附上「以 loss 選」欄（模型自己做得到的選法），兩者差距 ≤ 0.005；單獨用零初始化 restart 在 N=100 是 0.9684 ± 0.0004 | `seed_tables.md`「Held-out projection correlation, by restart」 |

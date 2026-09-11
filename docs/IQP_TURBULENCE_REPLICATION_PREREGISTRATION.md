@@ -149,7 +149,7 @@ pre-registered decision stands as the confirmatory result. Prediction: IQP PDF-J
 (aggregation noise is a large part of 0.24), but CTRL-interp still wins both metrics and the ordering against RBM
 and DCGAN is unlikely to flip to the paper's.
 
-### 2026-09-06 — post-hoc, exploratory: baseline alignment to the paper's literal wording (requested by Leo)
+### 2026-09-06 — post-hoc, exploratory: baseline alignment to the paper's literal wording (requested by <user>)
 
 The paper specifies its baselines only at the architecture level (RBM: same 11 anchors, same 18-bit tuples, latent =
 "first 50 entries of a fixed flattened parameter ordering (weights and biases)", rest fixed; DCGAN: Radford et al.,
@@ -161,7 +161,7 @@ chosen by us with standard defaults, and our baselines are far stronger than the
 - RBM-literal: latent block = first 50 entries of [W.flatten(), b_v, b_h] (= the 50 weights of visible unit 0), the
   most literal reading of the paper's sentence; two training recipes (our PCD-1 + Adam, and CD-1 + SGD
   lr 0.05 batch 64, 30 epochs-equivalent), each with and without the literal latent block. Single seed (seed 0) at
-  Leo's request on 2026-09-06; seeds can be added later.
+  <user>'s request on 2026-09-06; seeds can be added later.
 - DCGAN training-budget sweep at 11 snapshots: generator steps ∈ {300, 1000, 3000, 20000} × 3 tiers, single seed
   (seed 0), last checkpoint, everything else unchanged.
 Purpose: locate which (if any) of these settings reproduces the paper's baseline numbers. Prediction: the paper's

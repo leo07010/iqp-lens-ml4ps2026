@@ -349,7 +349,7 @@ Purity and disjointness are asserted at run time (`test_class.py`) and re-assert
 dataset in the job log (`logs_lens/sbatch-class-358382.out`): all three classes report
 `pure(train,val)=(True,True) disjoint=True`.
 
-**Provenance of the pixels.** SLURM job **358382**, partition `dev`, node `25a-hgpn024`,
+**Provenance of the pixels.** SLURM job **358382**, partition `dev`, node `<node>`,
 account <YOUR_ACCOUNT>, `/usr/bin/python3`.  Scripts: `data_lens_class.py`,
 `train_iqp_affine_class.py`, `evaluate_class.py`, `test_class.py`, `submit_lens_class.sbatch`
 (all in `EXP/`).  Metrics in `EXP/results_class.jsonl`.

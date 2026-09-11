@@ -6,8 +6,8 @@
 #SBATCH -c 32
 #SBATCH --mem=128G
 #SBATCH -t 03:00:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-v12follow-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_lens/sbatch-v12follow-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_lens/sbatch-v12follow-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_lens/sbatch-v12follow-%j.err
 #
 # Follow-up to seeds/submit_v12_grid.sbatch:
 #   (a) the data-scaling cells, N = 5 and N = 100, for the TOP_K arms of the N = 11 grid;
@@ -23,7 +23,7 @@
 # ---------------------------------------------------------------------------------------
 set -u
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPO=<REPO_ROOT>/code
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 OUT_ROOT="$REPO/outputs_v12"
@@ -42,7 +42,7 @@ echo "[$(ts)] START submit_v12_followup.sbatch job=${SLURM_JOB_ID:-none} node=$(
 # N = 11 grid (>= 200 of the 220 rows).
 N_ROWS=$("$PY" - <<'PYEOF2'
 import json, os
-p = "<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/results_seeds_v12.jsonl"
+p = "<REPO_ROOT>/code/results_seeds_v12.jsonl"
 n = 0
 if os.path.isfile(p):
     for line in open(p):

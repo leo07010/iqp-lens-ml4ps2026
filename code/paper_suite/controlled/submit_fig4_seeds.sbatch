@@ -6,8 +6,8 @@
 #SBATCH -c 8
 #SBATCH --mem=64G
 #SBATCH -t 00:40:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_controlled/f4seed-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_controlled/f4seed-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_controlled/f4seed-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_controlled/f4seed-%j.err
 #
 # ===========================================================================================
 # App. D (reference paper Fig. 4), seeds 3 and 4.
@@ -26,7 +26,7 @@
 # ===========================================================================================
 set -uo pipefail
 
-REPL=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPL=<REPO_ROOT>/code
 DIR="$REPL/paper_suite/controlled"
 OUT="$REPL/outputs_controlled"
 LOGS="$REPL/logs_controlled"

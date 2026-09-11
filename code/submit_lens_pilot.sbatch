@@ -11,7 +11,7 @@
 #
 # IQP generative pilot on DeepLense Model II (dark-matter substructure images).
 # Pre-registration: docs/IQP_LENS_PILOT_PREREGISTRATION.md (written 2026-09-06, before
-# any run). Single seed (seed 0) throughout, at Leo's request.
+# any run). Single seed (seed 0) throughout, at <user>'s request.
 #
 # ---------------------------------------------------------------------------- job list
 # Per class (axion, cdm, no_sub) x per regime N in {11, 100}:

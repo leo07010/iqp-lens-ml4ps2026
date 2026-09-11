@@ -1,6 +1,6 @@
 import os, sys, time, json
 import numpy as np
-REPO="<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication"
+REPO="<REPO_ROOT>/code"
 sys.path.insert(0, REPO)
 import codec, data_d2
 D=os.path.dirname(os.path.abspath(__file__))

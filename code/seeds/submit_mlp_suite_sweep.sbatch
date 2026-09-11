@@ -6,8 +6,8 @@
 #SBATCH -c 32
 #SBATCH --mem=128G
 #SBATCH -t 01:30:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_mlpsuite/sweep-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_mlpsuite/sweep-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_mlpsuite/sweep-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_mlpsuite/sweep-%j.err
 #
 # MLP suite, phase 1: the latent-width (M) and hidden-width (H) sweeps for the non-linear
 # arm  theta_i = theta0 + g(z_i),  g a tanh MLP  (train_iqp_affine_mlp.py).
@@ -25,7 +25,7 @@
 # check tests exactly that.
 set -u
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
+REPO=<REPO_ROOT>/code
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 OUT_ROOT=<WORK>/gsoc_iqp_mlpsuite/sweep

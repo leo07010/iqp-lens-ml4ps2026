@@ -1,6 +1,6 @@
 # 我們的方法與原論文（arXiv:2603.06440）差在哪：資料、影像與協定的逐項說明（v12）
 
-**用途**：給 Leo 與合作者的內部說明文件，不是論文。比論文詳細、比論文白話，但技術術語、表格 header、程式檔名一律用英文。
+**用途**：給 <user> 與合作者的內部說明文件，不是論文。比論文詳細、比論文白話，但技術術語、表格 header、程式檔名一律用英文。
 **對照的原論文**：Liu, Placidi, Brunner, Rinaldi（Quantinuum），*Toward Generative Quantum Utility via Correlation–Complexity Map*，arXiv:2603.06440 v2，2026-05-05（`docs/PAPER_2603.06440_SUMMARY.md:7-12`）。以下一律稱「原論文」。
 **我們的投稿**：NeurIPS ML4PS 2026 workshop，稿件在 `paper/ml4ps2026/v12/main.tex`（7 頁版）。
 **版本**：v12，2026-09-09。相對 v11（`docs/IQP_LENS_METHOD_DIFFERENCES_ZH_v11.md`，2026-09-09）的差異列在文末第 11 節。
@@ -449,7 +449,7 @@ per-class（`seed_tables_g.md` §4，通量抽樣，各自對照自己的 200-vs
 | 4 | **N=100 時 DCGAN 領先** | 直說：PDF-JS 與 raw MMD² 兩欄 DCGAN 領先且連 1 sd 都推不翻，flux-aligned 那欄 MLP mean 最佳但與 DCGAN 重疊。摘要與 Discussion 都寫了「the standing does not survive to 100 images」 | `seed_tables_g.md` §1；`v12/main.tex` §4 |
 | 5 | **exact classical simulation** | 全部用三次 FWHT 精確模擬，沒有 Monte-Carlo、沒有抽樣噪音；n=10 只有 1,024 個振幅。摘要與 Discussion 都明講 | `iqp_exact.py:1-11` |
 | 6 | **不主張量子優勢** | 「hardness results 描述的是這個模型族在 scale 上的性質，不是我們的實例」 | `v12/main.tex` §4 |
-| 7 | **只比 RBM 與 DCGAN** | **本文不與原論文未使用的古典模型比較。** 這是 Leo 指定的框架。§6.5 的 softmax 對照是內部 sanity check，不進論文 | memory `feedback-paper-baselines-only.md` |
+| 7 | **只比 RBM 與 DCGAN** | **本文不與原論文未使用的古典模型比較。** 這是 <user> 指定的框架。§6.5 的 softmax 對照是內部 sanity check，不進論文 | memory `feedback-paper-baselines-only.md` |
 | 8 | **DCGAN 不可重現** | cuDNN 沒有 deterministic transposed-convolution kernel：同 config 同 seed 重跑，raw MMD² 差最大 57.0%，與 DCGAN 對 IQP 的差距同一量級。RBM 與所有 IQP／MLP config 重跑 bit-identical | `seed_tables.md`「Repeat runs of an identical configuration」 |
 | 9 | **Baseline 有 early stopping、IQP 沒有** | RBM 160k/80k、DCGAN 5k–30k 由 validation 選出；IQP／MLP 固定 4,000 步。這只可能對 baseline 有利。而且我們也做了對稱檢查：MLP arm 在 16k 步 + validation-selected checkpoint 下沒有一格移動超過 1 sd（§7.1 末） | `seed_tables_g.md` §1e |
 | 10 | **projection corr 的選擇偏差** | 論文報的是「八個 restart 取與 held-out 影像相關最高的那個」。附上「以 loss 選」欄（模型自己做得到的選法），兩者差 0.0003；單獨零初始化 restart 是 0.8381 / 0.8871 | `seed_tables_g.md` §5b |

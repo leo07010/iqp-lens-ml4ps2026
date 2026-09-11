@@ -6,8 +6,8 @@
 #SBATCH -c 32
 #SBATCH --mem=128G
 #SBATCH -t 01:30:00
-#SBATCH -o <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_gridmlp/ctrl-%j.out
-#SBATCH -e <HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication/logs_gridmlp/ctrl-%j.err
+#SBATCH -o <REPO_ROOT>/code/logs_gridmlp/ctrl-%j.out
+#SBATCH -e <REPO_ROOT>/code/logs_gridmlp/ctrl-%j.err
 #
 # INTERNAL CONTROL (not for the paper): the same latent model with the IQP circuit deleted.
 #
@@ -21,8 +21,8 @@
 # IQP arm's 5,120, so it is parameter-matched as well as architecture-matched.
 set -u
 ts() { date "+%F %T"; }
-REPO=<HOME>/gsoc2026-deeplense-qml/experiments/13_iqp_turbulence_replication
-PAPER=<HOME>/gsoc2026-deeplense-qml/paper/ml4ps2026
+REPO=<REPO_ROOT>/code
+PAPER=<REPO_ROOT>/paper
 cd "$REPO" || exit 1
 PY=/usr/bin/python3
 OUT_ROOT=<WORK>/gsoc_iqp_gridmlp/ctrl        # heavy .npy output stays off /home
