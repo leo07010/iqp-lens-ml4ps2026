@@ -5,6 +5,21 @@ Stephon Alexander, Sergei Gleyzer, Evan McDonough, Michael~W. Toomey, and Emanue
 \newblock Deep learning the morphology of dark matter substructure.
 \newblock {\em The Astrophysical Journal}, 893(1):15, 2020.
 
+\bibitem{alexander_2021_decoding}
+Stephon Alexander, Sergei Gleyzer, Hanna Parul, Pranath Reddy, Michael~W. Toomey, Emanuele Usai, and Ryker Von~Klar.
+\newblock Decoding dark matter substructure without supervision, 2020.
+\newblock arXiv:2008.12731.
+
+\bibitem{benedetti_2019_generative}
+Marcello Benedetti, Delfina Garcia-Pintos, Oscar Perdomo, Vicente Leyton-Ortega, Yunseong Nam, and Alejandro Perdomo-Ortiz.
+\newblock A generative modeling approach for benchmarking and training shallow quantum circuits.
+\newblock {\em npj Quantum Information}, 5(1):45, 2019.
+
+\bibitem{binkowski_2018_demystifying}
+Miko{\l}aj Bi{\'n}kowski, Danica~J. Sutherland, Michael Arbel, and Arthur Gretton.
+\newblock Demystifying {MMD} {GAN}s.
+\newblock In {\em International Conference on Learning Representations (ICLR)}, 2018.
+
 \bibitem{bremner_2011_classical}
 Michael~J. Bremner, Richard Jozsa, and Dan~J. Shepherd.
 \newblock Classical simulation of commuting quantum computations implies collapse of the polynomial hierarchy.
@@ -15,34 +30,80 @@ Michael~J. Bremner, Ashley Montanaro, and Dan~J. Shepherd.
 \newblock Average-case complexity versus approximate simulation of commuting quantum computations.
 \newblock {\em Physical Review Letters}, 117:080501, 2016.
 
+\bibitem{cerezo_2025_does}
+M.~Cerezo, Martin Larocca, Diego Garc{\'\i}a-Mart{\'\i}n, N.~L. Diaz, Paolo Braccia, Enrico Fontana, Manuel~S. Rudolph, Pablo Bermejo, Aroosa Ijaz, Supanut Thanasilp, Eric~R. Anschuetz, and Zo{\"e} Holmes.
+\newblock Does provable absence of barren plateaus imply classical simulability?
+\newblock {\em Nature Communications}, 16(1):7907, 2025.
+
 \bibitem{chow_1968_approximating}
 C.~K. Chow and C.~N. Liu.
 \newblock Approximating discrete probability distributions with dependence trees.
 \newblock {\em IEEE Transactions on Information Theory}, 14(3):462--467, 1968.
+
+\bibitem{coyle_2020_born}
+Brian Coyle, Daniel Mills, Vincent Danos, and Elham Kashefi.
+\newblock The {Born} supremacy: quantum advantage and training of an {Ising} {Born} machine.
+\newblock {\em npj Quantum Information}, 6(1):60, 2020.
+
+\bibitem{gili_2024_generalization}
+Kaitlin Gili, Marta Mauri, and Alejandro Perdomo-Ortiz.
+\newblock Generalization metrics for practical quantum advantage in generative models.
+\newblock {\em Physical Review Applied}, 21(4):044032, 2024.
 
 \bibitem{gretton_2012_kernel}
 Arthur Gretton, Karsten~M. Borgwardt, Malte~J. Rasch, Bernhard Sch{\"o}lkopf, and Alexander Smola.
 \newblock A kernel two-sample test.
 \newblock {\em Journal of Machine Learning Research}, 13(25):723--773, 2012.
 
+\bibitem{hinton_2002_training}
+Geoffrey~E. Hinton.
+\newblock Training products of experts by minimizing contrastive divergence.
+\newblock {\em Neural Computation}, 14(8):1771--1800, 2002.
+
 \bibitem{khojasteh_2022_lagrangian}
-Ali~R. Khojasteh, Sylvain Laizet, Dominique Heitz, and Yin Yang.
+Ali~Rahimi Khojasteh, Sylvain Laizet, Dominique Heitz, and Yin Yang.
 \newblock Lagrangian and {Eulerian} dataset of the wake downstream of a smooth cylinder at a {Reynolds} number equal to 3900.
 \newblock {\em Data in Brief}, 40:107725, 2022.
+
+\bibitem{liu_2026_physics}
+Chen-Yu Liu, Leonardo Placidi, Marco Ballarin, and Enrico Rinaldi.
+\newblock Generative {IQP} circuit learning with physics-informed latent initialization, 2026.
+\newblock arXiv:2607.28866.
 
 \bibitem{liu_2026_correlation}
 Chen-Yu Liu, Leonardo Placidi, Eric Brunner, and Enrico Rinaldi.
 \newblock Toward generative quantum utility via correlation--complexity map, 2026.
-\newblock arXiv:2603.06440.
+\newblock arXiv:2603.06440v2 (v2, 5 May 2026); all section, equation, proposition and algorithm numbers refer to v2.
+
+\bibitem{liu_2018_differentiable}
+Jin-Guo Liu and Lei Wang.
+\newblock Differentiable learning of quantum circuit {Born} machines.
+\newblock {\em Physical Review A}, 98(6):062324, 2018.
+
+\bibitem{lizziobosco_2026_pauli}
+Daniele {Lizzio Bosco}, Gabriel Matos, Chen-Yu Liu, Frederic Rapp, Fabian Finger, Enrico Rinaldi, and Konstantinos Meichanetzidis.
+\newblock Efficiently simulable {Pauli} correlation encoding, 2026.
+\newblock arXiv:2607.20409.
 
 \bibitem{maslov_2024_fast}
 Dmitri Maslov, Sergey Bravyi, Felix Tripier, Andrii Maksymov, and Joe Latone.
 \newblock Fast classical simulation of {Harvard}/{QuEra} {IQP} circuits, 2024.
+\newblock arXiv:2402.03211.
 
 \bibitem{ml4sci_deeplense}
 {ML4SCI Collaboration}.
 \newblock {DeepLense}: Deep learning for strong gravitational lensing.
 \newblock \url{https://github.com/ML4SCI/DeepLense}, 2025.
+
+\bibitem{mustafa_2019_cosmogan}
+Mustafa Mustafa, Deborah Bard, Wahid Bhimji, Zarija Luki{\'c}, Rami Al-Rfou, and Jan~M. Kratochvil.
+\newblock {CosmoGAN}: creating high-fidelity weak lensing convergence maps using generative adversarial networks.
+\newblock {\em Computational Astrophysics and Cosmology}, 6(1):1, 2019.
+
+\bibitem{placidi_2026_connectivity}
+Leonardo Placidi, Enrico Rinaldi, Keisuke Fujii, and Chen-Yu Liu.
+\newblock The impact of qubit connectivity on quantum advantage in noisy {IQP} circuits, 2026.
+\newblock arXiv:2604.12635. Accepted at IEEE QCE 2026.
 
 \bibitem{radford_2015_unsupervised}
 Alec Radford, Luke Metz, and Soumith Chintala.
@@ -53,7 +114,6 @@ Alec Radford, Luke Metz, and Soumith Chintala.
 Joel Rajakumar, James~D. Watson, and Yi-Kai Liu.
 \newblock Polynomial-time classical simulation of noisy {IQP} circuits with constant depth.
 \newblock In {\em Proceedings of the 2025 Annual ACM-SIAM Symposium on Discrete Algorithms (SODA)}, pages 1037--1056, 2025.
-\newblock arXiv:2403.14607.
 
 \bibitem{recio_2025_train}
 Erik Recio-Armengol, Shahnawaz Ahmed, and Joseph Bowles.
@@ -74,6 +134,11 @@ Elad Schneidman, Susanne Still, Michael~J. Berry, and William Bialek.
 Bernard~W. Silverman.
 \newblock {\em Density Estimation for Statistics and Data Analysis}.
 \newblock Chapman and Hall, London, 1986.
+
+\bibitem{smolensky_1986_information}
+Paul Smolensky.
+\newblock Information processing in dynamical systems: foundations of harmony theory.
+\newblock In David~E. Rumelhart and James~L. McClelland, editors, {\em Parallel Distributed Processing: Explorations in the Microstructure of Cognition, Volume 1: Foundations}, pages 194--281. MIT Press, Cambridge, MA, 1986.
 
 \bibitem{tieleman_2008_training}
 Tijmen Tieleman.

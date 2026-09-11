@@ -53,8 +53,8 @@ classically~\cite{bremner_2011_classical,bremner_2016_average}, while the expect
 maximum-mean-discrepancy (MMD) loss needs stay computable, so such a Born machine can be trained
 classically and deployed on quantum hardware~\cite{recio_2025_train}. A recent
 correlation--complexity map is proposed to indicate which data suit them, and DeepLense
-strong-lensing images sit at the most IQP-compatible position among the encodings we measured,
-turbulence included. The reference protocol's frozen core with sequential
+strong-lensing images sit at the most IQP-compatible position among the encodings we measured. The
+reference protocol's frozen core with sequential
 adaptation yields only noise, which joint training repairs, and a learned linear map then loses
 coherence past $M{=}6$, so we let a small non-linear map carry the latent. At eleven training images
 the resulting 10-qubit machine matches a DCGAN of six times as many parameters on both generation
@@ -73,10 +73,13 @@ Walsh--Hadamard~\cite{walsh_1923_closed} transform of a phase function. Exact or
 approximate classical sampling from them would collapse the polynomial
 hierarchy~\cite{bremner_2011_classical}, and that hardness is conjectured to hold on average under
 additive error~\cite{bremner_2016_average}, a bounded motivation, since noise makes such circuits
-simulable in polynomial time~\cite{rajakumar_2024_polynomial} and classical algorithms keep
-improving~\cite{maslov_2024_fast}. The same structure keeps an MMD loss's expectation values
-computable, so such a model can be \emph{trained classically and deployed on quantum
-hardware}~\cite{recio_2025_train,recio_2025_iqpopt}.
+simulable in polynomial time~\cite{rajakumar_2024_polynomial}, classical algorithms keep
+improving~\cite{maslov_2024_fast} and trainability itself pulls towards
+simulability~\cite{cerezo_2025_does}. The same structure keeps an MMD loss's expectation values
+computable~\cite{recio_2025_iqpopt}, as it does for other encodings built to stay
+simulable~\cite{lizziobosco_2026_pauli}, so such a model can be \emph{trained
+classically and deployed on quantum hardware}~\cite{recio_2025_train}, in the line of Born machines
+trained by an MMD loss~\cite{liu_2018_differentiable,benedetti_2019_generative,coyle_2020_born}.
 
 Whether real data sit where that is useful is empirical, and a recent
 proposal~\cite{liu_2026_correlation} approaches it with two ingredients. (i) A
@@ -85,12 +88,14 @@ between its Walsh order spectrum, the Fourier power at each Hamming weight, and 
 baseline, and $\cci \in [0,1]$, the share of its correlation the best pairwise tree
 misses~\cite{watanabe_1960_information,schneidman_2003_network,chow_1968_approximating}, the
 high-$\qcli$, high-$\cci$ corner being where IQP circuits should do well. (ii) A latent-adaptation
-protocol (Algorithm~1 of that paper, a phase core trained on one anchor plus the first $50$ Walsh
+protocol (Algorithm~1 of that paper's v2, a phase core trained on one anchor plus the first $50$
 phases in Hamming order, randomly initialised and adapted sample by sample), demonstrated at $n=18$
-qubits on 2D turbulence~\cite{khojasteh_2022_lagrangian}, one of several datasets the map covers.
+qubits on 2D turbulence~\cite{khojasteh_2022_lagrangian}, one of several datasets the map covers. A follow-up
+initialises that same fixed block from a physics-informed surrogate~\cite{liu_2026_physics}, where we
+instead learn the directions.
 
 We take both to simulated dark-matter strong-lensing images from
-DeepLense~\cite{alexander_2020_deep} and contribute three things. We
+DeepLense~\cite{alexander_2020_deep,alexander_2021_decoding} and contribute three things. We
 recompute the map on lens crops, which land at the most IQP-compatible position we measured, and
 show with a permutation null that there the index is largely determined by the intensity histogram,
 so a favourable position is not by itself evidence of IQP-suitable structure. We trace why the
@@ -98,9 +103,9 @@ reference latent protocol produces noise on static images and replace its latent
 one. We then compare against an RBM and a DCGAN under two intensity conventions, and report a
 replication on the turbulence data in App.~\ref{app:turb}.
 
-\begin{figure}[t]
+\begin{figure}[tb]
 \centering
-\figboxw{figures/fig1_compact}{1.95in}{0.82}
+\figbox{figures/fig1_compact}{1.95in}
 \caption{\textbf{(a)} Correlation--complexity map, datasets filled, i.i.d.-uniform nulls open,
 permutation nulls as crosses (ours); lens 18b and 18b pool are the per-image and pooled 18-bit encodings, lens
 10b the crop pmf, turb.\ D2 the reference turbulence data. \textbf{(b)} First three unconditional
@@ -126,11 +131,11 @@ first as a linear map of $M$ directions,
 \end{equation}
 with each row of $\Phi$ normalised in $L^2$. That map degrades by $M{=}6$ on these crops, we suspect
 once the $\|z\|$ the images demand leaves the radius over which the Walsh phases interfere
-coherently, though we do not isolate the cause, so our main arm replaces $\Phi^{\!\top} z$ by a
+coherently, though we do not isolate the cause; our main arm replaces $\Phi^{\!\top} z$ by a
 one-hidden-layer $\tanh$ map $g$ of width $H{=}32$, the $z_i$ trained jointly with $g$ under a small
 $L^2$ penalty. The main objective is the flat MMD (uniform Walsh weights, estimable from hardware
-shots), with the paper kernel (the multi-bandwidth Gaussian kernel of
-IQPopt~\cite{recio_2025_iqpopt}) kept as a secondary arm, and $\theta^{0}$ is warm-started by
+shots), with the three-bandwidth Gaussian kernel of~\cite{recio_2025_train}, the \emph{paper
+kernel} of the tables, kept as a secondary arm, and $\theta^{0}$ is warm-started by
 $1{,}000$ exact-KL steps, which a flat-MMD warm start replaces at no cost (App.~\ref{app:arms}).
 
 \paragraph{Decoding, baselines and metrics.}
@@ -140,16 +145,17 @@ convention gives every frame the training-set mean $S$, leaving the generated fl
 where real crops spread by about a quarter of their mean, so we draw $S$ per image from a kernel
 density estimate of the $N$ training totals, with no retraining;
 App.~\ref{app:fixedS} repeats everything under the fixed $S$. The baselines are a restricted Boltzmann machine
-(RBM)~\cite{tieleman_2008_training} and a deep convolutional generative
+(RBM)~\cite{smolensky_1986_information,hinton_2002_training,tieleman_2008_training} and a deep convolutional generative
 adversarial network (DCGAN)~\cite{radford_2015_unsupervised}, both early-stopped on $200$ validation
 images while the IQP arms run a fixed $4{,}000$ steps, which can only favour them. We score with the
 Jensen--Shannon divergence between intensity histograms (PDF--JS) and Conv2D-MMD$^2$ in a fixed
-random encoder's feature space~\cite{gretton_2012_kernel}, add a post-hoc flux-aligned
+random encoder's feature space~\cite{gretton_2012_kernel,binkowski_2018_demystifying}, add a
+post-hoc flux-aligned
 Conv2D-MMD$^2$ rescaling every frame to the held-out mean total since the arms do not agree on how
 flux is set, and report a held-out projection correlation, the best of eight latent restarts by the
 fit's own loss. Bins, scale and bandwidth are set on the held-out data alone, so no metric moves with the arm scored, and every arm generates $200$ images against the
 same $200$ held-out frames at $N \in \{11,100\}$, every number a mean $\pm$ sample sd over five seeds
-beside a real-vs-real floor, the same metric between two disjoint real sets. The $N$
+beside a real-vs-real floor between two disjoint real sets. The $N$
 training images are fixed across seeds, so that spread is initialisation and sampling variance alone.
 A lead in sd means the difference of two means in units of the baseline's seed sd, descriptive and
 not a significance test.
@@ -178,7 +184,7 @@ largely tracks the histogram. Both indices depend on $K$, the codes per image, s
 against its own-$K$ null; at the protocol's own $N_t = 5\times10^{4}$ samples per
 snapshot~\cite{liu_2026_correlation} the turbulence $\qcli$ falls to $0.091$ against a null of
 $0.098$. The 10-bit crop pmf, the encoding we model, is the one that separates from its null in both
-coordinates, but it sits at $\cci = 0.43$, outside the high-$\cci$ corner, so its favourable $\qcli$
+coordinates, but sits at $\cci = 0.43$, outside the high-$\cci$ corner, so its favourable $\qcli$
 motivates the encoding, not the choice of an IQP over a pairwise model.
 
 \begin{table}[b]
@@ -217,10 +223,10 @@ own. On a $20$-image sweep the learned linear map holds a held-out projection co
 $0.906 \pm 0.002$ at $M{=}2$, falls to $0.738 \pm 0.067$ at $M{=}6$ and collapses to
 $0.218 \pm 0.121$ at $M{=}8$. The non-linear map removes that collapse, holding $0.9368$ to
 $0.9519$ across the sweep, a little above that split's nearest-training-image reference of $0.9339$;
-the two sweeps come from separate drivers differing in optimiser schedule and initialisation, both
+the two sweeps come from separate drivers differing in optimiser schedule
+and initialisation, both
 scored on the same $20$ held-out frames, so a small offset between them is not a model difference. It does not
-buy a large useful width, being flat to $M{=}4$ on the generation metrics and degrading from
-$M{=}8$. We report it at $M{=}2$, where the held-out projection correlation is $0.901$ at $N{=}11$
+buy a large useful width, being flat to $M{=}4$ and degrading from $M{=}8$. We report it at $M{=}2$, where the held-out projection correlation is $0.901$ at $N{=}11$
 and $0.977$ at $N{=}100$, against $0.892$ and $0.970$ for projecting the nearest training image and
 $0.838$ and $0.887$ for a single zero-initialised restart.
 
@@ -272,23 +278,14 @@ convention, the largest paired difference being $6\times10^{-9}$ over the $325$ 
 That is invariance, not independence from the raw column, so the two MMD$^2$ columns measure shape,
 and shape plus flux, not two separate things. The sampling rule is also not
 neutral between arms, improving every IQP arm's raw Conv2D-MMD$^2$ by $22$ to $39\%$ at $N{=}11$
-while making the RBM's $20\%$ worse, and under the fixed intensity the RBM is in fact ahead of the
-non-linear arm there ($6.5 \pm 0.8$ against $8.5 \pm 0.2$, Table~\ref{tab:fixed}), so the raw-column
+while making the RBM's $20\%$ worse, and under the fixed intensity the RBM leads the non-linear arm
+there ($6.5 \pm 0.8$ against $8.5 \pm 0.2$, App.~\ref{app:fixedS}), so the raw-column
 standing against the RBM is a property of the sampled decode and not of the model. Sampling fixes the
 shape of the generated flux distribution and not its location, the eleven training frames being $9\%$
 dimmer than the held-out set, which is why the raw column stops there.
 
-\paragraph{Data scaling and per-class training.}
-\label{sec:scaling}
-Across $N \in \{10,\dots,100\}$ (App.~\ref{app:sweeps}) the non-linear arm's raw Conv2D-MMD$^2$
-falls from $0.062 \pm 0.016$ to $0.024 \pm 0.005$ and the RBM's from $0.091 \pm 0.017$ to
-$0.051 \pm 0.008$, the DCGAN starting ahead at $N{=}10$ ($0.046 \pm 0.017$) and ending level; on the
-flux-aligned column the non-linear arm holds the lowest mean at every $N$, though only at $N{=}10$
-and $N{=}70$ by more than a seed sd. Retrained inside one class at $N{=}100$ it reaches flux-aligned
-$0.017$, $0.015$ and $0.021$ for axion, cdm and no-sub against floors of $0.0031$, $0.0032$ and
-$0.0045$, so each class can be generated on its own, not that the model separates them.
-
-
+Data scaling over $N \in \{10,\dots,100\}$ and per-class retraining are reported in
+App.~\ref{app:sweeps}.
 
 \section{Discussion and limitations}
 \label{sec:disc}
@@ -296,13 +293,14 @@ $0.0045$, so each class can be generated on its own, not that the model separate
 At eleven training images a $10$-qubit IQP Born machine with a learned non-linear latent map is
 competitive with an RBM and a DCGAN, matching the DCGAN on both generation metrics within the seed
 spread at a sixth of its parameters and holding the lowest flux-aligned mean; that standing does not
-survive to $100$ images. Nothing here is evidence of quantum advantage, since every
-circuit is simulated exactly at $n=10$ qubits. Generated frames sit farther in $L_2$ from their
+survive to $100$ images. Nothing here is evidence of quantum advantage, since every circuit is
+simulated exactly at $n=10$ qubits, and any deployed margin is bounded by connectivity and
+noise~\cite{placidi_2026_connectivity}. Generated frames sit farther in $L_2$ from their
 nearest training image than real held-out frames do ($4.21 \pm 0.10$ against $2.90$ at $N{=}11$), so
 the arm is not memorising. Two steps are not shot-estimable as run, the exact-KL
 warm start, replaced in App.~\ref{app:arms} within one seed sd, and the projection, which
 optimises $z$ against the exact pmf; and at $n=10$ we parameterise all $2^{n}$ Walsh phases where the
-hard regime would need them sparsified~\cite{liu_2026_correlation}, untested here. Only the model fit
+scaling up would need them sparsified~\cite{liu_2026_correlation}, untested here. Only the model fit
 sees $N$ images, while bandwidths, floors and the baselines' early stopping use hundreds to thousands
 of real frames, so this is a small-training-set study, not a small-data pipeline; alignment and the
 crop leave translation and the outer $0.6\%$ of the light outside the task, floor included. Five
@@ -315,142 +313,212 @@ metrics do not test substructure, and no destroyed image is scored as an upper r
 
 \appendix
 
-\section{Pipeline}
+\section{\texorpdfstring{Pipeline and the fixed-$S$ convention}{Pipeline and the fixed-S convention}}
 \label{app:pipe}
 
 \begin{figure}[tb]
 \centering
-\figboxw{figures/fig_pipeline_v2_c}{3.0in}{0.64}
-\caption{Pipeline. \textbf{(a)} A held-out image and the crop window. \textbf{(b)} The aligned crop
-as a pmf over $1{,}024$ cells, the pixel $(12,20)$ carrying code $404$, bit $j$ addressing qubit
-$j$. \textbf{(c)} Learned latents at $M = 4$. \textbf{(d)} The circuit. \textbf{(e)} Exact
-simulation, drawn for Eq.~\eqref{eq:affine}; the main arm holds $\theta = \theta^{0} + g(z)$ there.
-\textbf{(f)} Decoding at $S$. \textbf{(g)} Metrics for the linear $M{=}4$ arm.}
+\figbox{figures/fig_pipeline_v2_c}{3.0in}
+\caption{Pipeline. \textbf{(a)} A held-out image and the crop window. \textbf{(b)} The aligned crop as
+a pmf over $1{,}024$ cells, the pixel $(12,20)$ carrying code $404$, bit $j$ addressing qubit $j$.
+\textbf{(c)} Learned latents at $M = 4$. \textbf{(d)} The circuit. \textbf{(e)} Exact simulation,
+drawn for Eq.~\eqref{eq:affine}; the main arm holds $\theta = \theta^{0} + g(z)$. \textbf{(f)}
+Decoding at $S$. \textbf{(g)} Metrics for the linear $M{=}4$ arm.}
 \label{fig:pipe}
 \end{figure}
 
-\section{\texorpdfstring{The fixed-$S$ convention}{The fixed-S convention}}
 \label{app:fixedS}
-
-Table~\ref{tab:fixed} is Table~\ref{tab:main} with the single training-mean intensity every
-pmf-based arm published under, on the same runs; rebuilding those frames from each run's saved crops
-reproduces the published ones exactly, so the two tables differ only in the decode and the comparison
-is paired. On raw Conv2D-MMD$^2$ at $N{=}11$ sampling improves every IQP arm by $0.033$ to $0.041$
-with a paired sd of $0.012$ to $0.020$, the reference-protocol and fixed-basis arms included, while
-making the RBM worse by $0.013 \pm 0.017$; at $N{=}100$ it improves every arm including the RBM
-($0.008 \pm 0.008$). On PDF--JS the paired effect is at most $7\times10^{-4}$ and mixed in sign.
-
-\begin{table}[tb]
-\centering
-\caption{Table~\ref{tab:main} under the fixed intensity, same runs, seeds, units, bold rule and
-floor, the reference-protocol and fixed-basis arms left to the text. The DCGAN has no fixed $S$ to
-swap, so its row is repeated.}
-\label{tab:fixed}
-\scriptsize
-\setlength{\tabcolsep}{2pt}
-\begin{tabular}{lrcccccc}
-\toprule
-& & \multicolumn{3}{c}{$N = 11$} & \multicolumn{3}{c}{$N = 100$} \\
-\cmidrule(lr){3-5}\cmidrule(lr){6-8}
-Model & Params & PDF--JS & MMD$^2$ & MMD$^2_{\mathrm{al}}$ & PDF--JS & MMD$^2$ & MMD$^2_{\mathrm{al}}$ \\
-\midrule
-IQP, linear map $M{=}4$ (flat MMD) & 5{,}164 / 5{,}520 & 3.0\,$\pm$\,0.2 & 8.9\,$\pm$\,0.2 & 2.7\,$\pm$\,0.2 & 2.9\,$\pm$\,0.3 & 7.2\,$\pm$\,0.3 & 2.6\,$\pm$\,0.4 \\
-IQP, linear map $M{=}4$ (paper kernel) & 5{,}164 / 5{,}520 & 0.81\,$\pm$\,0.05 & 9.6\,$\pm$\,0.3 & 7.4\,$\pm$\,0.6 & 1.4\,$\pm$\,0.2 & 11.3\,$\pm$\,0.5 & 10.0\,$\pm$\,0.8 \\
-IQP, non-linear map $M{=}2$ (flat MMD) & 33{,}910 / 34{,}088 & 0.96\,$\pm$\,0.09 & 8.5\,$\pm$\,0.2 & \textbf{2.2}\,$\pm$\,0.2 & 1.9\,$\pm$\,0.2 & 6.8\,$\pm$\,0.1 & 1.8\,$\pm$\,0.2 \\
-IQP, non-linear map $M{=}2$ (paper kernel) & 33{,}910 / 34{,}088 & 0.49\,$\pm$\,0.07 & 8.7\,$\pm$\,0.2 & 5.1\,$\pm$\,0.3 & 0.86\,$\pm$\,0.08 & 9.8\,$\pm$\,0.3 & 6.6\,$\pm$\,0.6 \\
-RBM~\cite{tieleman_2008_training}  & 11{,}510 / 15{,}960 & 1.7\,$\pm$\,0.8 & 6.5\,$\pm$\,0.8 & 11.1\,$\pm$\,3.9 & 0.92\,$\pm$\,0.13 & 5.9\,$\pm$\,0.4 & 8.1\,$\pm$\,2.2 \\
-DCGAN~\cite{radford_2015_unsupervised} & 199{,}837   & 1.1\,$\pm$\,0.6 & 5.1\,$\pm$\,1.5 & 3.9\,$\pm$\,1.0 & \textbf{0.55}\,$\pm$\,0.12 & \textbf{2.2}\,$\pm$\,0.3 & 2.1\,$\pm$\,0.4 \\
-\bottomrule
-\end{tabular}
-\end{table}
+Rerunning Table~\ref{tab:main} with the single training-mean intensity every pmf-based arm published
+under rebuilds the published frames exactly from the same runs, so the two decodes are paired.
+Sampling improves every IQP arm's raw Conv2D-MMD$^2$ at $N{=}11$ by $0.033$ to $0.041$ (paired sd
+$0.012$ to $0.020$) while making the RBM worse by $0.013 \pm 0.017$, which is why the RBM leads the
+non-linear arm there under the fixed intensity ($6.5 \pm 0.8$ against $8.5 \pm 0.2$); at $N{=}100$ it
+improves every arm, the PDF--JS effect is at most $7\times10^{-4}$ and mixed in sign, and the
+flux-aligned effect is below $10^{-8}$. The full table is in the released seed tables.
 
 \section{Latent sweeps and per-class results}
 \label{app:sweeps}
 
-Hidden width matters less than latent width, $H \in \{4,8,16,32\}$ giving flux-aligned $0.029$,
-$0.022$, $0.020$ and $0.019$ at $M{=}4$, $N{=}100$. Each class is scored against its own floor,
-$0.03/0.36/0.31$ for axion, $0.03/0.30/0.32$ for cdm and $0.04/0.45/0.45$ for no sub in the table's
-units. Across $N \in \{10,30,50,70,90,100\}$ the non-linear arm's flux-aligned column runs $0.026$,
-$0.023$, $0.020$, $0.016$, $0.019$, $0.018$ against the RBM's $0.077$ to $0.127$. The mean $\|z\|$ at
-$N{=}11$ is $0.101$ at $M{=}2$ and $0.120$ at $M{=}8$ while the relative residual of the best affine
-fit to $g$ falls from $0.70$ to $0.17$, so $g$ is most nearly linear where it fails, which is
-consistent with a coherence-radius reading but does not establish it.
+Hidden width matters less than latent width, everything from $H{=}16$ up being inside a seed sd, and
+the latent-width sweep is flat over $M \le 4$ before degrading at $M{=}8$ and collapsing at $M{=}16$;
+both full sweeps are in the released seed tables. Across $N \in \{10,30,50,70,90,100\}$ the non-linear arm's raw
+Conv2D-MMD$^2$ falls from $0.062 \pm 0.016$ to $0.024 \pm 0.005$ and the RBM's from
+$0.091 \pm 0.017$ to $0.051 \pm 0.008$, the DCGAN starting ahead at $N{=}10$ ($0.046 \pm 0.017$) and
+ending level, while on the flux-aligned column it runs $0.026$, $0.023$, $0.020$, $0.016$, $0.019$,
+$0.018$ against the RBM's $0.077$ to $0.127$, lowest at every $N$ but only at $N{=}10$ and $N{=}70$
+by more than a seed sd. Retrained inside one class
+(Table~\ref{tab:perclass}, Fig.~\ref{fig:classes}) each class can be generated on its own, which is
+not the same as the model separating them. The mean $\|z\|$ at $N{=}11$ is $0.101$ at $M{=}2$ and
+$0.120$ at $M{=}8$ while the affine residual of $g$ falls from $0.70$ to $0.17$, so $g$ is most
+nearly linear where it fails.
+
+\begin{figure}[tb]
+\centering
+\figboxw{figures/figB_classes_v12}{1.6in}{0.70}
+\caption{One row per substructure class at $N{=}100$, sharing one $0$ to $1$ intensity scale. Left,
+two held-out frames of that class; right, three unconditional samples from the non-linear $M{=}2$ arm
+retrained on that class alone, first two and first three in index order, no selection, seed $0$.}
+\label{fig:classes}
+\end{figure}
 
 \begin{table}[tb]
 \centering
-\caption{Latent-width sweep at $H{=}32$ under the flat MMD, then the same arm retrained inside one
-class; sampled intensity, five seeds, units of Table~\ref{tab:main}.}
-\label{tab:sweeps}
+\caption{Per class, each arm retrained on that class alone and scored against that class's own $200$
+held-out frames; sampled intensity, five seeds, units of Table~\ref{tab:main}. A column reads down a
+class, not across classes. The real-vs-real floors are $0.03 / 0.36 / 0.31$ for axion,
+$0.03 / 0.30 / 0.32$ for cdm and $0.04 / 0.45 / 0.45$ for no sub, in the same units and order.}
+\label{tab:perclass}
 \scriptsize
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{rcccccc}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llcccccc}
 \toprule
-& \multicolumn{3}{c}{$N = 11$} & \multicolumn{3}{c}{$N = 100$} \\
-\cmidrule(lr){2-4}\cmidrule(lr){5-7}
-$M$ & PDF--JS & MMD$^2$ & MMD$^2_{\mathrm{al}}$ & PDF--JS & MMD$^2$ & MMD$^2_{\mathrm{al}}$ \\
+& & \multicolumn{3}{c}{non-linear $M{=}2$} & \multicolumn{3}{c}{linear $M{=}4$} \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-8}
+Class & $N$ & PDF--JS & MMD$^2$ & MMD$^2_{\mathrm{al}}$ & PDF--JS & MMD$^2$ & MMD$^2_{\mathrm{al}}$ \\
 \midrule
-2  & 1.2\,$\pm$\,0.07 & 5.2\,$\pm$\,1.8 & 2.2\,$\pm$\,0.2 & 1.7\,$\pm$\,0.19 & 2.4\,$\pm$\,0.5 & 1.8\,$\pm$\,0.2 \\
-4  & 1.2\,$\pm$\,0.04 & 5.4\,$\pm$\,1.9 & 2.5\,$\pm$\,0.2 & 1.6\,$\pm$\,0.10 & 2.5\,$\pm$\,0.5 & 1.9\,$\pm$\,0.4 \\
-8  & 3.0\,$\pm$\,1.28 & 6.9\,$\pm$\,2.3 & 5.0\,$\pm$\,2.8 & 2.5\,$\pm$\,0.29 & 2.5\,$\pm$\,0.4 & 2.1\,$\pm$\,0.3 \\
-16 & 7.7\,$\pm$\,0.91 & 12.4\,$\pm$\,2.5 & 17.3\,$\pm$\,2.5 & 8.8\,$\pm$\,0.14 & 13.3\,$\pm$\,0.3 & 24.5\,$\pm$\,0.8 \\
-\midrule
-axion & 1.1\,$\pm$\,0.10 & 4.6\,$\pm$\,0.6 & 2.9\,$\pm$\,0.4 & 1.8\,$\pm$\,0.17 & 2.9\,$\pm$\,0.2 & 1.7\,$\pm$\,0.2 \\
-cdm & 0.94\,$\pm$\,0.05 & 4.4\,$\pm$\,0.2 & 2.7\,$\pm$\,0.3 & 1.7\,$\pm$\,0.06 & 2.1\,$\pm$\,0.3 & 1.5\,$\pm$\,0.3 \\
-no sub & 0.98\,$\pm$\,0.10 & 3.1\,$\pm$\,0.9 & 2.4\,$\pm$\,0.6 & 1.7\,$\pm$\,0.10 & 2.3\,$\pm$\,0.4 & 2.1\,$\pm$\,0.3 \\
+axion  & 11  & 1.1\,$\pm$\,0.10 & 4.6\,$\pm$\,0.6 & 2.9\,$\pm$\,0.4 & 3.4\,$\pm$\,0.20 & 4.7\,$\pm$\,0.7 & 2.8\,$\pm$\,0.5 \\
+axion  & 100 & 1.8\,$\pm$\,0.17 & 2.9\,$\pm$\,0.2 & 1.7\,$\pm$\,0.2 & 2.6\,$\pm$\,0.11 & 2.7\,$\pm$\,0.2 & 2.1\,$\pm$\,0.2 \\
+cdm    & 11  & 0.94\,$\pm$\,0.05 & 4.4\,$\pm$\,0.2 & 2.7\,$\pm$\,0.3 & 2.4\,$\pm$\,0.09 & 4.3\,$\pm$\,0.3 & 2.6\,$\pm$\,0.5 \\
+cdm    & 100 & 1.7\,$\pm$\,0.06 & 2.1\,$\pm$\,0.3 & 1.5\,$\pm$\,0.3 & 2.7\,$\pm$\,0.25 & 2.3\,$\pm$\,0.4 & 1.8\,$\pm$\,0.3 \\
+no sub & 11  & 0.98\,$\pm$\,0.10 & 3.1\,$\pm$\,0.9 & 2.4\,$\pm$\,0.6 & 2.6\,$\pm$\,0.22 & 3.5\,$\pm$\,0.8 & 2.6\,$\pm$\,0.1 \\
+no sub & 100 & 1.7\,$\pm$\,0.10 & 2.3\,$\pm$\,0.4 & 2.1\,$\pm$\,0.3 & 2.7\,$\pm$\,0.31 & 2.7\,$\pm$\,0.4 & 2.9\,$\pm$\,0.3 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\section{Replication on the turbulence dataset}
+\section{Turbulence replication, training and evaluation details}
 \label{app:turb}
 
-On the reference paper's own dataset (2D cylinder-wake turbulence D2~\cite{khojasteh_2022_lagrangian},
+On that paper's own dataset (2D cylinder-wake turbulence D2~\cite{khojasteh_2022_lagrangian},
 $n=18$ qubits, 11 anchor snapshots, five seeds) the result is \textbf{not reproduced} under our
 pre-registered convention, the RBM (PDF--JS $0.217 \pm 0.007$) and a 1.2M-parameter DCGAN
 ($0.045 \pm 0.062$) both scoring better than our 31k-parameter IQP ($0.272 \pm 0.004$) on
-\emph{both} metrics. Under a last-write-wins aggregation convention, never specified in that
-paper~\cite{liu_2026_correlation}, our PDF--JS values move towards the published ones without
-reaching them ($0.0324$ and $0.0473$ against $0.0238$ and $0.0221$), and the RBM still scores better.
-Conv2D-MMD$^2$ there does not rank a destroyed image below a trained one, pixel-shuffled ground
-truth already scoring $0.7045 \pm 0.0095$, better than every model in that paper's Table~2.
+\emph{both} metrics. Under a last-write-wins aggregation, never specified in that
+paper~\cite{liu_2026_correlation}, our PDF--JS moves towards the published values without
+reaching them ($0.0324$, $0.0473$ against $0.0238$, $0.0221$), and the RBM still leads.
+Conv2D-MMD$^2$ there does not rank a destroyed image below a trained one, pixel-shuffled ground truth
+scoring $0.7045 \pm 0.0095$, better than every model in that paper's Table~2; that paper notes itself
+that its baselines are not exhaustive and that this metric is no substitute for spectral
+diagnostics~\cite{liu_2026_correlation}.
 
-\section{Training and evaluation details}
 \label{app:arms}
 
-\paragraph{Table conventions.} The $^{\dagger}$ arm runs Algorithm~1~\cite{liu_2026_correlation} on
-our own latent block, the $50$ subsets of Hamming weight at most $2$ whose Walsh coefficients vary
-most over a pool of $2{,}000$ images disjoint from every training and held-out frame, where the
-reference block is the first $50$ in Hamming order; \emph{fixed basis, joint} is that same block
-trained jointly with the core across all $N$ images. Every Params entry is a total at that $N$, the
-shared parameters ($\theta^{0}$ included) plus $N$ per-image latents, so the fixed-basis arms hold
-$974 + 50N$, the learned-direction arms $5{,}120 + MN$ and the RBM $10{,}960 + 50N$, while the DCGAN
-entry is its generator alone and its training-only discriminator adds $53{,}497$. The RBM has $10$
-visible and $1{,}000$ hidden units on the $10$-bit code, each image owning its visible biases and the
-first $40$ hidden biases, and ran $160$k or $80$k steps; the DCGAN builds the crop from a
-$128$-dimensional prior through four transposed convolutions, ran $5$k to $30$k steps and learns its
-own intensity, so neither intensity convention applies to it.
-
-\paragraph{Protocol details.} The paper kernel is the three-bandwidth Gaussian MMD of
-IQPopt~\cite{recio_2025_iqpopt} at $\sigma = \{0.989, 1.729, 2.236\}$, set by that paper's own rule,
-a mean-Pauli-weight heuristic for the smallest, the square root of the median heuristic for the
-largest and
-their root mean square for the middle, since the protocol we replicate~\cite{liu_2026_correlation}
-publishes none for this encoding. The Conv2D-MMD$^2$ bandwidth, fixed once on the held-out
-features and shared by every table except the per-class rows of Table~\ref{tab:sweeps}, which use
-their own class's, is $0.005547$ raw and $0.002558$ flux-aligned, the $20$ floor
-draws come from the $8{,}710$ validation images the held-out split leaves, and the Silverman
+\paragraph{Arms, baselines and protocol.} The $^{\dagger}$ arm runs Algorithm~1 of
+v2~\cite{liu_2026_correlation} on our own latent block, the $50$ subsets of Hamming weight at most
+$2$ whose Walsh coefficients vary most over a disjoint pool of $2{,}000$ images, where the reference
+block is the first $50$ in Hamming order; \emph{fixed basis, joint} is that block trained jointly
+with the core across all $N$ images. Params are totals at that $N$, shared ($\theta^{0}$ included)
+plus $N$ per-image latents, so the fixed-basis arms hold $974 + 50N$, the learned-direction arms
+$5{,}120 + MN$ and the RBM $10{,}960 + 50N$; the DCGAN entry is its generator alone, its
+discriminator adding $53{,}497$. The RBM has $10$ visible and $1{,}000$ hidden units on the $10$-bit
+code, each image owning its visible biases and the first $40$ hidden biases, and ran $160$k or $80$k
+steps; the DCGAN builds the crop from a $128$-dimensional prior through four transposed
+convolutions, ran $5$k to $30$k steps and learns its own intensity. The paper kernel is the three-bandwidth Gaussian MMD
+of~\cite{recio_2025_train} at $\sigma = \{0.989, 1.729, 2.236\}$, with $\sigma_1$ set so the average
+Pauli weight is $2$, $\sigma_3$ the square root of the median heuristic and $\sigma_2$ their root
+mean square, since the protocol we replicate publishes none for this encoding. The Conv2D-MMD$^2$
+bandwidth is $0.005547$ raw and $0.002558$ flux-aligned, fixed once on the held-out features and
+shared by every table except the per-class rows; the $20$ floor draws come from the $8{,}710$
+validation images the held-out split leaves; and the Silverman
 bandwidth~\cite{silverman_1986_density} of the intensity estimate is $14.64$ at $N{=}11$ and $10.36$
-at $N{=}100$. Applying the baselines' validation rule to the IQP arms selects $2$k to $16$k steps and
-moves every Table~\ref{tab:main} cell it changes toward better IQP values without altering any
-comparison in the table, so the fixed $4{,}000$ steps we pre-registered is the conservative choice
-and we keep it; at $20{,}000$ fixed steps both baselines are much worse, so their early stopping is
-load-bearing and is granted throughout.
+at $N{=}100$. The baselines' validation rule applied to the IQP arms selects $2$k to $16$k steps and
+moves every Table~\ref{tab:main} cell it changes toward better IQP values without altering a
+comparison, so our pre-registered $4{,}000$ steps is the conservative choice, and at $20{,}000$ fixed
+steps both baselines are much worse, so their early stopping is load-bearing and granted. Of
+three ablations none moves a generation metric by more than a seed sd.
+A flat-MMD warm start of $\theta^{0}$, making every stage shot-estimable, leaves the flux-aligned
+column at $0.0231$ against $0.0225$ at $N{=}11$; picking the projection restart by correlation rather
+than by fit loss moves the correlation by $0.0003$; and two restarts match eight ($0.901$, $0.977$)
+where one zero-initialised restart reaches $0.838$ and $0.887$. The projection references at $M{=}2$
+are $0.892$ and $0.970$ for the nearest training image and $0.765$ and $0.779$ for the mean crop. Our Conv2D-MMD$^2$ is
+the kernel inception distance~\cite{binkowski_2018_demystifying} with an untrained encoder, we do not
+use the purpose-built generalisation metrics of~\cite{gili_2024_generalization}, and classical
+generation of cosmological images is established~\cite{mustafa_2019_cosmogan}. As Wasserstein-1
+distance in ring radius and the two ellipticity components the main arm is at
+$0.82 / 0.33 / 0.35$ at $N{=}11$ against $3.23 / 0.46 / 0.24$ (RBM), $1.67 / 0.62 / 0.40$ (DCGAN) and
+$0.10 / 0.17 / 0.10$ between two real sets; at $N{=}100$ the DCGAN is closest, $0.40 / 0.28 / 0.15$
+against $1.01 / 0.31 / 0.14$. Retraining the same DCGAN configuration at the same seed moves its raw
+Conv2D-MMD$^2$ by $5$ to $57\%$ and its PDF--JS by $2$ to $74\%$, which is what we mean by the one
+arm that is not bit-reproducible.
 
-\paragraph{Ablations.} Three settings of the main arm were varied and none moves a generation metric
-by more than a seed sd. A flat-MMD warm start of $\theta^{0}$ in place of the exact-KL one, making
-every stage shot-estimable, leaves flux-aligned Conv2D-MMD$^2$ at $0.0231$ against $0.0225$ at
-$N{=}11$; picking the projection restart by correlation rather than by the fit's own loss moves the
-correlation by $0.0003$; and two restarts match eight, only the zero-initialised restart losing
-correlation (Sec.~\ref{sec:latent}).
+\section{\texorpdfstring{Qubit count, the reference paper's Fig.~4, and the departures in full}{Qubit count, the reference paper's Fig. 4, and the departures in full}}
+\label{app:nsweep}
+
+The qubit count has to match the effective resolution, a choice the reference paper does not face at
+$n=18$ on a field of tuples. At $n=8$ the $16\times16$ pmf averages the ring away and the fixed
+bilinear upsampling cannot put it back, so the flux-aligned error is more than twice the $n=10$
+value; at $n=12$ about three quarters of the $4{,}096$ cells carry background rather than lens light,
+the arm learns that background and becomes unstable across seeds, its $N{=}100$ PDF--JS reaching
+$92 \pm 71$ with a spread as large as the mean. We therefore work at $n=10$.
+
+\begin{table}[!ht]
+\centering
+\caption{Qubit ladder at $N{=}11$, five seeds, units of Table~\ref{tab:main}. The flux-aligned column
+is invariant to the intensity convention (App.~\ref{app:fixedS}) and compares across rows; the other
+two are under the fixed intensity except the $n=8$ row, marked $^{*}$. The latent map differs by row,
+so this is a ladder of encodings, not a sweep of $n$ alone.}
+\label{tab:nsweep}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{clcrccc}
+\toprule
+$n$ & Encoding & Latent map & Params & PDF--JS & MMD$^2$ & MMD$^2_{\mathrm{al}}$ \\
+\midrule
+8  & $16\times16$ pmf, bilinear upsampling & MLP $H{=}8$, $M{=}2$  & 2{,}350  & 1.7\,$\pm$\,0.05$^{*}$ & 8.0\,$\pm$\,1.7$^{*}$ & 5.1\,$\pm$\,0.3 \\
+10 & $32\times32$ aligned crop pmf         & MLP $H{=}32$, $M{=}2$ & 33{,}910 & 1.0\,$\pm$\,0.1 & 8.5\,$\pm$\,0.2 & \textbf{2.3}\,$\pm$\,0.2 \\
+12 & whole $64\times64$ frame as one pmf   & linear, $M{=}4$       & 20{,}524 & 43\,$\pm$\,30 & 23.3\,$\pm$\,8.8 & 18.4\,$\pm$\,11.3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Re-running that paper's Fig.~4 over five SPSA seeds, its positive low-$\qcli$ coupling
+($\qcli \le 0.3$) reproduces at every size and in every seed, Spearman $+0.92 \pm 0.10$,
+$+0.91 \pm 0.04$ and $+0.96 \pm 0.01$ at $n = 8$, $12$, $16$, while above that range the sign of the
+global coefficient changes from seed to seed.
+
+\label{app:diffs}
+
+\begin{table}[!b]
+\centering
+\caption{Every place our protocol departs from the one we replicate, with the property of the data
+that drove it; none of them is a tuning result.}
+\label{tab:diffs}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{p{0.115\textwidth}p{0.245\textwidth}p{0.255\textwidth}p{0.275\textwidth}}
+\toprule
+& Reference protocol & This paper & Property of the data \\
+\midrule
+Encoding &
+18-bit $(x,y,\mathrm{intensity})$ tuples, many per snapshot &
+one 10-bit pmf over $1{,}024$ cells of an aligned $32\times32$ crop &
+the raw intensity axis carries barely one bit and $99.4\%$ of the light is inside the crop \\
+Latent &
+a fixed block of $50$ phases, the first in Hamming order &
+a learned map, linear $\Phi^{\!\top} z$ or a $\tanh$ $g(z)$ &
+on static images fixed directions cross-fade pixels instead of moving ring structure \\
+Training &
+core fitted on one anchor, then each sample adapted in sequence &
+core and all $N$ latents trained jointly, $4{,}000$ Adam steps &
+with at most $100$ static frames there is no stream to adapt along \\
+Objective &
+multi-bandwidth Gaussian MMD estimated from samples &
+flat MMD as the main arm, that kernel kept as a secondary one &
+at $n=10$ the pmf is exact, so sampling noise would be a choice \\
+Flux &
+every decoded frame carries the training-set mean total &
+$S$ drawn per image from a density estimate of the $N$ totals &
+real crops spread by about a quarter of their mean, which one $S$ cannot reproduce \\
+Evaluation &
+held-out times, that paper's own metrics &
+$200$ held-out frames fixed across arms and seeds, bins and bandwidth set on them alone &
+the images are static, so time cannot be held out \\
+Baselines &
+compared at a fixed budget &
+RBM and DCGAN early-stopped on $200$ validation frames, IQP arms not &
+the baselines converge at very different step counts, so one budget would favour us \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \end{document}

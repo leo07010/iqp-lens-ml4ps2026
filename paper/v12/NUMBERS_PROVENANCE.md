@@ -306,3 +306,175 @@ Content removed to hold 7 pages (4 + references + 2).
 | Figure 4 (data scaling, `figA_scaling_v12`) | endpoints are in Sec. 3.3 and the full six-point flux-aligned series is now written out in App. C |
 | `\cite{hinton_2002_training}` and `\cite{alexander_2021_decoding}` | the RBM is trained with PCD-1 (Tieleman 2008), and DeepLense provenance is carried by `alexander_2020_deep` plus the dataset citation `ml4sci_deeplense`. Dropping two entries was needed to keep the bibliography on page 5 |
 | `\cite{codsi_2025_classically}` | replaced by `maslov_2024_fast` on the citation review's finding that Codsi does not restore classical simulability; the bib entry is kept (with number and doi added) but is no longer cited |
+
+---
+
+## 2026-09-11 second revision (figures restored at full width, appendix filled)
+
+Layout change. Main text still ends on page 4; references run from page 5 into the top of page 6
+(uncounted per the submission spec); the appendix runs page 6 to page 9. Both previously deleted
+figures are back at `\linewidth`, and the two previously dropped citations (`hinton_2002_training`,
+`alexander_2021_decoding`) are restored.
+
+Figure regeneration for the "no figure text below 7 pt" rule. `fig2_v12_msweep.py` and
+`figA_scaling_v12.py` were re-run with per-script rcParams (`xtick/ytick.labelsize` 6.5 -> 7,
+`legend.fontsize` 6 -> 7) and with their explicit `fontsize=5.0/5.2/5.4/5.6` calls raised to 7.0;
+heights went 2.15 in -> 2.85 in and 2.15 in -> 2.75 in so nothing collides. `figA_scaling_v12`'s
+in-figure 5 pt footnote is deleted from the figure and its content now lives in the LaTeX caption;
+that footnote was what stretched the saved bounding box to 7.9 in and made LaTeX shrink the whole
+panel to 0.70 scale. Backups: `figures/*.py.backup-20260911`, `figures/*.pdf.bak-20260911`,
+`v12/figures/*.pdf.backup-20260911`. Rendered minimum base font at the placed width is now
+7.11 pt (fig1), 7.27 pt (fig2), 7.29 pt (figA), 7.48 pt (pipeline), 7.96 pt (figB); the only text
+below 7 pt anywhere is mathtext sub/superscripts, which TeX and matplotlib both set at about
+0.73 of the base size.
+
+New figure. `figures/figB_classes_v12.py` is `figB_classes_c.py` with `FB.OUT_TREE` and
+`FB.RUN_FMT` pointed at the non-linear per-class runs
+`<WORK>/gsoc_iqp_mlpsuite/phase2/s0/<class>_mlp_M2_H32_n100`, so the samples shown are the
+`IQP-mlpH32-M2-MMDflat-resample` arm of Table 2 retrained inside one class, not the v11 linear arm
+that `figB_classes_c.pdf` draws. Selection rule inherited unchanged, first two held-out and first
+three generated frames in index order, seed 0, shared 0-1 colour scale.
+
+New numbers.
+
+| number | where | source |
+|---|---|---|
+| Table 5 row $n=8$: 1.7 +- 0.05, 8.0 +- 1.7, 5.1 +- 0.3, Params 2,350 | App. F | `seed_tables_e.md`, row `lowres8, mlpH8, M=2, flat, flux=resample`, N=11: 0.00167 +- 5.052e-05 / 0.08007 +- 0.01673 / 0.05109 +- 0.003043, Params column 2,350. Columns are `PDF-JS, MMD2, MMD2_u, MMD2_al` (header at `seed_tables_e.md:30`), so the paper's MMD2_al is that file's 4th numeric column. Sampled S, marked with a dagger in the table |
+| Table 5 row $n=10$: 1.0 +- 0.1, 8.5 +- 0.2, 2.3 +- 0.2, Params 33,910 | App. F | `seed_tables_d.md` section 1, row `IQP-mlpH32-M2 (fixed 4k)`, N=11: 0.0010 +- 0.0001 / 0.0851 +- 0.0019 / 0.0225 +- 0.0018. Same evaluator as the $n=12$ row, fixed S |
+| Table 5 row $n=12$: 43 +- 30, 23.3 +- 8.8, 18.4 +- 11.3, Params 20,524 | App. F | `seed_tables_d.md` section 1, row `IQP-n12-affine-M4 (fixed 4k)`, N=11: 0.0433 +- 0.0300 / 0.2328 +- 0.0879 / 0.1841 +- 0.1128 |
+| $n=12$ at $N=100$, PDF-JS 92 +- 71 | App. F text | same table, N=100 row: 0.0921 +- 0.0711 |
+| Fig. 4 replication, Spearman +0.92 +- 0.10 / +0.91 +- 0.04 / +0.96 +- 0.01 at $n = 8, 12, 16$ | App. F text | `seed_tables_b.md` section 4, column "rho for I_QCLI <= 0.3, per-seed": +0.9159 +- 0.0987, +0.9051 +- 0.0440, +0.9554 +- 0.0105 over 5 SPSA seeds. The global coefficient's sign is seed-dependent in the same table (per-seed lists for n = 8 and n = 12), which is what the second sentence says |
+
+Bibliography. `rajakumar_2024_polynomial` lost its now-redundant `note = {arXiv:2403.14607}`, since
+the entry carries the SODA 2025 venue, pages and DOI.
+
+Relocation, not deletion. The "Data scaling and per-class training" paragraph moved from Section 3.3
+into App. C, where the scaling figure and the per-class table already live; Section 3.3 keeps a
+one-line pointer. This was the space that restoring Figure 1 to full width needed in order to keep
+the main text inside four pages. Its numbers are unchanged and the flux-aligned series
+(0.026, 0.023, 0.020, 0.016, 0.019, 0.018 against the RBM's 0.077 to 0.127, from `seed_tables_g.md`
+section 3) is now written out alongside them.
+
+---
+
+## 2026-09-11 third revision (appendix filled to four pages)
+
+Float map of the final build: Fig. 1 (map + samples, main text), Fig. 2 (pipeline, App. A),
+Fig. 3 (latent width, App. C), Fig. 4 (scaling, App. C), Fig. 5 (per-class samples, App. C),
+Table 1 (map, main), Table 2 (baselines, main), Table 3 (fixed S, App. B), Table 4 (M sweep on top,
+H sweep below, App. C), Table 5 (per class, App. C), Table 6 (scaling, App. C), Table 7 (qubit
+ladder, App. F), Table 8 (departures, App. G).
+
+| number | where | source |
+|---|---|---|
+| Table 4 upper block, M = 1, 3, 6 rows | App. C | `seed_tables_g.md` section 2 (resampled S), M=1: 0.001128 +- 6.546e-05 / 0.05169 +- 0.01756 / 0.02366 +- 0.004649 (N=11) and 0.00127 +- 9.108e-05 / 0.0233 +- 0.004082 / 0.01876 +- 0.002453 (N=100); M=3: 0.001184 / 0.05304 / 0.02398 and 0.001669 / 0.02569 / 0.01884; M=6: 0.001432 / 0.05551 / 0.02837 and 0.001769 / 0.0263 / 0.02049. Params 33,867 (M=1) to 34,512 (M=16) at N=11, same section |
+| Table 4 lower block, H = 4, 8, 16, 32 | App. C | `seed_tables_f.md` section 2 (fixed S, v11 evaluator), H=4: 0.0042 +- 0.0009 / 0.0955 +- 0.0061 / 0.0385 +- 0.0098 (N=11) and 0.0033 / 0.0722 / 0.0290 (N=100); H=8: 0.0017 / 0.0881 / 0.0282 and 0.0023 / 0.0706 / 0.0219; H=16: 0.0010 / 0.0866 / 0.0253 and 0.0020 / 0.0701 / 0.0197; H=32: 0.0009 / 0.0866 / 0.0249 and 0.0018 / 0.0700 / 0.0193. Params 5,184 to 33,996 at N=11. The caption says the block is under the fixed intensity |
+| Table 5, per class, both arms | App. C | `seed_tables_g.md` section 4 (resampled S), MLP and affine columns at N=11 and N=100 for axion / cdm / no_sub, verbatim in the paper's units |
+| Table 5 caption, per-class floors 0.03/0.36/0.31, 0.03/0.30/0.32, 0.04/0.45/0.45 | App. C | same section, the three *floor (200 vs 200)* rows: 3.165e-05 / 0.003599 / 0.003068 (axion), 3.41e-05 / 0.003024 / 0.003166 (cdm), 3.519e-05 / 0.004462 / 0.004463 (no_sub) |
+| Table 6, scaling, non-linear / linear / RBM columns | App. C | `seed_tables_g.md` section 3 (resampled S), the MLP, affine and RBM raw and aligned columns at N = 10, 30, 50, 70, 90, 100 |
+| Table 6, scaling, DCGAN column | App. C | `seed_tables.md`, "Figure 5 -- data scaling": 0.04651 +- 0.01939 / 0.05093 +- 0.009273 at N=10 down to 0.02045 +- 0.00254 / 0.02222 +- 0.004382 at N=100. The DCGAN learns its own per-image flux, so this row is the same under either convention, which the caption states |
+| mean training crop projection reference 0.765 (N=11), 0.779 (N=100) | App. E | `results_seeds_mlp_suite_es.jsonl`, arm `IQP-mlpH32-M2-MMDflat-resample`, field `ref_projection_mean_crop_corr` = 0.7653 / 0.7789, identical across seeds |
+| Wasserstein-1 shape distances | App. E | `results_seeds_table2.jsonl` fields `w1_radius`, `w1_e1`, `w1_e2`, means over seeds 0-4: RBM 3.234 / 0.460 / 0.240 (N=11) and 1.143 / 0.377 / 0.470 (N=100); DCGAN 1.667 / 0.621 / 0.402 and 0.404 / 0.283 / 0.148; `HOLDOUT split-half` 0.102 / 0.171 / 0.100 at both sizes. The main arm is `results_seeds_mlp_suite_es.jsonl`, `kind = mlpsuite_fixed_steps`, same arm: 0.816 / 0.331 / 0.353 (N=11) and 1.013 / 0.308 / 0.144 (N=100). All under the fixed-intensity decode of `evaluate_lens.py` |
+| DCGAN repeat-run spread, raw MMD2 5 to 57%, PDF-JS 2 to 74% | App. E | `seed_tables.md`, "Repeat runs of an identical configuration": all seven DCGAN-32 conv_mmd2 gaps at seed 0 are 17.9 / 28.6 / 34.3 / 57.0 / 11.9 / 4.6 / 38.5% (min 4.6 rounds to 5, max 57.0) and the pdf_js gaps are 1.9 / 30.5 / 74.1 / 33.2 / 2.9 / 44.7 / 20.3% (min 1.9 rounds to 2, max 74.1 rounds to 74). An earlier draft quoted 12 as the lower bound, from reading only the first five rows |
+| restart and warm-start ablation numbers | App. E | `seed_tables_g.md` section 5b: baseline proj 0.9016 / 0.9773, one restart 0.8381 / 0.8871, two restarts 0.9010 / 0.9772, pick-by-loss 0.9013 / 0.9773, flat-MMD warm start MMD2_al 0.0231 / 0.01775 against the baseline's 0.02247 / 0.01812 |
+| Table 8, departures | App. G | no numbers; each row restates a choice already in Sec. 2 and names the property of the data behind it |
+
+Space bookkeeping. To hold ten pages the H sweep was merged into Table 4 as a second block rather
+than kept as its own float, the per-class floors moved from three table rows into the caption, and
+the captions of Figs. 3-5, Table 7 and the App. B, App. D and App. E paragraphs were tightened. No
+number was dropped in the process.
+
+---
+
+## 2026-09-11 citation round
+
+Blocking fix. The three-bandwidth Gaussian MMD rule is **not** IQPopt's. IQPopt
+(`recio_2025_iqpopt`, arXiv:2501.04776) uses a single median-heuristic bandwidth; the verbatim rule
+we follow is in `recio_2025_train` (arXiv:2503.02934), "sigma_1 is such that the average Pauli weight
+of Z_a is 2, sigma_3 is the square root of the median heuristic, and sigma_2 = sqrt((sigma_1^2 +
+sigma_3^2)/2)", with the loss averaged over the three. Both the Setup definition of the paper kernel
+and App. E's protocol paragraph now cite `recio_2025_train`; `recio_2025_iqpopt` is cited once, in
+the intro, as the software implementing the train-classically-deploy-on-quantum framework.
+
+Other fixes. `khojasteh_2022_lagrangian` first author is `Rahimi Khojasteh, Ali` (Crossref/Elsevier).
+The Discussion no longer attributes the sparsification argument to a hardness regime: it now reads
+"scaling up would need them sparsified", which is what `liu_2026_correlation` actually argues
+(hardware connectivity, resources, learnability). Added DOIs to `bremner_2016_average`,
+`chow_1968_approximating`, `walsh_1923_closed` and `alexander_2020_deep`; added `eprint` to
+`rajakumar_2024_polynomial`; `liu_2026_correlation` primaryclass corrected to `cs.LG`.
+
+Eight references added, each checked online before being written into `refs.bib`.
+
+| key | title | verified at | cited at |
+|---|---|---|---|
+| `liu_2018_differentiable` | Differentiable learning of quantum circuit Born machines, Phys. Rev. A 98, 062324 (2018) | arxiv.org/abs/1804.04168, doi 10.1103/PhysRevA.98.062324 | main.tex:81, the MMD-trained Born machine lineage |
+| `benedetti_2019_generative` | A generative modeling approach for benchmarking and training shallow quantum circuits, npj QI 5, 45 (2019) | arxiv.org/abs/1801.07686, doi 10.1038/s41534-019-0157-8 | main.tex:81, same sentence |
+| `coyle_2020_born` | The Born supremacy: quantum advantage and training of an Ising Born machine, npj QI 6, 60 (2020) | arxiv.org/abs/1904.02214, doi 10.1038/s41534-020-00288-9 | main.tex:81, same sentence. The paper calls its circuits Ising-Hamiltonian-derived, not IQP, so our sentence claims only the MMD-trained Born machine lineage |
+| `cerezo_2025_does` | Does provable absence of barren plateaus imply classical simulability? Nat. Commun. 16, 7907 (2025) | arxiv.org/abs/2312.09121, doi 10.1038/s41467-025-63099-6 | main.tex:78, "trainability itself pulls towards simulability", next to the noise and classical-algorithm caveats |
+| `binkowski_2018_demystifying` | Demystifying MMD GANs, ICLR 2018 | arxiv.org/abs/1801.01401 | main.tex:149 (metric definition) and 500 (App. E, our Conv2D-MMD2 is KID's construction with an encoder that is not pre-trained) |
+| `smolensky_1986_information` | Information processing in dynamical systems: foundations of harmony theory, in Parallel Distributed Processing vol. 1, MIT Press, 194-281 | MIT Press book record, cross-checked against Semantic Scholar and the PDP volume listing | main.tex:145, origin of the RBM baseline |
+| `mustafa_2019_cosmogan` | CosmoGAN: creating high-fidelity weak lensing convergence maps using generative adversarial networks, Comput. Astrophys. Cosmol. 6, 1 (2019) | arxiv.org/abs/1706.02390, doi 10.1186/s40668-019-0029-9 | main.tex:503, classical generative models for cosmological images. The v1 arXiv title differs; the published title is used |
+| `gili_2024_generalization` | Generalization metrics for practical quantum advantage in generative models, Phys. Rev. Applied 21, 044032 (2024) | arxiv.org/abs/2201.08770, doi 10.1103/PhysRevApplied.21.044032 | main.tex:501, purpose-built generalisation metrics exist and we do not use them |
+
+Two candidates were checked and not used. `gili_2023_doqcbms` (arXiv:2207.13645) and
+`hibatallah_2024_framework` (arXiv:2303.15626) apply the generalisation framework rather than
+proposing it, so the original proposal is cited instead.
+
+---
+
+## 2026-09-11 Liu-group IQP citations
+
+Four papers by Chen-Yu Liu's group are now all cited, with the BibTeX supplied pre-verified against
+arXiv. `plain` prints only `note`, so every entry keeps its `note = {arXiv:...}` field.
+
+| key | eprint | cited at | what the sentence claims |
+|---|---|---|---|
+| `liu_2026_correlation` | 2603.06440 | intro, Sec. 3.1, Discussion, App. D, App. E | the map and the latent-adaptation protocol we replicate; `primaryclass` corrected to cs.LG |
+| `liu_2026_physics` | 2607.28866 | main.tex:93 | the follow-up initialises the same fixed Walsh latent block from a physics-informed surrogate, where we instead learn the directions, two answers to one bottleneck. Previously present in refs.bib but never cited; `note` added |
+| `placidi_2026_connectivity` | 2604.12635 | main.tex:299 | in the no-quantum-advantage sentence, that any deployed margin is still bounded by qubit connectivity and the noise threshold |
+| `lizziobosco_2026_pauli` | 2607.20409 | main.tex:79 | beside `recio_2025_iqpopt`, as a use of the same classically computable expectation-value structure outside generative modelling |
+
+Not cited, deliberately: the same-name neutron-physics papers by a different Chen-Yu Liu, and the
+Quantum-Train / QLSTM / tensor-network line, which is not IQP work.
+
+Main-text space for these three sentences came from eight one-clause tightenings (abstract,
+Sec. 2 Model and Decoding, Sec. 3.1, Sec. 3.2, Sec. 3.3, Discussion); no number or claim was removed.
+
+---
+
+## 2026-09-11 appendix compression (three-page cap)
+
+Removed from the paper to fit the appendix cap. Every number below is unchanged and still
+traceable in the released seed tables; nothing was recomputed.
+
+| removed | where the numbers still live |
+|---|---|
+| Fig. 4, the data-scaling figure | `seed_tables_g.md` section 3 (resampled S) and `seed_tables.md` "Figure 5 -- data scaling" (DCGAN). The six flux-aligned values and both endpoints are written out in App. C |
+| Fig. 3, the latent-width figure | `seed_tables_f.md` section 1b (N=20 projection sweep) and `seed_tables_g.md` section 2 (M sweep). Sec. 3.2 keeps 0.906 / 0.738 / 0.218, 0.9368 to 0.9519 and the 0.9339 reference |
+| Table, fixed-S version of Table 2 | `seed_tables_g.md` section 1, "fixed S" columns. App. B keeps the paired deltas and the RBM-leads fact, and Sec. 3.3 keeps 6.5 +- 0.8 against 8.5 +- 0.2 |
+| Table, M and H sweeps | `seed_tables_g.md` section 2 (M, resampled S) and `seed_tables_f.md` section 2 (H, fixed S). App. C keeps the shape of both sweeps in one sentence |
+| Table, data scaling | `seed_tables_g.md` section 3 and `seed_tables.md` "Figure 5"; the non-linear arm's six flux-aligned values and the RBM range are in App. C |
+
+Kept, as the user asked: the pipeline figure, the per-class sample figure, the per-class table, the
+qubit-ladder table and the departures table.
+
+---
+
+## 2026-09-11 final geometry
+
+Nine pages. Main text p1-4 (unchanged in this round), references p5-p6, appendix p6 (from y=621)
+through p9. The appendix runs three full pages plus a 101 pt tail at the bottom of p6, which is the
+section heading and the fixed-$S$ paragraph.
+
+Appendix sections were merged to save headings, without moving content between them.
+
+| final section | absorbed |
+|---|---|
+| A. Pipeline and the fixed-$S$ convention | old A (pipeline) + old B (fixed $S$) |
+| B. Latent sweeps and per-class results | old C, unchanged |
+| C. Turbulence replication, training and evaluation details | old D + old E |
+| D. Qubit count, the reference paper's Fig. 4, and the departures in full | old F + old G |
+
+Labels `app:pipe`, `app:fixedS`, `app:sweeps`, `app:turb`, `app:arms`, `app:nsweep` and `app:diffs`
+are all retained, so every `\ref` in the main text still resolves; several now point at the same
+merged section, which is intended.
