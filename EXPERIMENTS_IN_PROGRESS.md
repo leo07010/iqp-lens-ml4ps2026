@@ -1,5 +1,7 @@
 # Experiments in progress (2026-09-09 evening)
 
+> **Status (2026-11-02): all experiments below have finished and their results are in this repo** (`results/`, `paper/seed_tables/`). This file is kept as a record of how the v12 campaign was run.
+
 Two exploratory runs were launched after v11 was frozen. Neither changes `paper/v11/`.
 Their outputs are synced into this repo when they finish; if you are reading this before
 that happened, the raw results live on the cluster under

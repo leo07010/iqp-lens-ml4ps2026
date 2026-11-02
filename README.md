@@ -1,4 +1,6 @@
-> **Current version: [`paper/v12/main.pdf`](paper/v12/main.pdf)** (9 pages: 4 body, references, 3 appendix; non-linear latent map as the main arm, sampled flux, five seeds; claims, citations and figures checked in three independent review passes, see paper/v12/CITATION_CHECK.md and REFS_VERIFICATION.md). `paper/v11/main.pdf` is the previous five-seed version and (five seeds, mean ± sd, metric protocol v11, baselines with validation early stopping). `paper/main.pdf` is the superseded **v10** (single seed, legacy metric protocol, baselines at a fixed 20,000 steps) and is kept only for the record; its Table 2 differs from v11 for those three reasons.
+> **Current version: [`paper/v13/main.pdf`](paper/v13/main.pdf)** (9 pages: 4 body, references, appendix). v13 rewrites the prose of v12 and keeps its numbers, citations, figures and claims. Sentences are shorter, repeated points are removed, and numbers that sat in sentences now sit in tables (Table 2 lead rows, Tables 3, 4 and 6). A marked-up comparison against v12 is in [`paper/v13/diff.pdf`](paper/v13/diff.pdf).
+>
+> Previous version: [`paper/v12/main.pdf`](paper/v12/main.pdf) (9 pages: 4 body, references, 3 appendix; non-linear latent map as the main arm, sampled flux, five seeds; claims, citations and figures checked in three independent review passes, see paper/v12/CITATION_CHECK.md and REFS_VERIFICATION.md). `paper/v11/main.pdf` is the previous five-seed version and (five seeds, mean ± sd, metric protocol v11, baselines with validation early stopping). `paper/main.pdf` is the superseded **v10** (single seed, legacy metric protocol, baselines at a fixed 20,000 steps) and is kept only for the record; its Table 2 differs from v11 for those three reasons.
 
 # IQP generative modeling of strong-lensing images — code release
 
@@ -20,7 +22,8 @@ repository.
 paper/      the submission itself, in all three revisions that were compiled:
             paper/          v10 (superseded, single seed, legacy metrics)
             paper/v11/      v11 (five seeds, metric protocol v11)
-            paper/v12/      v12 (current: non-linear latent map, sampled flux)
+            paper/v13/      v13 (current: prose revision of v12, same results)
+            paper/v12/      v12 (non-linear latent map, sampled flux)
             each holds main.tex, main.pdf, refs.bib, the NeurIPS style files,
             NUMBERS_PROVENANCE.md and its own figures/ directory
             paper/seed_tables/  the seed-aggregated tables (seed_tables*.md)
